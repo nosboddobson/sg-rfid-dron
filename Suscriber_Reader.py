@@ -7,7 +7,14 @@ import pandas as pd
 from EpcTranslator import EpcTranslator
 from Services import FileService as files
 from Services import PublisherService as publisher
+import logging
 
+# Configuración básica del logging
+logging.basicConfig(
+    filename='/log/mi_programa.log',  # Ruta al archivo de log
+    level=logging.DEBUG,                  # Nivel de logging (puede ser DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    format='%(asctime)s %(levelname)s:%(message)s'  # Formato del log
+)
 # Create a dictionary to store EPC and its details
 epc_data = {}
 
@@ -123,7 +130,7 @@ def get_reads():
 
 if __name__ == '__main__':
     print("main")
-    
+    logging.info('Suscriber Reader start')
     publisher.send_dron_csv()        
     get_reads()
     
