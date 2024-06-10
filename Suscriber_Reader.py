@@ -2,72 +2,75 @@ import socket
 import MessageTran as mt
 import RealTimeInventoryResponse as invResponse
 import time
-from EpcTranslator import EpcTranslator
+import pandas as pd
 
-# Crear un diccionario para almacenar los EPC y su contador
-epc_counts = {}
+from EpcTranslator import EpcTranslator
+from Services import FileService as files
+from Services import PublisherService as publisher
+
+# Create a dictionary to store EPC and its details
+epc_data = {}
 
 def calculate_frequency_and_antenna(value):
-       # Convertir el entero en bytes
+    # Convert the integer to bytes
     bytes_data = value.to_bytes(2, byteorder='big')
 
-    # Convertir bytes_data a un entero
+    # Convert bytes_data to an integer
     int_data = int.from_bytes(bytes_data, byteorder='big')
 
-    # Obtener el parámetro de frecuencia y el ID de la antena
-    freq_param = (int_data >> 2) & 0b111111  # Obtener los 6 bits más altos
-    antenna_id = int_data & 0b11  # Obtener los 2 bits más bajos
+    # Get the frequency parameter and antenna ID
+    freq_param = (int_data >> 2) & 0b111111  # Get the highest 6 bits
+    antenna_id = int_data & 0b11  # Get the lowest 2 bits
 
-    # Calcular la frecuencia en MHz y ajustarla según sea necesario
-    freq_mhz = 860 + (freq_param)
+    # Calculate the frequency in MHz and adjust as needed
+    freq_mhz = 860 + freq_param
 
     return freq_mhz, antenna_id
 
 def rssi_data(rssi):
-    r = rssi
-    return r*-1
+    return rssi * -1
 
 def pc_data(bytes_data):
-    # Convertir los bytes a una cadena hexadecimal
+    # Convert the bytes to a hexadecimal string
     hex_str = bytes_data.hex()
 
-    # Separar la cadena hexadecimal en grupos de dos caracteres
+    # Separate the hexadecimal string into groups of two characters
     formatted_str = ' '.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)])
 
     return formatted_str
 
-
 def send_message(btAryTranData):
-    # Configuración de la conexión al lector
-    ip = '192.168.1.200'  # Dirección IP del lector
-    port = 4001           # Puerto del lector
-    buffer_size = 4096    # Tamaño del buffer de recepción
+    # Connection settings to the reader
+    ip = '192.168.1.200'  # Reader's IP address
+    port = 4001           # Reader's port
+    buffer_size = 4096    # Receive buffer size
 
-    # Crear un socket TCP/IP
+    # Create a TCP/IP socket
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     try:
-        # Conectar al lector
+        # Connect to the reader
         client_socket.connect((ip, port))
 
-        # Enviar los datos al lector
+        # Send the data to the reader
         client_socket.sendall(btAryTranData)
 
-        # Recibir la respuesta del lector
+        # Receive the response from the reader
         response = client_socket.recv(buffer_size)
 
-        # Procesar la respuesta (código de respuesta, datos, etc.)
-        # En este ejemplo, simplemente se devuelve la respuesta como está
+        # Process the response (response code, data, etc.)
+        # In this example, simply return the response as is
         return response
 
     finally:
-        # Cerrar la conexión
+        # Close the connection
         client_socket.close()
 
-if __name__ == '__main__':
-    print("main")
-    while 1==1:
-        # Ejemplo de uso
+
+def get_reads():
+
+    while True:
+        # Example usage
         btReadId = 0xFF
         btCmd = 0x89
         btAryData = [0x01, 0x02, 0x03, 0x04]
@@ -75,38 +78,55 @@ if __name__ == '__main__':
         msgTran = mt.MessageTran(btReadId, btCmd, btAryData)
         time.sleep(0.5)
         result = send_message(msgTran.AryTranData)
-        if len(result) <= 10:  # Comprobar si la longitud es menor que 4 bytes
-            print("Paquete de datos incompleto. Continuando con la próxima iteración.")
+
+        if len(result) <= 10:  # Check if the length is less than 4 bytes
+            print("Incomplete data packet. Continuing with the next iteration.")
             continue
+
         try:
-            # Crear una instancia de RealTimeInventoryResponse con el resultado recibido
+            # Create an instance of RealTimeInventoryResponse with the received result
             response = invResponse.RealTimeInventoryResponse(result)
 
-            # Acceder a los campos interpretados de la respuesta
-            print("btPacketType:", response.btPacketType)
-            print("btDataLen:", response.btDataLen)
-            print("btReadId:", response.btReadId)
-            print("btCmd:", hex(response.btCmd))
-            value = response.freq_ant_list[0]  # Ejemplo de valor entero que representa los bytes
+            # Access interpreted fields of the response
+            value = response.freq_ant_list[0]  # Example integer value representing bytes
             freq_mhz, antenna_id = calculate_frequency_and_antenna(value)
-            print(f"Frecuencia en MHz: {freq_mhz}, ID de Antena: {antenna_id+1}")
-            print("PC List:",  pc_data(response.pc_list[0])) #"response.pc_list"
-        
-            epc = EpcTranslator.getData(response.epc_list[0])
-            print("EPC List:", epc)
-            print("RSSI List:", rssi_data(response.rssi_list[0]))
-            print("-------")
+            pc_list = pc_data(response.pc_list[0])
 
-            # Incrementar el contador del EPC en el diccionario
-            if epc in epc_counts:
-                epc_counts[epc] += 1
+            epc = EpcTranslator.getData(response.epc_list[0])
+            rssi = rssi_data(response.rssi_list[0])
+
+            # Update the EPC data in the dictionary
+            if epc in epc_data:
+                epc_data[epc]['Read Count'] += 1
             else:
-                epc_counts[epc] = 1
-            if epc == "00":
-                a = 1
-            # Imprimir el contador actualizado del EPC
-            print(f"Veces leído: {epc_counts[epc]}")
+                epc_data[epc] = {
+                    
+                    "Frequency (MHz)": freq_mhz,
+                    "Antenna ID": antenna_id + 1,
+                    "PC List": pc_list,
+                    "RSSI List": rssi,
+                    "Read Count": 1
+                }
+
+
+            files.write_file(epc, freq_mhz, antenna_id + 1, pc_list, rssi,  epc_data[epc]['Read Count'])
+
         except IndexError:
-            print("Ocurrió un IndexError. Continuando con la próxima iteración.")
+            print("An IndexError occurred. Continuing with the next iteration.")
             continue
- 
+
+        # Example of how to end the loop and display the stored data as a table
+        if len(epc_data) >= 1:  # You can change this condition as needed
+            df = pd.DataFrame.from_dict(epc_data, orient='index')
+            print(df)
+            #break
+
+if __name__ == '__main__':
+    print("main")
+    
+    publisher.send_dron_csv()        
+    get_reads()
+    
+
+
+    
