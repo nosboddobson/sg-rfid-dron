@@ -2,7 +2,7 @@ import time
 from flask import Flask, jsonify, request
 import jsonschema
 from Services import LogService as SaveExecutions
-from Services import ActualizarInventarioService
+from Services import DronService
 import os
 import json 
 from datetime import datetime
@@ -87,7 +87,7 @@ def actualizar_estado_inventario():
     try:
         jsonschema.validate(instance=archivo_json, schema=json_schema)
         # Devuelve el JSON como respuesta
-        archivo_json=ActualizarInventarioService.actualizar_estado_inventario(archivo_json)
+        archivo_json=DronService.actualizar_estado_inventario(archivo_json)
         end_time = time.time()
         SaveExecutions.Guardar_Ejecucion_a_csv(start_time,end_time,"actualizar-estado-inventario",200)
         return jsonify(archivo_json)

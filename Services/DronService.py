@@ -58,10 +58,10 @@ def actualizar_estado_inventario(json_entrada):
     for item in json_entrada['Inventario']:     
         match = Ultimo_Archivo_Dron_data[Ultimo_Archivo_Dron_data['EPC'] == str(item['NumeroEtiqueta']).replace(" ", "").lower()]
         if not match.empty:    
-            item['Existe']="Si"
+            item['ResultadoConteo']="OK"
             #print (item)
         else:
-            item['Existe']="No"
+            item['ResultadoConteo']="FALTANTE"
             
                  
         return json_entrada

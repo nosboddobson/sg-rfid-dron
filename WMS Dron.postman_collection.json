@@ -1,0 +1,186 @@
+{
+	"info": {
+		"_postman_id": "7d93589a-0aad-407d-97ee-fbc16f857296",
+		"name": "WMS Dron",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17725679",
+		"_collection_link": "https://kcl999.postman.co/workspace/KCL-Workspace~cda8a2f9-2f28-4da7-8612-724f18a9ae25/collection/17725679-7d93589a-0aad-407d-97ee-fbc16f857296?action=share&source=collection_link&creator=17725679"
+	},
+	"item": [
+		{
+			"name": "GENERACION CONTEO",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "Lr9kk#e+!a3=RdBo",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "S-ORCHDRN",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"TransactionId\": \"abc1234\",\n    \"Sucursal\": \"SGMINA\",\n    \"Ubicacion\": \"PF2\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://kwjdeais60:99/jderest/v3/orchestrator/ORCH_Generacion_Conteo_Dron",
+					"protocol": "http",
+					"host": [
+						"kwjdeais60"
+					],
+					"port": "99",
+					"path": [
+						"jderest",
+						"v3",
+						"orchestrator",
+						"ORCH_Generacion_Conteo_Dron"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RETORNO DATOS CONTEO",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "Lr9kk#e+!a3=RdBo",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "S-ORCHDRN",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"ARRAY_INPUT\": [\n        {\n            \"InventoryId\": \"fc18d4c8-ec7c-406d-b358-447f38db4531\",\n            \"TransactionId\": \"fc18d4c8-ec7c-406d-b358-447f38db4531\",\n            \"BatchNumber\": \"10611\",\n            \"Sequence\": \"2\",\n            \"NumeroConteo\": 10611,\n            \"Bodega\": \"      SGMINA\",\n            \"Ubicacion\": \"P02002003           \",\n            \"NumeroEtiqueta\": \"E2805C1F03D1662042131883                \",\n            \"CodigoArticulo\": \"56818\",\n            \"CoordenadaX\": \"0\",\n            \"CoordenadaY\": \"0\",\n            \"CoordenadaZ\": \"0\",\n            \"ResultadoConteo\": \"FALTANTE\"\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://kwjdeais60:99/jderest/v3/orchestrator/ORCH_RetornoDatosConteo_Dron",
+					"protocol": "http",
+					"host": [
+						"kwjdeais60"
+					],
+					"port": "99",
+					"path": [
+						"jderest",
+						"v3",
+						"orchestrator",
+						"ORCH_RetornoDatosConteo_Dron"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "END RETORNO DATOS CONTEO",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "Lr9kk#e+!a3=RdBo",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "S-ORCHDRN",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Estado\": \" \",\n  \"NumC\": \"10622\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://kwjdeais60:99/jderest/v3/orchestrator/ORCH_EndRetornoConteo_Dron",
+					"protocol": "http",
+					"host": [
+						"kwjdeais60"
+					],
+					"port": "99",
+					"path": [
+						"jderest",
+						"v3",
+						"orchestrator",
+						"ORCH_EndRetornoConteo_Dron"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "ORCH_HOST",
+			"value": "kwjdeais60.quadra.local:97",
+			"type": "string"
+		},
+		{
+			"key": "ORCH_User",
+			"value": "S-ORCHRBT",
+			"type": "string"
+		},
+		{
+			"key": "ORCH_Password",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
