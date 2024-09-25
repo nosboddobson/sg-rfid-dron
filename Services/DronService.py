@@ -64,6 +64,7 @@ def actualizar_estado_inventario():
         json_entrada = json.load(f)
 
     
+    
     #Buscar coincidencias de tags en inventario y actualizar json de entrada con existencias
     
     if json_entrada['Inventario']:
@@ -80,9 +81,20 @@ def actualizar_estado_inventario():
         
         NumeroConteo=str(item['NumeroConteo'])
         #remover archivo de inventario ya utilizado para que no se sume con la siguiente llamada
-        borrar_archivos_en_carpeta(os.getenv('JD_DRON_FOLDER'))
+    
+        json_valid = json.dumps(json_entrada, ensure_ascii=True, indent=4)
 
-        return json_entrada,NumeroConteo
+        json_valid = json_valid.replace('"Inventario"', '"ARRAY_INPUT"')
+
+
+        with open('output_Inventario.json', 'w') as outfile:
+             outfile.write(json_valid)
+
+        print ("Json de Inventario Creado")
+
+        json_valid = json.loads(json_valid)
+
+        return json_valid,NumeroConteo
     else:
         return None
 
@@ -146,8 +158,8 @@ if __name__ == "__main__":
 
     #test();
     #Obtener_Ultimo_Archivo()
-    file_path="jdbkp\\jsonout.txt"
-    with open(file_path, 'r') as f:
-        data = json.load(f)
+    #file_path="jdbkp\\jsonout.txt"
+    #with open(file_path, 'r') as f:
+    #    data = json.load(f)
     
-    actualizar_estado_inventario(data)
+    actualizar_estado_inventario()

@@ -52,6 +52,8 @@ def Generar_Conteo (Sucursal: str,Ubicacion: str)  -> Tuple[str, str]:
     "Ubicacion": Ubicacion
     })
 
+    #print (payload)
+
     headers = {
     'Content-Type': 'application/json',
     'Authorization': os.getenv('JD_AUTHORIZATION') ,
@@ -69,7 +71,7 @@ def Generar_Conteo (Sucursal: str,Ubicacion: str)  -> Tuple[str, str]:
                 #job_number = service_request['jobNumber']
                 
                 print('Éxito Ejecutando la Api de Conteo de JD')
-                print (response.json())
+               # print (response.json())
                 return  "OK"       
             else:
                 print(f"Error en Api de Conteo de JD, Solicitud termina con el codigo {response.status_code} en el intento {attempt + 1}")
@@ -93,6 +95,7 @@ def Retorno_Datos_Conteo (resultado:json):
 
 
 
+
     for attempt in range(max_retries):
         try:
             response = requests.request("POST", os.getenv('JD_URL_RETORNO_CONTEO'), headers=headers, json=payload)
@@ -104,8 +107,9 @@ def Retorno_Datos_Conteo (resultado:json):
 
                 return  "OK"        
             else:
-                print(f"Error en Api de Retorno Conteo de JD, Solicitud termina con el codigo {response.status_code} y mensaje  {response.json().get('message', 'No message found')} en el intento {attempt + 1}")
-               
+                print(f"Error en Api de Retorno Conteo de JD, Solicitud termina con el codigo {response.status_code}  en el intento {attempt + 1}")
+                #print(f"Error en Api de Retorno Conteo de JD, Solicitud termina con el codigo {response.status_code} y mensaje  {response.json().get('message', 'No message found')} en el intento {attempt + 1}")
+
         except requests.exceptions.RequestException as e:
             print(f"Error Ejecutando la Api de Retorno Conteo de JD: {e}")
             time.sleep(2 ** attempt)  # Exponential backoff

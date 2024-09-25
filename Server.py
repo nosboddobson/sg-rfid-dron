@@ -133,6 +133,7 @@ def actualizar_inventario():
                
                 # Comparamos inventario disponible con  obtenido desde Dron
                 inventario_json,NumeroConteo= DronService.actualizar_estado_inventario()
+                #print (inventario_json)
                 #si resulta, entonces guardamos resultado como csv
                 if inventario_json:
                     #Guardar Resultado de Inventario en csv
