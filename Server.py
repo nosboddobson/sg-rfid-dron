@@ -1,16 +1,17 @@
 import time
+from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 import jsonschema
-from Services import LogService as SaveExecutions
+from Services import JDService, LogService as SaveExecutions
 from Services import DronService
 import os
 import json 
-from datetime import datetime
+import datetime
 
 
 
 app = Flask(__name__)
-
+load_dotenv(override=True)
 
 """
 This code defines a Flask route that handles POST requests to the /AssignmentOperators/ endpoint. 
@@ -103,6 +104,77 @@ def actualizar_estado_inventario():
     
 def utc_time():
     return datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
+
+'''
+Defines a Flask route to handle POST requests for updating drone inventory. 
+Calls an API to generate an inventory file, processes the file to update inventory status, and logs the execution details. 
+Returns the updated inventory JSON if successful, or appropriate error messages if unsuccessful.
+'''
+@app.route('/dron/actualizar-inventario', methods=['POST'])
+def actualizar_inventario():
+
+    start_time = time.time()
+    
+    #Obtener parametros del POST
+    Sucursal = request.args.get('Sucursal', "SGMINA") #SGMIN valor por defecto si no viene parametro en la consulta
+    Ubicacion = request.args.get('Ubicacion', "PF2") #PF2 valor por defecto si no viene parametro en la consulta
+
+    try:
+        
+        #LLamar API para que¡JD Edwards genere un archivo con el inventario
+        if JDService.Generar_Conteo(Sucursal,Ubicacion) is not None:
+            #obtenemos los valores retornados de Generar Conteo
+           
+            #Esperamos unos segundos para que el servidor genere el archivo con el inventario jsonout.txt
+            time.sleep(10)
+
+            #Revisar si se la fecha del archivo disponoble es actual (> a la hora de inicio de ejecucion del codigo)
+            if JDService.Archivo_Conteo_Generado_Nuevo(start_time):
+               
+                # Comparamos inventario disponible con  obtenido desde Dron
+                inventario_json,NumeroConteo= DronService.actualizar_estado_inventario()
+                #si resulta, entonces guardamos resultado como csv
+                if inventario_json:
+                    #Guardar Resultado de Inventario en csv
+                    DronService.Guardar_json_como_csv(inventario_json,os.getenv('DRON_FOLDER_RESULTS'),Ubicacion)
+
+                    #Devolvemos inventario Actualizado a JD
+                    if JDService.Retorno_Datos_Conteo(inventario_json):
+
+                        #Generar Reporte 
+                        JDService.Generar_Reporte_Conteo(NumeroConteo)
+                        
+                        end_time = time.time()
+                        SaveExecutions.Guardar_Ejecucion_a_csv(start_time,end_time,"actualizar-inventario",200)
+                        return jsonify({'OK': 'Inventario en JD Actualizado con Éxito'}), 200 
+                    
+                    else:
+                        end_time = time.time()
+                        SaveExecutions.Guardar_Ejecucion_a_csv(start_time,end_time,"actualizar-inventario",404)
+                        return jsonify({'error': 'No fue posible Enviar Inventario a JD'}), 404 
+
+                else:
+                    end_time = time.time()
+                    SaveExecutions.Guardar_Ejecucion_a_csv(start_time,end_time,"actualizar-inventario",404)
+                    return jsonify({'error': 'No fue posible Obtener Inventario desde JD'}), 404
+            else:
+                    end_time = time.time()
+                    SaveExecutions.Guardar_Ejecucion_a_csv(start_time,end_time,"actualizar-inventario",404)
+                    return jsonify({'error': 'Archivo desde JD No Generado'}), 404    
+            
+
+        else:
+            end_time = time.time()
+            SaveExecutions.Guardar_Ejecucion_a_csv(start_time,end_time,"actualizar-inventario",404)
+            return jsonify({'error': 'No fue posible Obtener Inventario desde JD'}), 404
+        
+        #devolvemos el json con el resultado si todo salio bien
+        return jsonify(inventario_json), 200
+    except Exception as e:
+        end_time = time.time()
+        SaveExecutions.Guardar_Ejecucion_a_csv(start_time,end_time,"actualizar-inventario",500)
+        return jsonify({'Error': str(e)}), 500
+
 
 
 if __name__ == '__main__':
