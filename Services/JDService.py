@@ -71,7 +71,7 @@ def Generar_Conteo (Sucursal: str,Ubicacion: str)  -> Tuple[str, str]:
                 #job_number = service_request['jobNumber']
                 
                 print('Éxito Ejecutando la Api de Conteo de JD')
-               # print (response.json())
+                print (response.json())
                 return  "OK"       
             else:
                 print(f"Error en Api de Conteo de JD, Solicitud termina con el codigo {response.status_code} en el intento {attempt + 1}")

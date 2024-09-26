@@ -109,6 +109,9 @@ def utc_time():
 Defines a Flask route to handle POST requests for updating drone inventory. 
 Calls an API to generate an inventory file, processes the file to update inventory status, and logs the execution details. 
 Returns the updated inventory JSON if successful, or appropriate error messages if unsuccessful.
+
+On success: JSON response {'OK': 'Inventario en JD Actualizado con Éxito'}, HTTP status 200.
+On failure: JSON response with an error message, HTTP status 404 or 500.
 '''
 @app.route('/dron/actualizar-inventario', methods=['POST'])
 def actualizar_inventario():
@@ -178,5 +181,69 @@ def actualizar_inventario():
 
 
 
+@app.route('/api/data', methods=['POST'])
+def post_data():
+    new_data = request.json
+    return jsonify(new_data), 201
+
+'''
+This code defines a Flask route that handles POST requests to the /upload endpoint. 
+It processes file uploads, saves the file to a specified directory, logs the execution details, 
+and returns appropriate responses based on the success or failure of the upload.
+
+Outputs
+On success: JSON response with a success message and filename, HTTP status 200.
+On failure: JSON response with an error message, HTTP status 400 or 500.
+'''
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    # Verifica si el archivo está en la solicitud
+    start_time = time.time()
+
+    if 'file' not in request.files:
+        end_time = time.time()
+        SaveExecutions.Guardar_Ejecucion_a_csv(start_time,end_time,"Upload_File",400)
+        return jsonify({'error': 'No file part'}), 400
+    
+    file = request.files['file']
+    
+    # Si el usuario no selecciona un archivo, el navegador puede enviar un archivo sin nombre
+    if file.filename == '':
+        end_time = time.time()
+        SaveExecutions.Guardar_Ejecucion_a_csv(start_time,end_time,"Upload_File",500)
+        return jsonify({'error': 'No selected file'}), 400
+    
+    # Guarda el archivo en el directorio de subidas
+    if file:
+        filename = file.filename
+        file.save(os.path.join(os.getenv('DRON_FOLDER'), filename)) #guardar Archivo
+
+        SaveExecutions.Guardar_Recepcion_Archivos_Dron_a_csv(filename) #Actualizar Log en Carpeta de Archivos
+
+        end_time = time.time()
+        SaveExecutions.Guardar_Ejecucion_a_csv(start_time,end_time,"Upload_File",200)
+        return jsonify({'message': 'File successfully uploaded', 'filename': "1"}), 200
+
+
+
+'''
+This code defines a Flask route that handles POST requests to the /printer/<msg> endpoint.
+It prints the message provided in the URL and returns a JSON response indicating success 
+or an error message if an exception occurs.
+
+Outputs
+On success: JSON response {'message': 'ok'} with a 200 status code.
+On failure: JSON response {'Error': <error_message>} with a 500 status code.
+
+'''
+@app.route('/printer/<msg>', methods=['POST'])
+def show_message(msg):
+    try:
+        print(msg)
+        return jsonify({'message': 'ok'}), 200
+    except Exception as e:
+        return jsonify({'Error': str(e)}), 500
+
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001)
+    app.run(host='0.0.0.0', port=5100)

@@ -81,7 +81,8 @@ def actualizar_estado_inventario():
         
         NumeroConteo=str(item['NumeroConteo'])
         #remover archivo de inventario ya utilizado para que no se sume con la siguiente llamada
-    
+        borrar_archivos_en_carpeta(os.getenv('JD_DRON_FOLDER'))
+        
         json_valid = json.dumps(json_entrada, ensure_ascii=True, indent=4)
 
         json_valid = json_valid.replace('"Inventario"', '"ARRAY_INPUT"')
