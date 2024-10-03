@@ -4,6 +4,7 @@ from flask import Flask, jsonify, request
 import jsonschema
 from Services import JDService, LogService as SaveExecutions
 from Services import DronService
+from Services import SQLite_Service
 import os
 import json 
 import datetime
@@ -121,7 +122,7 @@ def actualizar_inventario():
     #Obtener parametros del POST
     Sucursal = request.args.get('Sucursal', "SGMINA") #SGMIN valor por defecto si no viene parametro en la consulta
     Ubicacion = request.args.get('Ubicacion', "PF2") #PF2 valor por defecto si no viene parametro en la consulta
-
+    
     try:
         
         #LLamar API para que¡JD Edwards genere un archivo con el inventario
@@ -219,6 +220,8 @@ def upload_file():
         file.save(os.path.join(os.getenv('DRON_FOLDER'), filename)) #guardar Archivo
 
         SaveExecutions.Guardar_Recepcion_Archivos_Dron_a_csv(filename) #Actualizar Log en Carpeta de Archivos
+
+        SQLite_Service.insertar_datos_inventario_vuelos (filename) #Guardar informacion en DB para Web
 
         end_time = time.time()
         SaveExecutions.Guardar_Ejecucion_a_csv(start_time,end_time,"Upload_File",200)
