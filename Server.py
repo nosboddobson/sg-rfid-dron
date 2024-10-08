@@ -121,7 +121,14 @@ def actualizar_inventario():
     
     #Obtener parametros del POST
     Sucursal = request.args.get('Sucursal', "SGMINA") #SGMIN valor por defecto si no viene parametro en la consulta
-    Ubicacion = request.args.get('Ubicacion', "PF2") #PF2 valor por defecto si no viene parametro en la consulta
+    Ubicacion = request.args.get('Ubicacion', "PT") #PF2 valor por defecto si no viene parametro en la consulta
+
+    print(Sucursal + " ; " + Ubicacion)
+    ID=request.args.get('ID')
+    Tipo_Inventario=request.args.get('Tipo_Inventario')
+
+    if Tipo_Inventario == "Completo":
+        Ubicacion="PT"
     
     try:
         
@@ -132,25 +139,45 @@ def actualizar_inventario():
             #Esperamos unos segundos para que el servidor genere el archivo con el inventario jsonout.txt
             time.sleep(10)
 
+            print ("Conteo Solicitado OK")
             #Revisar si se la fecha del archivo disponoble es actual (> a la hora de inicio de ejecucion del codigo)
             if JDService.Archivo_Conteo_Generado_Nuevo(start_time):
                
+                print ("Archivos de Conteo Existentes")
                 # Comparamos inventario disponible con  obtenido desde Dron
-                inventario_json,NumeroConteo= DronService.actualizar_estado_inventario()
+                inventario_json,NumeroConteo,TransactionId= DronService.actualizar_estado_inventario()
                 #print (inventario_json)
                 #si resulta, entonces guardamos resultado como csv
+
+                
                 if inventario_json:
                     #Guardar Resultado de Inventario en csv
                     DronService.Guardar_json_como_csv(inventario_json,os.getenv('DRON_FOLDER_RESULTS'),Ubicacion)
 
                     #Devolvemos inventario Actualizado a JD
                     if JDService.Retorno_Datos_Conteo(inventario_json):
-
+                        
+                        print ("Retorno de Conteo OK")
                         #Generar Reporte 
                         JDService.Generar_Reporte_Conteo(NumeroConteo)
+                        print ("Cierre de Conteo OK")
                         
                         end_time = time.time()
                         SaveExecutions.Guardar_Ejecucion_a_csv(start_time,end_time,"actualizar-inventario",200)
+
+                        #Actualizar DB
+                        if (ID):
+                           
+                            SQLite_Service.Actuaizar_Estado_inventario_vuelos(int(ID))
+                            resumen=SQLite_Service.Resumen_de_Conteo_desde_Json(inventario_json)
+                            print (resumen)
+
+                            ahora = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                            #print (ahora)
+
+                            SQLite_Service.insertar_inventario_jde(ID,ahora,resumen['OK Count'],resumen['FALTANTE Count'],resumen['Other Count'],resumen['Percentage OK'],NumeroConteo,Sucursal,Ubicacion,TransactionId)
+
+                            print ("DB Actualizada con Exito")
                         return jsonify({'OK': 'Inventario en JD Actualizado con Éxito'}), 200 
                     
                     else:
@@ -178,6 +205,7 @@ def actualizar_inventario():
     except Exception as e:
         end_time = time.time()
         SaveExecutions.Guardar_Ejecucion_a_csv(start_time,end_time,"actualizar-inventario",500)
+        print ({'Error': str(e)})
         return jsonify({'Error': str(e)}), 500
 
 

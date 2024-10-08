@@ -14,6 +14,7 @@ def crear_db_inventario():
             Nombre_Archivo TEXT,
             Fecha_Vuelo TEXT,
             N_elementos INTEGER,
+            Tiempo_Vuelo INTEGER,
             Estado_Inventario TEXT CHECK(Estado_Inventario IN ('Pendiente', 'OK'))
         )
     ''')
@@ -41,7 +42,7 @@ def crear_db_inventario():
         CREATE TABLE IF NOT EXISTS Elementos_JDE (
             ID INTEGER PRIMARY KEY AUTOINCREMENT,
             EPC TEXT,
-            Resultado TEXT CHECK(Resultado IN ('Ok', 'Faltante', 'Sobrante')),
+            Resultado TEXT CHECK(Resultado IN ('OK', 'FALTANTE', 'SOBRANTE')),
             ID_Inventario INTEGER,
             Ubicacion TEXT,
             CodigoArticulo TEXT,
@@ -64,4 +65,5 @@ if __name__ == "__main__":
        crear_db_inventario()
     except Exception as e:
        print(e)
+    
     

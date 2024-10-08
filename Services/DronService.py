@@ -50,55 +50,64 @@ def actualizar_estado_inventario():
     
     Ultimo_Archivo_Dron = Obtener_Ultimo_Archivo_csv(os.getenv('Dron_Folder'),"csv" )
     
-    #buscar ultimo archivo y limpiarlo
-    if Ultimo_Archivo_Dron:
-        Ultimo_Archivo_Dron_data = pd.read_csv(Ultimo_Archivo_Dron )
-    
-    Ultimo_Archivo_Dron_data = Ultimo_Archivo_Dron_data[Ultimo_Archivo_Dron_data['EPC'] != '00 00 00'] #eliminar filas sin lectura de tag
-    Ultimo_Archivo_Dron_data = Ultimo_Archivo_Dron_data.drop_duplicates(subset=['EPC']) # eliminar filas duplicadas
-    Ultimo_Archivo_Dron_data['EPC'] = Ultimo_Archivo_Dron_data['EPC'].str.replace(' ', '').str.lower() # llevar todo a minusculas
-
-    #abrimon archivo generado por JD
-    ruta_Archivo_JD = os.path.join(os.getenv('JD_DRON_FOLDER'), os.getenv('JD_DRON_FILE'))
-    with open(ruta_Archivo_JD, 'r') as f:
-        json_entrada = json.load(f)
-
-    
-    
-    #Buscar coincidencias de tags en inventario y actualizar json de entrada con existencias
-    
-    if json_entrada['Inventario']:
-        for item in json_entrada['Inventario']:     
-            match = Ultimo_Archivo_Dron_data[Ultimo_Archivo_Dron_data['EPC'] == str(item['NumeroEtiqueta']).replace(" ", "").lower()]
-            del item['CoordenadaX']
-            del item['CoordenadaY']
-            del item['CoordenadaZ']
-            if not match.empty:    
-                item['ResultadoConteo']="OK"
-                #print (item)
-            else:
-                item['ResultadoConteo']="FALTANTE"
+    try :
+        #buscar ultimo archivo y limpiarlo
+        if Ultimo_Archivo_Dron:
+            Ultimo_Archivo_Dron_data = pd.read_csv(Ultimo_Archivo_Dron )
         
-        NumeroConteo=str(item['NumeroConteo'])
-        #remover archivo de inventario ya utilizado para que no se sume con la siguiente llamada
-        borrar_archivos_en_carpeta(os.getenv('JD_DRON_FOLDER'))
+        Ultimo_Archivo_Dron_data = Ultimo_Archivo_Dron_data[Ultimo_Archivo_Dron_data['EPC'] != '00 00 00'] #eliminar filas sin lectura de tag
+        Ultimo_Archivo_Dron_data = Ultimo_Archivo_Dron_data.drop_duplicates(subset=['EPC']) # eliminar filas duplicadas
+        Ultimo_Archivo_Dron_data['EPC'] = Ultimo_Archivo_Dron_data['EPC'].str.replace(' ', '').str.lower() # llevar todo a minusculas
+
+        #abrimon archivo generado por JD
+        ruta_Archivo_JD = os.path.join(os.getenv('JD_DRON_FOLDER'), os.getenv('JD_DRON_FILE'))
+        with open(ruta_Archivo_JD, 'r') as f:
+            json_entrada = json.load(f)
+
         
-        json_valid = json.dumps(json_entrada, ensure_ascii=True, indent=4)
+        
+        #Buscar coincidencias de tags en inventario y actualizar json de entrada con existencias
+        
+        if json_entrada['Inventario']:
 
-        json_valid = json_valid.replace('"Inventario"', '"ARRAY_INPUT"')
+            print ("archivo " +  os.getenv('JD_DRON_FILE') + " Leido con éxito." )
+
+            for item in json_entrada['Inventario']:     
+                match = Ultimo_Archivo_Dron_data[Ultimo_Archivo_Dron_data['EPC'] == str(item['NumeroEtiqueta']).replace(" ", "").lower()]
+                del item['CoordenadaX']
+                del item['CoordenadaY']
+                del item['CoordenadaZ']
+                if not match.empty:    
+                    item['ResultadoConteo']="OK"
+                    #print (item)
+                else:
+                    item['ResultadoConteo']="FALTANTE"
+            
+            NumeroConteo=str(item['NumeroConteo'])
+            TransactionId=str(item['TransactionId'])
+            #remover archivo de inventario ya utilizado para que no se sume con la siguiente llamada
+            #borrar_archivos_en_carpeta(os.getenv('JD_DRON_FOLDER'))
+            
+            json_valid = json.dumps(json_entrada, ensure_ascii=True, indent=4)
+
+            json_valid = json_valid.replace('"Inventario"', '"ARRAY_INPUT"')
 
 
-        with open('output_Inventario.json', 'w') as outfile:
-             outfile.write(json_valid)
+            with open('output_Inventario.json', 'w') as outfile:
+                outfile.write(json_valid)
 
-        print ("Json de Inventario Creado")
+            print ("Json de Inventario Creado")
 
-        json_valid = json.loads(json_valid)
+            json_valid = json.loads(json_valid)
 
-        return json_valid,NumeroConteo
-    else:
+            return json_valid,NumeroConteo,TransactionId
+        else:
+            print ("archivo " +  os.getenv('JD_DRON_FILE') + " Vacío" )
+            return None
+        
+    except Exception as e:
+        print(f"Error Actualizando estdo Inventario. Error: {e}")
         return None
-
 
 def Guardar_Json(json_entrada,folder,Prefix):
 
@@ -127,6 +136,7 @@ def Guardar_json_como_csv(json_entrada,folder,Prefix):
         return "Archivo Creado  CSV  con exito"
         
     except Exception as e:
+        print(f"Error al guardar Json como CSV. Error: {e}")
         return None
 
 def borrar_archivos_en_carpeta(carpeta):
