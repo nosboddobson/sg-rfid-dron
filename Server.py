@@ -4,7 +4,7 @@ from flask import Flask, jsonify, request
 import jsonschema
 from Services import JDService, LogService as SaveExecutions
 from Services import DronService
-from Services import SQLite_Service
+from Services import MsSQL_Service as dbService
 import os
 import json 
 import datetime
@@ -168,14 +168,15 @@ def actualizar_inventario():
                         #Actualizar DB
                         if (ID):
                            
-                            SQLite_Service.Actuaizar_Estado_inventario_vuelos(int(ID))
-                            resumen=SQLite_Service.Resumen_de_Conteo_desde_Json(inventario_json)
+                            dbService.Actuaizar_Estado_inventario_vuelos(int(ID))
+                            resumen=dbService.Resumen_de_Conteo_desde_Json(inventario_json)
                             print (resumen)
 
                             ahora = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
                             #print (ahora)
 
-                            SQLite_Service.insertar_inventario_jde(ID,ahora,resumen['OK Count'],resumen['FALTANTE Count'],resumen['Other Count'],resumen['Percentage OK'],NumeroConteo,Sucursal,Ubicacion,TransactionId)
+                            Inventario_jed_id=dbService.insertar_inventario_jde(ID,ahora,resumen['OK Count'],resumen['FALTANTE Count'],resumen['Other Count'],resumen['Percentage OK'],NumeroConteo,Sucursal,Ubicacion,TransactionId)
+                            print(dbService.insertar_elementos_jde(Inventario_jed_id,inventario_json))
 
                             print ("DB Actualizada con Exito")
                         return jsonify({'OK': 'Inventario en JD Actualizado con Éxito'}), 200 
@@ -208,7 +209,39 @@ def actualizar_inventario():
         print ({'Error': str(e)})
         return jsonify({'Error': str(e)}), 500
 
+@app.route('/dron/eliminar-inventario', methods=['POST'])
+def eliminar_inventario():
 
+    start_time = time.time()
+    
+   
+    ID=request.args.get('ID')
+    if int(ID) >0:
+        try:
+            
+            #LLamar API para que¡JD Edwards genere un archivo con el inventario
+            Eliminar_inventario_id=dbService.delete_inventario_vuelo_row(ID)
+            
+            if Eliminar_inventario_id:
+                end_time = time.time()
+                SaveExecutions.Guardar_Ejecucion_a_csv(start_time,end_time,"eliminar-inventario",200)
+                return jsonify({'OK': 'Inventario eliminado con Éxito'}), 200 
+            
+          
+            else:
+                end_time = time.time()
+                SaveExecutions.Guardar_Ejecucion_a_csv(start_time,end_time,"eliminar-inventario",404)
+                return jsonify({'error': 'No fue posible Eliminar Inventario'}), 404 
+            
+        except Exception as e:
+            end_time = time.time()
+            SaveExecutions.Guardar_Ejecucion_a_csv(start_time,end_time,"eliminar-inventario",500)
+            print ({'Error': str(e)})
+            return jsonify({'Error': str(e)}), 500
+    else:
+        end_time = time.time()
+        SaveExecutions.Guardar_Ejecucion_a_csv(start_time,end_time,"elimimar-inventario",404)
+        return jsonify({'error': 'No fue posible Obtener ID de Inventario'}), 404  
 
 @app.route('/api/data', methods=['POST'])
 def post_data():
@@ -249,7 +282,7 @@ def upload_file():
 
         SaveExecutions.Guardar_Recepcion_Archivos_Dron_a_csv(filename) #Actualizar Log en Carpeta de Archivos
 
-        SQLite_Service.insertar_datos_inventario_vuelos (filename) #Guardar informacion en DB para Web
+        dbService.insertar_datos_inventario_vuelos (filename) #Guardar informacion en DB para Web
 
         end_time = time.time()
         SaveExecutions.Guardar_Ejecucion_a_csv(start_time,end_time,"Upload_File",200)
