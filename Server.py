@@ -280,6 +280,7 @@ def upload_file():
     
     # Guarda el archivo en el directorio de subidas
     if file:
+        print (file.filename)
         unique_id = str(uuid.uuid4())
         filename = utc_time() +"_"+unique_id + "_epc_records.csv"
         file.save(os.path.join(os.getenv('DRON_FOLDER'), filename)) #guardar Archivo
@@ -290,7 +291,7 @@ def upload_file():
 
         end_time = time.time()
         SaveExecutions.Guardar_Ejecucion_a_csv(start_time,end_time,"Upload_File",200)
-        return jsonify({'message': 'File successfully uploaded', 'filename': "1"}), 200
+        return jsonify({'message': 'File successfully uploaded', 'filename': filename}), 200
 
 
 

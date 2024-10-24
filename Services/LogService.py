@@ -65,11 +65,13 @@ def Extraer_Fecha_Hora_Desde_Archivo (filename:str):
     if Ultimo_Archivo_Dron:
         try:
             df = pd.read_csv(Ultimo_Archivo_Dron)
-            df['Timestamp'] = pd.to_datetime(df['Timestamp'])
-            time_inicial = df['Timestamp'].iloc[0]
-            return time_inicial
+            if 'Localtime' in df.columns and len(df)>0:
+                df['Localtime'] = pd.to_datetime(df['Localtime'])
+                time_inicial = df['Localtime'].iloc[0]            
+                return time_inicial
+            return 0
         except Exception as e:
-            print(f"Error: {e}")
+            print(f"Error Extraer_Fecha_Hora_Desde_Archivo: {e}")
             return 0
     else:
         return 0

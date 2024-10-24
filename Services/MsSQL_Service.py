@@ -23,14 +23,17 @@ def Contar_Numero_de_Elementos(filename):
     
     if Ultimo_Archivo_Dron:
         Ultimo_Archivo_Dron_data = pd.read_csv(Ultimo_Archivo_Dron)
-        Ultimo_Archivo_Dron_data = Ultimo_Archivo_Dron_data[Ultimo_Archivo_Dron_data['EPC'] != '00 00 00']  # Filter out rows without a valid tag
-        Ultimo_Archivo_Dron_data = Ultimo_Archivo_Dron_data.drop_duplicates(subset=['EPC'])  # Remove duplicates
-        Ultimo_Archivo_Dron_data['EPC'] = Ultimo_Archivo_Dron_data['EPC'].str.replace(' ', '').str.lower()  # Normalize EPC
+        if 'EPC' in Ultimo_Archivo_Dron_data.columns:
+            Ultimo_Archivo_Dron_data['EPC'] = Ultimo_Archivo_Dron_data['EPC'].str.replace(' ', '').str.lower()  # Normalize EPC
+            Ultimo_Archivo_Dron_data = Ultimo_Archivo_Dron_data[Ultimo_Archivo_Dron_data['EPC'] != '00 00 00']  # Filter out rows without a valid tag
+            Ultimo_Archivo_Dron_data = Ultimo_Archivo_Dron_data.drop_duplicates(subset=['EPC'])  # Remove duplicates
+            
 
-        numero_de_epc = Ultimo_Archivo_Dron_data['EPC'].count()
-        return numero_de_epc
+            numero_de_epc = Ultimo_Archivo_Dron_data['EPC'].count()
+            return numero_de_epc
+        return 0
     else:
-        return None
+        return 0
 
 def Obtener_duracion_Vuelo(filename):
     Ultimo_Archivo_Dron = os.path.join(os.getenv('DRON_FOLDER'), filename)
@@ -39,12 +42,12 @@ def Obtener_duracion_Vuelo(filename):
     if Ultimo_Archivo_Dron:
         try:
             df = pd.read_csv(Ultimo_Archivo_Dron)
-            if(len(df) >2):
-                df['Timestamp'] = pd.to_datetime(df['Timestamp'])
-                time_diff = df['Timestamp'].max() - df['Timestamp'].min()
+            if len(df) >2:
+                df['Localtime'] = pd.to_datetime(df['Localtime'])
+                time_diff = df['Localtime'].max() - df['Localtime'].min()
                 return int(time_diff.total_seconds())
         except Exception as e:
-            print(f"Error: {e}")
+            print(f"Error Obtener_duracion_Vuelo: {e}")
             return 0
     else:
         return 0
@@ -55,6 +58,9 @@ def insertar_datos_inventario_vuelos(filename):
             Fecha_Vuelo = LogService.Extraer_Fecha_Hora_Desde_Nombre_Archivo(filename)
     
     Tiempo_Vuelo = Obtener_duracion_Vuelo(filename)
+    if not Tiempo_Vuelo :
+        Tiempo_Vuelo=0
+    #print ("Tiempo de vuelo: " + str(Tiempo_Vuelo))
     Numero_Elementos = Contar_Numero_de_Elementos(filename)
     
     try:
@@ -65,7 +71,7 @@ def insertar_datos_inventario_vuelos(filename):
             INSERT INTO Inventario_Vuelos (Nombre_Archivo, Fecha_Vuelo, N_elementos, Tiempo_Vuelo, Estado_Inventario)
             VALUES (?, ?, ?, ?, ?)
         '''
-        data = (filename, Fecha_Vuelo, int(Numero_Elementos), int(Tiempo_Vuelo), 'Pendiente')
+        data = (filename, Fecha_Vuelo, int(Numero_Elementos), Tiempo_Vuelo, 'Pendiente')
         cursor.execute(insert_query, data)
 
         conn.commit()
