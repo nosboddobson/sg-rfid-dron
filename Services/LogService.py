@@ -26,6 +26,8 @@ csv_Recepcion_Archivos_Dron= "Log_Lecturas_Dron.csv"
 def Guardar_Recepcion_Archivos_Dron_a_csv(archivo):
     
     execution_time = Extraer_Fecha_Hora_Desde_Archivo(archivo)
+    if execution_time==0:
+        execution_time = time.strftime("%Y-%m-%d %H:%M:%S")
     
     try:
         data = {'Fecha_Medicion': execution_time, 'Fecha_Envio':time.strftime("%Y-%m-%d %H:%M:%S"), 'Archivo': archivo}

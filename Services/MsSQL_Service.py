@@ -34,13 +34,15 @@ def Contar_Numero_de_Elementos(filename):
 
 def Obtener_duracion_Vuelo(filename):
     Ultimo_Archivo_Dron = os.path.join(os.getenv('DRON_FOLDER'), filename)
+
     
     if Ultimo_Archivo_Dron:
         try:
             df = pd.read_csv(Ultimo_Archivo_Dron)
-            df['Timestamp'] = pd.to_datetime(df['Timestamp'])
-            time_diff = df['Timestamp'].max() - df['Timestamp'].min()
-            return int(time_diff.total_seconds())
+            if(len(df) >2):
+                df['Timestamp'] = pd.to_datetime(df['Timestamp'])
+                time_diff = df['Timestamp'].max() - df['Timestamp'].min()
+                return int(time_diff.total_seconds())
         except Exception as e:
             print(f"Error: {e}")
             return 0
