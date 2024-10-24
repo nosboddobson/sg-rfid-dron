@@ -6,7 +6,7 @@ __pycache__/
 *.DS_Store
 /dron_results
 /Resultados
-
+API_Excecutions.csv
 # C extensions
 *.so
 
