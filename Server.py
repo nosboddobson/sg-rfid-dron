@@ -1,4 +1,5 @@
 import time
+import uuid
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 import jsonschema
@@ -104,7 +105,7 @@ def actualizar_estado_inventario():
 
     
 def utc_time():
-    return datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
+    return datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
 
 '''
 Defines a Flask route to handle POST requests for updating drone inventory. 
@@ -130,6 +131,8 @@ def actualizar_inventario():
     if Tipo_Inventario == "Completo":
         Ubicacion="PT"
     
+    #Borramos el contenido de la carpeta par asegurar que no exista informacion antigua.
+    DronService.borrar_archivos_en_carpeta(os.getenv('JD_DRON_FOLDER'))
     try:
         
         #LLamar API para que¡JD Edwards genere un archivo con el inventario
@@ -137,7 +140,7 @@ def actualizar_inventario():
             #obtenemos los valores retornados de Generar Conteo
            
             #Esperamos unos segundos para que el servidor genere el archivo con el inventario jsonout.txt
-            time.sleep(10)
+            time.sleep(15)
 
             print ("Conteo Solicitado OK")
             #Revisar si se la fecha del archivo disponoble es actual (> a la hora de inicio de ejecucion del codigo)
@@ -277,7 +280,8 @@ def upload_file():
     
     # Guarda el archivo en el directorio de subidas
     if file:
-        filename = file.filename
+        unique_id = str(uuid.uuid4())
+        filename = utc_time() +"_"+unique_id + "_epc_records.csv"
         file.save(os.path.join(os.getenv('DRON_FOLDER'), filename)) #guardar Archivo
 
         SaveExecutions.Guardar_Recepcion_Archivos_Dron_a_csv(filename) #Actualizar Log en Carpeta de Archivos
@@ -291,10 +295,7 @@ def upload_file():
 
 
 '''
-This code defines a Flask route that handles POST requests to the /printer/<msg> endpoint.
-It prints the message provided in the URL and returns a JSON response indicating success 
-or an error message if an exception occurs.
-
+Funcion utilizada por  el Dron como Keep Alive, para determinar si hay conectividad al servidor
 Outputs
 On success: JSON response {'message': 'ok'} with a 200 status code.
 On failure: JSON response {'Error': <error_message>} with a 500 status code.

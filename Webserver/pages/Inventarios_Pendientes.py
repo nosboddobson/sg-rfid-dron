@@ -97,7 +97,7 @@ def crear_fila_interactiva(index, row):
         zona = st.selectbox("Zona", ["PF1", "PF2", "PT"], key=f"zona_{index}")
         if st.form_submit_button("Iniciar Inventario"):
             # Actualizar el estado del inventario (simulando la llamada a la API)
-            st.experimental_rerun(url=f"http://127.0.0.1:5100/actualizar-estado-inventario?sucursal={tipo_inventario}&Ubicacion={zona}&ID={row['ID Inventario']}")
+            st.rerun(url=f"http://127.0.0.1:5100/actualizar-estado-inventario?sucursal={tipo_inventario}&Ubicacion={zona}&ID={row['ID Inventario']}")
             # Actualizar los datos de la tabla
             datos = obtener_datos_inventarios_pendientes()
             st.table(datos)
@@ -158,7 +158,7 @@ def eliminar_inventario_dialog(inventario):
             try:
                 result = Eliminar_Inventario(f"http://127.0.0.1:5100/dron/eliminar-inventario?ID={inventario}")
                 show_popup(result)
-                time.sleep(5)
+                time.sleep(2)
                 #datos = obtener_datos_inventarios_pendientes() #Actualizar Tabla
                 st.rerun()
                 # Disable the button
@@ -301,11 +301,11 @@ with st.expander("Inventarios Pendientes",expanded=True):
 
 
             # Column 4: Tipo Inventario dropdown
-            tipo_inventario = col5.selectbox("", ["Parcial", "Completo"], key=f"tipo_{inventario[0]}",label_visibility="collapsed")
+            tipo_inventario = col5.selectbox("Tipo Inventario", ["Parcial", "Completo"], key=f"tipo_{inventario[0]}",label_visibility="collapsed")
 
             zona_disabled = True if tipo_inventario == "Completo" else False
             # Column 5: Zona dropdown
-            zona = col6.selectbox("", ["SF0","SF1","SF2","PF1", "PF2", "PF3","PF4","PF5","PF6","PF7"], key=f"zona_{inventario[0]}", help="S= Shelving, P= Pasillo y F=Fila",label_visibility="collapsed",disabled=zona_disabled)
+            zona = col6.selectbox("Zona", ["SF0","SF1","SF2","PF1", "PF2", "PF3","PF4","PF5","PF6","PF7"], key=f"zona_{inventario[0]}", help="S= Shelving, P= Pasillo y F=Fila",label_visibility="collapsed",disabled=zona_disabled)
 
             # Column 6: Acción button
             if col7.button("Iniciar Inventario", key=f"iniciar_{inventario[0]}", help="Enviar Inventario a JD Edwards"): #Si el boton es presionado entonces:
@@ -430,8 +430,8 @@ with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inven
                 col2.write(inventario["Ubicacion"])
                 col3.write(inventario["Fecha_Inventario"])
                 col4.write(inventario["Fecha_Vuelo"])
-                minutes = str(inventario[3] // 60)
-                seconds = str(inventario[3] % 60)
+                minutes = str(inventario["Tiempo_Vuelo"] // 60)
+                seconds = str(inventario["Tiempo_Vuelo"] % 60)
                 col5.write(minutes+":"+seconds)
                 #col5.write(inventario["Tiempo_Vuelo"])
                 col6.write(inventario["Elementos_OK"])

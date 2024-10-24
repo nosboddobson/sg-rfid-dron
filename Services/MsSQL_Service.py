@@ -48,7 +48,10 @@ def Obtener_duracion_Vuelo(filename):
         return 0
 
 def insertar_datos_inventario_vuelos(filename):
-    Fecha_Vuelo = LogService.Extraer_Fecha_Hora_Desde_Nombre_Archivo(filename)
+    Fecha_Vuelo = LogService.Extraer_Fecha_Hora_Desde_Archivo(filename)
+    if Fecha_Vuelo==0:
+            Fecha_Vuelo = LogService.Extraer_Fecha_Hora_Desde_Nombre_Archivo(filename)
+    
     Tiempo_Vuelo = Obtener_duracion_Vuelo(filename)
     Numero_Elementos = Contar_Numero_de_Elementos(filename)
     
