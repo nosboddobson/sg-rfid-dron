@@ -41,9 +41,12 @@ def set_bg_hack_url():
 st.set_page_config(page_title="Inicio",layout="wide",initial_sidebar_state="collapsed")
 #set_bg_hack_url()
 
+
+
 make_sidebar()
 
 
+    
 # Create two columns for the logo and title
 col1, col2 = st.columns([1, 6])  # Adjust the ratios as necessary
 # Add logo
@@ -68,7 +71,7 @@ with col2_t:
 
         if st.form_submit_button("Iniciar sesión", type="primary"):
             if username == "test" and password == "test":        
-                st.session_state.logged_in = True
+                st.session_state['logged_in'] = True
                 st.success("Conectado correctamente!")
                 sleep(0.5)
                 st.switch_page("pages/Inventarios_Pendientes.py")
@@ -98,8 +101,8 @@ with col2_t:
                         user_info = conn.entries[0]
                         user_name = user_info.cn
                         #print(user_name)
-                        st.session_state.username=user_name
-                        st.session_state.logged_in = True
+                        st.session_state['username']=user_name
+                        st.session_state['logged_in'] = True
                         st.success("Conectado correctamente!")
                         sleep(0.5)
                         st.switch_page("pages/Inventarios_Pendientes.py")

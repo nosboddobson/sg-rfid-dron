@@ -47,7 +47,7 @@ def make_sidebar():
 
 
 def logout():
-    st.session_state.logged_in = False
+    st.session_state['logged_in']= False
     st.info("Sesión iniciada correctamente!")
     sleep(0.5)
     st.switch_page("inicio.py")

@@ -83,7 +83,7 @@ def obtener_datos_inventarios_pendientes():
 
     cursor.execute('''
         SELECT ID, Fecha_Vuelo, N_Elementos, Tiempo_Vuelo FROM Inventario_Vuelos
-        WHERE Estado_Inventario = 'Pendiente'
+        WHERE Estado_Inventario = 'Pendiente' ORDER BY ID DESC
     ''')
 
     datos = cursor.fetchall()
@@ -295,8 +295,8 @@ with st.expander("Inventarios Pendientes",expanded=True):
             # Column 3: Elementos Detectador
             col3.write(inventario[2])
             # Column 3: Elementos Detectador
-            minutes = str(inventario[3] // 60)
-            seconds = str(inventario[3] % 60)
+            minutes = str(inventario[3] // 60).zfill(2)
+            seconds = str(inventario[3] % 60).zfill(2)
             col4.write(minutes+":"+seconds)
 
 
@@ -430,8 +430,8 @@ with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inven
                 col2.write(inventario["Ubicacion"])
                 col3.write(inventario["Fecha_Inventario"])
                 col4.write(inventario["Fecha_Vuelo"])
-                minutes = str(inventario["Tiempo_Vuelo"] // 60)
-                seconds = str(inventario["Tiempo_Vuelo"] % 60)
+                minutes = str(inventario["Tiempo_Vuelo"] // 60).zfill(2)
+                seconds = str(inventario["Tiempo_Vuelo"] % 60).zfill(2)
                 col5.write(minutes+":"+seconds)
                 #col5.write(inventario["Tiempo_Vuelo"])
                 col6.write(inventario["Elementos_OK"])
