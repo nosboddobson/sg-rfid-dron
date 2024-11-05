@@ -132,8 +132,15 @@ def actualizar_inventario():
         Ubicacion="PT"
     
     #Borramos el contenido de la carpeta par asegurar que no exista informacion antigua.
-    DronService.borrar_archivos_en_carpeta(os.getenv('JD_DRON_FOLDER'))
+    #DronService.connect_to_share_folder(os.getenv('JD_REMOTE_FOLDER'),os.getenv('JD_REMOTE_FOLDER_USERNAME'),os.getenv('JD_REMOTE_FOLDER_USERNAME_PASSWORD'))
+    #DronService.borrar_archivos_en_carpeta(os.getenv('JD_REMOTE_FOLDER'))
+    #DronService.borrar_archivos_en_carpeta(os.getenv('JD_DRON_FOLDER'))
     try:
+
+         #Borramos el contenido de la carpeta par asegurar que no exista informacion antigua.
+        DronService.connect_to_share_folder(os.getenv('JD_REMOTE_FOLDER'),os.getenv('JD_REMOTE_FOLDER_USERNAME'),os.getenv('JD_REMOTE_FOLDER_PASSWORD'))
+        DronService.borrar_archivos_en_carpeta(os.getenv('JD_REMOTE_FOLDER'))
+        #DronService.borrar_archivos_en_carpeta(os.getenv('JD_DRON_FOLDER'))
         
         #LLamar API para que¡JD Edwards genere un archivo con el inventario
         if JDService.Generar_Conteo(Sucursal,Ubicacion) is not None:
@@ -211,6 +218,8 @@ def actualizar_inventario():
         SaveExecutions.Guardar_Ejecucion_a_csv(start_time,end_time,"actualizar-inventario",500)
         print ({'Error': str(e)})
         return jsonify({'Error': str(e)}), 500
+    finally:
+        DronService.disconnect_from_share_folder(os.getenv('JD_REMOTE_FOLDER'))
 
 @app.route('/dron/eliminar-inventario', methods=['POST'])
 def eliminar_inventario():

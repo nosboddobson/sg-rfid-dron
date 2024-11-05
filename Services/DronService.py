@@ -2,6 +2,7 @@ import datetime
 import glob
 import json
 import os
+import win32wnet
 
 from dotenv import load_dotenv
 import pandas as pd
@@ -49,7 +50,7 @@ def Obtener_Ultimo_Archivo_csv(folder,extension="csv"):
 def actualizar_estado_inventario():
     
     Ultimo_Archivo_Dron = Obtener_Ultimo_Archivo_csv(os.getenv('Dron_Folder'),"csv" )
-    
+   
     try :
         #buscar ultimo archivo y limpiarlo
         if Ultimo_Archivo_Dron:
@@ -60,7 +61,8 @@ def actualizar_estado_inventario():
         Ultimo_Archivo_Dron_data['EPC'] = Ultimo_Archivo_Dron_data['EPC'].str.replace(' ', '').str.lower() # llevar todo a minusculas
 
         #abrimon archivo generado por JD
-        ruta_Archivo_JD = os.path.join(os.getenv('JD_DRON_FOLDER'), os.getenv('JD_DRON_FILE'))
+        #ruta_Archivo_JD = os.path.join(os.getenv('JD_DRON_FOLDER'), os.getenv('JD_DRON_FILE'))
+        ruta_Archivo_JD = os.path.join(os.getenv('JD_REMOTE_FOLDER'), os.getenv('JD_DRON_FILE'))
         with open(ruta_Archivo_JD, 'r') as f:
             json_entrada = json.load(f)
 
@@ -86,7 +88,7 @@ def actualizar_estado_inventario():
             NumeroConteo=str(item['NumeroConteo'])
             TransactionId=str(item['TransactionId'])
             #remover archivo de inventario ya utilizado para que no se sume con la siguiente llamada
-            borrar_archivos_en_carpeta(os.getenv('JD_DRON_FOLDER'))
+            #borrar_archivos_en_carpeta(os.getenv('JD_DRON_FOLDER'))
             
             json_valid = json.dumps(json_entrada, ensure_ascii=True, indent=4)
 
@@ -164,6 +166,18 @@ def borrar_archivos_en_carpeta(carpeta):
 
 
 
+def connect_to_share_folder(share_name, username, password):
+    try:
+        win32wnet.WNetAddConnection2(0, None, share_name, None, username, password)
+    except Exception as e:
+        print(f"Error connecting to share: {e}")
+
+def disconnect_from_share_folder(share_name):
+    try:
+        win32wnet.WNetCancelConnection2(share_name, 0,0)
+    except Exception as e:
+        print(f"Error disconnecting from share: {e}")
+
     
 if __name__ == "__main__":
 
@@ -173,4 +187,7 @@ if __name__ == "__main__":
     #with open(file_path, 'r') as f:
     #    data = json.load(f)
     
-    actualizar_estado_inventario()
+    #actualizar_estado_inventario()
+    connect_to_share_folder(os.getenv('JD_REMOTE_FOLDER'),os.getenv('JD_REMOTE_FOLDER_USERNAME'),os.getenv('JD_REMOTE_FOLDER_PASSWORD'))
+    borrar_archivos_en_carpeta(os.getenv('JD_REMOTE_FOLDER'))
+    disconnect_from_share_folder(os.getenv('JD_REMOTE_FOLDER'))

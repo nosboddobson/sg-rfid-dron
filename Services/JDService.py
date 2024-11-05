@@ -162,7 +162,9 @@ def Generar_Reporte_Conteo (NumeroConteo:str):
 
 def Archivo_Conteo_Generado_Nuevo(start_time:time):
     
-    ruta_Archivo_JD = os.path.join(os.getenv('JD_DRON_FOLDER'), os.getenv('JD_DRON_FILE'))
+    #ruta_Archivo_JD = os.path.join(os.getenv('JD_DRON_FOLDER'), os.getenv('JD_DRON_FILE'))
+    ruta_Archivo_JD = os.path.join(os.getenv('JD_REMOTE_FOLDER'), os.getenv('JD_DRON_FILE'))
+    
     #obtenemos la fecha de creacion del archivo jsonout disponible
     fecha_creacion_jsonout = datetime.datetime.fromtimestamp(os.path.getmtime(ruta_Archivo_JD))
 
