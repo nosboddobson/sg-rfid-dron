@@ -527,9 +527,9 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
             'Category': ['Correctos', 'Faltantes', 'Sobrantes'],
             'Values': [int(Inventario_Realizado["Elementos_OK"]), int(Inventario_Realizado["Elementos_Faltantes"]), int(Inventario_Realizado["Elementos_Sobrantes"])]
         }
-
+        color_map = {'Correctos': 'green', 'Faltantes': 'orange', 'Sobrantes': 'yellow'}
         # Create a pie chart using Plotly
-        fig = px.pie(data, names='Category', values='Values', title='Distribución de Elementos')
+        fig = px.pie(data, names='Category', values='Values', title='Distribución de Elementos', color='Category',color_discrete_map=color_map)
 
         # Display the pie chart in Streamlit
         #st.plotly_chart(fig)
