@@ -155,7 +155,7 @@ def actualizar_inventario():
                
                 print ("Archivos de Conteo Existentes")
                 # Comparamos inventario disponible con  obtenido desde Dron
-                inventario_json,NumeroConteo,TransactionId= DronService.actualizar_estado_inventario()
+                inventario_json,NumeroConteo,TransactionId= DronService.actualizar_estado_inventario(ID)
                 #print (inventario_json)
                 #si resulta, entonces guardamos resultado como csv
 

@@ -237,12 +237,34 @@ def delete_inventario_vuelo_row(id_to_delete):
     finally:
         conn.close()
 
+def obtener_nombre_archivo(ID):
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    query='''
+        SELECT Nombre_Archivo  FROM Inventario_Vuelos
+        WHERE ID=?'''
+    
+    cursor.execute(query, (ID,))
+
+    result = cursor.fetchone()
+
+    if result:
+        Nombre_Archivo = result[0]
+        conn.close()
+        return Nombre_Archivo
+    else:
+        conn.close()
+        return None
+    
 if __name__ == "__main__":
 
     print("OK")
+    print (obtener_nombre_archivo(135))
 
-    with open("output_inventario.json", "r") as file:
-        json_content = file.read()
+   # with open("output_inventario.json", "r") as file:
+   #     json_content = file.read()
     
-    print("OK")
-    print(insertar_elementos_jde(2, json_content))
+    #print("OK")
+    #print(insertar_elementos_jde(2, json_content))

@@ -12,6 +12,9 @@ from typing import Optional
 from menu import make_sidebar
 from streamlit_modal import Modal
 
+
+
+
 # Load environment variables
 load_dotenv(override=True)
 
@@ -55,9 +58,9 @@ def obtener_datos_inventarios_jde():
     # Query to fetch all data from the table
     cursor.execute('''
         SELECT j.ID, j.ID_Vuelo, v.Fecha_Vuelo, v.Tiempo_Vuelo, j.Fecha_Inventario, 
-               j.Elementos_OK, j.Elementos_Faltantes, j.Elementos_Sobrantes, 
+               j.Elementos_OK, j.Elementos_Faltantes, 
                j.Porcentaje_Lectura, j.NumeroConteo, j.Sucursal, j.Ubicacion, 
-               j.TransactionId
+               j.TransactionId, (v.N_elementos - j.Elementos_OK) AS Elementos_Sobrantes
         FROM Inventarios_JDE j
         JOIN Inventario_Vuelos v ON j.ID_Vuelo = v.ID
         ORDER BY j.ID DESC
@@ -404,7 +407,7 @@ with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inven
 
         st.subheader("Detalles de Inventarios Realizados")
 
-        headers = st.columns([2, 1, 2, 2, 2, 2, 2, 2, 2,2], gap="small", vertical_alignment="top")
+        headers = st.columns([2, 1, 2, 2, 2, 2, 2, 2, 2,2,2], gap="small", vertical_alignment="top")
         headers[0].write("Tipo Inventario")
         headers[1].write("Zona")
         headers[2].write("Fecha Inventario")
@@ -412,15 +415,16 @@ with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inven
         headers[4].write("Tiempo de Vuelo[MM:SS]")
         headers[5].write("Correctos")
         headers[6].write("Faltantes")
-        headers[7].write("Lectura [%]")
-        headers[8].write("Código JD")
-        headers[9].write("")
+        headers[7].write("Sobrantes")
+        headers[8].write("Lectura [%]")
+        headers[9].write("Código JD")
+        headers[10].write("")
         
 
         if not datosJDE.empty:  # Check if the DataFrame is not empty
             for index, inventario in df_to_display.iterrows():  # Iterate over rows using iterrows()
                 # Each row of the table
-                col1, col2, col3, col4, col5, col6, col7, col8, col9,col10 = st.columns([2, 1, 2, 2, 2, 2, 2, 2, 2,2], gap="medium", vertical_alignment="center")
+                col1, col2, col3, col4, col5, col6, col7, col8, col9,col10,col11 = st.columns([2, 1, 2, 2, 2, 2, 2, 2, 2,2,2], gap="medium", vertical_alignment="center")
 
                 # Determine Tipo_inventario based on Ubicacion
                 Tipo_inventario = "Completo" if inventario["Ubicacion"] == "PT" else "Parcial"
@@ -436,11 +440,12 @@ with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inven
                 #col5.write(inventario["Tiempo_Vuelo"])
                 col6.write(inventario["Elementos_OK"])
                 col7.write(inventario["Elementos_Faltantes"])
-                col8.write(str(inventario["Porcentaje_Lectura"])+"%")
-                col9.write(str(inventario["NumeroConteo"]))
+                col8.write(inventario["Elementos_Sobrantes"])
+                col9.write(str(inventario["Porcentaje_Lectura"])+"%")
+                col10.write(str(inventario["NumeroConteo"]))
 
                 # Botón de "Resumen"
-                if col10.button("Ver", key=f"resumen_{inventario['ID']}"):
+                if col11.button("Ver", key=f"resumen_{inventario['ID']}"):
                     st.session_state.selected_inventory = inventario["ID"]
                     st.session_state.expand_resumen_inventario=True
                     st.session_state.expand_inventario_Realizado = False

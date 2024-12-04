@@ -3,6 +3,9 @@ import streamlit as st
 from time import sleep
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 from streamlit.source_util import get_pages
+from streamlit_cookies_controller import CookieController
+
+controller = CookieController()
 
 
 def get_current_page_name():
@@ -17,7 +20,7 @@ def get_current_page_name():
 
 
 def make_sidebar():
-
+    
     no_sidebar_style = """
     <style>
         div[data-testid="stSidebarNav"] {display: none;}
@@ -31,6 +34,7 @@ def make_sidebar():
         st.page_link("inicio.py", label="Inicio", icon="🏠")
         st.write("")
 
+        #if controller.get("logged_in"):
         if st.session_state.get("logged_in", False):
             st.page_link("pages/Inventarios_Pendientes.py", label="Patio Mina 2", icon="🕵️")
 
@@ -45,9 +49,18 @@ def make_sidebar():
             # redirect them to the login page
             st.switch_page("inicio.py")
 
-
+        print (str())
 def logout():
-    st.session_state['logged_in']= False
-    st.info("Sesión iniciada correctamente!")
-    sleep(0.5)
-    st.switch_page("inicio.py")
+
+
+    if st.session_state.get('logged_in',True):  
+       
+        del st.session_state["logged_in"]  # Update session state
+        if controller.get("logged_in"):
+            controller.remove("logged_in")
+            
+        st.info("Sesión Cerrada correctamente!")
+        sleep(0.5)
+        st.switch_page("inicio.py")
+    else: 
+        st.warning("Aún no inicias sesión")

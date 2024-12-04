@@ -1,12 +1,16 @@
 import base64
 import os
 from dotenv import load_dotenv
-import msal
-import requests
 import streamlit as st
 from time import sleep
-from menu import make_sidebar
+#from menu import make_sidebar
 from ldap3 import Server, Connection, ALL, SUBTREE
+from streamlit_cookies_controller import CookieController
+
+
+st.set_page_config(page_title="Inicio",layout="wide",initial_sidebar_state="collapsed")
+
+
 
 
 load_dotenv(override=True)
@@ -16,6 +20,9 @@ USER_NAME = 'nombre_usuario'
 USER_NAME_DOMAIN = os.getenv('AD_DOMAIN')+"\\{USER_NAME}"
 USER_PASSWORD = "contraseña_usuario"  # checkear
 SEARCH_BASE = os.getenv('AD_SEARCH_BASE')
+
+
+
 
 
 def set_bg_hack_url():
@@ -38,14 +45,17 @@ def set_bg_hack_url():
          unsafe_allow_html=True
      )
     
-st.set_page_config(page_title="Inicio",layout="wide",initial_sidebar_state="collapsed")
+
+
+#make_sidebar()
 #set_bg_hack_url()
+controller = CookieController()
 
-
-
-make_sidebar()
-
-
+#redirigir si ya esta logeado
+if st.session_state.get('logged_in',False):
+    #st.session_state['logged_in'] = True
+    #controller.set("logged_in", True)
+    st.switch_page("pages/Inventarios_Pendientes.py")
     
 # Create two columns for the logo and title
 col1, col2 = st.columns([1, 6])  # Adjust the ratios as necessary
@@ -72,6 +82,7 @@ with col2_t:
         if st.form_submit_button("Iniciar sesión", type="primary"):
             if username == "test" and password == "test":        
                 st.session_state['logged_in'] = True
+                controller.set("logged_in", True,path="/")
                 st.success("Conectado correctamente!")
                 sleep(0.5)
                 st.switch_page("pages/Inventarios_Pendientes.py")
@@ -90,24 +101,29 @@ with col2_t:
                     #print(f'User name: {USER_NAME}')
                     #print(f'User password: {USER_PASSWORD}')
                     print(f'Estado conexión: {conn.bind()}')
-                    search_filter = f'(SAMAccountName={USER_NAME})'
+                    
+                    if conn.bind():
+                        search_filter = f'(SAMAccountName={USER_NAME})'
 
-                    search_result = conn.search(search_base=SEARCH_BASE,
-                                                search_filter=search_filter,
-                                                attributes=["cn"],
-                                                )
-                    #print(search_result)
-                    if conn.entries:
-                        user_info = conn.entries[0]
-                        user_name = user_info.cn
-                        #print(user_name)
-                        st.session_state['username']=user_name
-                        st.session_state['logged_in'] = True
-                        st.success("Conectado correctamente!")
-                        sleep(0.5)
-                        st.switch_page("pages/Inventarios_Pendientes.py")
-                    print("Conexión cerrada")
-                    conn.unbind()
+                        search_result = conn.search(search_base=SEARCH_BASE,
+                                                    search_filter=search_filter,
+                                                    attributes=["cn"],
+                                                    )
+                        #print(search_result)
+                        if conn.entries:
+                            user_info = conn.entries[0]
+                            user_name = user_info.cn
+                            #print(user_name)
+                            st.session_state['username']=user_name
+                            controller.set("logged_in", True,path="/")
+                            st.session_state['logged_in'] = True
+                            st.success("Conectado correctamente!")
+                            sleep(0.5)
+                            st.switch_page("pages/Inventarios_Pendientes.py")
+                        print("Conexión cerrada")
+                        conn.unbind()
+                    else:
+                        st.error(f"Actualmente presentamos problemas para conectarnos al servidor.")
                 except Exception as e:
                     print(f"Error en la conexión: {e}")
 

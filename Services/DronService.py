@@ -3,7 +3,8 @@ import glob
 import json
 import os
 import win32wnet
-
+from Services import MsSQL_Service
+#import MsSQL_Service
 from dotenv import load_dotenv
 import pandas as pd
 
@@ -47,14 +48,15 @@ def Obtener_Ultimo_Archivo_csv(folder,extension="csv"):
 
 
 
-def actualizar_estado_inventario():
+def actualizar_estado_inventario(ID):
     
-    Ultimo_Archivo_Dron = Obtener_Ultimo_Archivo_csv(os.getenv('Dron_Folder'),"csv" )
+    #Ultimo_Archivo_Dron = Obtener_Ultimo_Archivo_csv(os.getenv('Dron_Folder'),"csv" )
    
+    Ultimo_Archivo_Dron=MsSQL_Service.obtener_nombre_archivo(ID)
     try :
         #buscar ultimo archivo y limpiarlo
         if Ultimo_Archivo_Dron:
-            Ultimo_Archivo_Dron_data = pd.read_csv(Ultimo_Archivo_Dron )
+            Ultimo_Archivo_Dron_data = pd.read_csv(os.path.join(os.getenv('Dron_Folder'),Ultimo_Archivo_Dron ))
         
         Ultimo_Archivo_Dron_data = Ultimo_Archivo_Dron_data[Ultimo_Archivo_Dron_data['EPC'] != '00 00 00'] #eliminar filas sin lectura de tag
         Ultimo_Archivo_Dron_data = Ultimo_Archivo_Dron_data.drop_duplicates(subset=['EPC']) # eliminar filas duplicadas
