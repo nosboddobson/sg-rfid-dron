@@ -320,5 +320,18 @@ def show_message(msg):
         return jsonify({'Error': str(e)}), 500
 
 
+@app.route('/dron/TestJDFolder', methods=['POST'])
+def TestJDFolder():
+
+    
+    try:
+        print ("connecting to: " +os.getenv('JD_REMOTE_FOLDER') + " with user " + os.getenv('JD_REMOTE_FOLDER_USERNAME') )
+         #Borramos el contenido de la carpeta par asegurar que no exista informacion antigua.
+        DronService.connect_to_share_folder(os.getenv('JD_REMOTE_FOLDER'),os.getenv('JD_REMOTE_FOLDER_USERNAME'),os.getenv('JD_REMOTE_FOLDER_PASSWORD'))
+        return "OK"
+    except Exception as e:
+        print ({'Error': str(e)})
+        return jsonify({'Error': str(e)}), 500
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5100)
