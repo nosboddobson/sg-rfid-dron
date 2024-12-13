@@ -147,7 +147,7 @@ def actualizar_inventario():
             #obtenemos los valores retornados de Generar Conteo
            
             #Esperamos unos segundos para que el servidor genere el archivo con el inventario jsonout.txt
-            time.sleep(16)
+            time.sleep(40)
 
             print ("Conteo Solicitado OK")
             #Revisar si se la fecha del archivo disponoble es actual (> a la hora de inicio de ejecucion del codigo)

@@ -8,6 +8,8 @@ import os
 from dotenv import load_dotenv
 import pandas as pd
 
+from Services import DronService
+
 
 
 load_dotenv(override=True)
@@ -164,13 +166,20 @@ def Archivo_Conteo_Generado_Nuevo(start_time:time):
     
     #ruta_Archivo_JD = os.path.join(os.getenv('JD_DRON_FOLDER'), os.getenv('JD_DRON_FILE'))
     ruta_Archivo_JD = os.path.join(os.getenv('JD_REMOTE_FOLDER'), os.getenv('JD_DRON_FILE'))
+    print (ruta_Archivo_JD)
     
+    if not os.path.exists(ruta_Archivo_JD):
+        DronService.connect_to_share_folder(os.getenv('JD_REMOTE_FOLDER'),os.getenv('JD_REMOTE_FOLDER_USERNAME'),os.getenv('JD_REMOTE_FOLDER_PASSWORD'))
+        print ("conectando nuevamente a " +ruta_Archivo_JD)
+
+    if os.path.exists(ruta_Archivo_JD):
     #obtenemos la fecha de creacion del archivo jsonout disponible
-    fecha_creacion_jsonout = datetime.datetime.fromtimestamp(os.path.getmtime(ruta_Archivo_JD))
+        fecha_creacion_jsonout = datetime.datetime.fromtimestamp(os.path.getmtime(ruta_Archivo_JD))
 
     #Revisar si se la fecha del archivo disponoble es actual (> a la hora de inicio de ejecucion del codigo)
-    if fecha_creacion_jsonout > datetime.datetime.fromtimestamp(start_time):
-        return "OK"
+        if fecha_creacion_jsonout > datetime.datetime.fromtimestamp(start_time):
+            return "OK"
+        
     else:
         return None
 
