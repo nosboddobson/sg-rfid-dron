@@ -37,8 +37,10 @@ def make_sidebar():
         #if controller.get("logged_in"):
         if st.session_state.get("logged_in", False):
             st.page_link("pages/Inventarios_Pendientes.py", label="Patio Mina 2", icon="🕵️")
+    
 
             st.write("")
+            st.page_link("pages/Inventarios_Log.py", label="Log de Vuelos", icon="📃")
             st.write("")
 
             if st.button("Cerrar Sesión"):
