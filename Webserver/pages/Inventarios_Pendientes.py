@@ -331,6 +331,7 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
             <p>Fecha de vuelo</p>
         </div>
         </div>""", unsafe_allow_html=True)
+        st.write('')
 
         st.markdown(f"""
         <div style="display: flex; align-items: center;">
