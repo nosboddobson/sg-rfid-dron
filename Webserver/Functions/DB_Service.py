@@ -6,9 +6,6 @@ import streamlit as st
 import pyodbc
 from dotenv import load_dotenv
 import time
-from streamlit_ldap_authenticator import Authenticate, Connection, UserInfos
-from typing import Optional
-from streamlit_modal import Modal
 
 
 # Load environment variables
