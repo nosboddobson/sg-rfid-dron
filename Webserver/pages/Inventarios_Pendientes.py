@@ -156,7 +156,7 @@ with st.expander("Inventarios Pendientes",expanded=True):
                         # Disable the button
                         
                     except Exception as e:
-                        st.error(f"Error Conectado a Servidor, por favor, intenta mas tarde!")
+                        st.error(f"invp Error Conectado a Servidor, por favor, intenta mas tarde!" + str(e))
                         st.session_state.button_disabled = False
            
             

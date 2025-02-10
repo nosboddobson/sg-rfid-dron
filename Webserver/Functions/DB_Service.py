@@ -130,11 +130,12 @@ def obtener_elementos_jde(id_inventario):
 
 def Generar_Inventario(url):
     """Consumes the specified URL and returns the response."""
+
     response = requests.post(url)
     if response.status_code == 200:
         return "Inventario procesado con éxito por JD Edwards"
     else:
-        raise Exception(f"Error procesando Inventario con JD Edwards")
+        raise Exception(f"Error procesando Inventario con JD Edwards _ " + str(url))
     
 def Eliminar_Inventario(url):
     """Consumes the specified URL and returns the response."""
@@ -169,7 +170,7 @@ def eliminar_inventario_dialog(inventario):
                 # Disable the button
                 
             except Exception as e:
-                st.error(f"Error Conectado a Servidor, por favor, intenta mas tarde!")
+                st.error(f"dbs Error Conectado a Servidor, por favor, intenta mas tarde!")
 
     with cole2:
         if st.button("No"):

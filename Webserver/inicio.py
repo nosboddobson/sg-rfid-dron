@@ -37,8 +37,9 @@ def set_bg_hack_url():
          f"""
          <style>
          .stApp {{
-             background: url(data:image/jpeg;base64,{base64.b64encode(open("images/PM2_Dron.jpeg", "rb").read()).decode()});
-             background-size: cover
+             background: url(data:image/jpeg;base64,{base64.b64encode(open("images/PM2_Dron.jpg", "rb").read()).decode()});
+             background-size: cover;s
+            
          }}
          </style>
          """,
@@ -48,7 +49,7 @@ def set_bg_hack_url():
 
 
 #make_sidebar()
-#set_bg_hack_url()
+set_bg_hack_url()
 controller = CookieController()
 
 #redirigir si ya esta logeado
@@ -65,72 +66,87 @@ with col1:
     st.image('images/SG_Logo.png', width=250)  # Adjust the width as necessary
 # Add title in the second column
 with col2:
-    #st.title("Inventarios Patio Mina 2")
+    #st.title("Inventarios Patio Mina 2"
     st.markdown("<h1 style='text-align: center;'>Inventarios Patio Mina </h1>", unsafe_allow_html=True)
 
 col1_t, col2_t, col3_t = st.columns([2,3,2])
 
 with col2_t:
-    with st.form("login_form"):
-    
+        
+        st.markdown(
+        """
+        <style>
+        .st-cw {
+            background-color: white; /* Light gray background */
+            border: 3px solid #ccc; /* Gray border */
+            border-radius: 15px; /* Rounded corners */
+            padding: 20px; 
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+        )
 
-        st.write("Por favor, inicia sesión para continuar .")
+        with st.form("login_form"):
+        
 
-        username = st.text_input("Nombre de Usuario SG")
-        password = st.text_input("Contraseña", type="password")
+            st.write("Por favor, inicia sesión para continuar .")
 
-        if st.form_submit_button("Iniciar sesión", type="primary"):
-         #   if username == "test" and password == "test":        
-         #       st.session_state['logged_in'] = True
-         #       controller.set("logged_in", True,path="/")
-         #       st.success("Conectado correctamente!")
-         #       sleep(0.5)
-         #       st.switch_page("pages/Inventarios_Pendientes.py")
-            if username != ""  and password != "":
+            username = st.text_input("Nombre de Usuario SG")
+            password = st.text_input("Contraseña", type="password")
 
-                USER_NAME=username
-                USER_PASSWORD=password
-                USER_NAME_DOMAIN=f'quadra\\{USER_NAME}'
-                # Crear una conexión
-                conn = Connection(AD_SERVER, user=USER_NAME_DOMAIN,
-                        password=USER_PASSWORD,
-                        authentication='SIMPLE'
-                        )
-                
-                try:
-                    #print(f'User name: {USER_NAME}')
-                    #print(f'User password: {USER_PASSWORD}')
-                    print(f'Estado conexión: {conn.bind()}')
+            if st.form_submit_button("Iniciar sesión", type="primary"):
+            #   if username == "test" and password == "test":        
+            #       st.session_state['logged_in'] = True
+            #       controller.set("logged_in", True,path="/")
+            #       st.success("Conectado correctamente!")
+            #       sleep(0.5)
+            #       st.switch_page("pages/Inventarios_Pendientes.py")
+                if username != ""  and password != "":
+
+                    USER_NAME=username
+                    USER_PASSWORD=password
+                    USER_NAME_DOMAIN=f'quadra\\{USER_NAME}'
+                    # Crear una conexión
+                    conn = Connection(AD_SERVER, user=USER_NAME_DOMAIN,
+                            password=USER_PASSWORD,
+                            authentication='SIMPLE'
+                            )
                     
-                    if conn.bind():
-                        search_filter = f'(SAMAccountName={USER_NAME})'
+                    try:
+                        #print(f'User name: {USER_NAME}')
+                        #print(f'User password: {USER_PASSWORD}')
+                        print(f'Estado conexión: {conn.bind()}')
+                        
+                        if conn.bind():
+                            search_filter = f'(SAMAccountName={USER_NAME})'
 
-                        search_result = conn.search(search_base=SEARCH_BASE,
-                                                    search_filter=search_filter,
-                                                    attributes=["cn"],
-                                                    )
-                        #print(search_result)
-                        if conn.entries:
-                            user_info = conn.entries[0]
-                            user_name = user_info.cn
-                            #print(user_name)
-                            st.session_state['username']=user_name
-                            controller.set("logged_in", True,path="/")
-                            st.session_state['logged_in'] = True
-                            st.success("Conectado correctamente!")
-                            sleep(0.5)
-                            st.switch_page("pages/Inventarios_Pendientes.py")
-                        print("Conexión cerrada")
-                        conn.unbind()
-                    else:
-                        st.error(f"Actualmente presentamos problemas para conectarnos al servidor.")
-                except Exception as e:
-                    print(f"Error en la conexión: {e}")
+                            search_result = conn.search(search_base=SEARCH_BASE,
+                                                        search_filter=search_filter,
+                                                        attributes=["cn"],
+                                                        )
+                            #print(search_result)
+                            if conn.entries:
+                                user_info = conn.entries[0]
+                                user_name = user_info.cn
+                                #print(user_name)
+                                st.session_state['username']=user_name
+                                controller.set("logged_in", True,path="/")
+                                st.session_state['logged_in'] = True
+                                st.success("Conectado correctamente!")
+                                sleep(0.5)
+                                st.switch_page("pages/Inventarios_Pendientes.py")
+                            print("Conexión cerrada")
+                            conn.unbind()
+                        else:
+                            st.error(f"Actualmente presentamos problemas para conectarnos al servidor.")
+                    except Exception as e:
+                        print(f"Error en la conexión: {e}")
 
-                
+                    
 
-            else:
-                st.error("Nombre de usuario o contraseña incorrectos")
+                else:
+                    st.error("Nombre de usuario o contraseña incorrectos")
 
    
 
