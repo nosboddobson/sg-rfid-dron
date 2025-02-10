@@ -67,7 +67,7 @@ with st.expander("Log de Vuelos",expanded=True):
         <p>Nº de Vuelos</p>
     </div>
     <div style="display:inline-block;background-color:orange;padding:10px;border-radius:10px;text-align:center;width:600px;margin-right:10px;">
-        <h1>{datos.iloc[0]["Fecha_Vuelo"]}</h1>
+        <h1>{DB.format_datetime(datos.iloc[0]["Fecha_Vuelo"])}</h1>
         <p>Último Vuelo</p>
     </div>
     <div style="display:inline-block;background-color:orange;padding:10px;border-radius:10px;text-align:center;width:200px;margin-right:10px;">
@@ -132,7 +132,7 @@ with st.expander("Log de Vuelos",expanded=True):
             col1.write(inventario["ID"])
 
             # Column 2: Fecha de Vuelo
-            col2.write(inventario["Fecha_Vuelo"])
+            col2.write(DB.format_datetime(inventario["Fecha_Vuelo"]))
 
             # Column 3: Elementos Detectador
             col3.write(inventario["N_Elementos"])
@@ -140,7 +140,7 @@ with st.expander("Log de Vuelos",expanded=True):
             #minutes = str(inventario["Tiempo_Vuelo"] // 60).zfill(2)
             #seconds = str(inventario["Tiempo_Vuelo"] % 60).zfill(2)
             #col4.write(minutes+":"+seconds)
-            col4.write(DB.seconds_to_hhmmss(inventario["Tiempo_Vuelo"]))
+            col4.write(DB.format_seconds_HHMMSS(inventario["Tiempo_Vuelo"]))
             if inventario["Estado_Inventario"]=="OK":
                 col5.write("Procesado")
             elif inventario["N_Elementos"] == 0:

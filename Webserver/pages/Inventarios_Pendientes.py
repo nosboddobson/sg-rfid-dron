@@ -12,17 +12,6 @@ st.set_page_config(page_title="Inventario Sierra Gorda",layout="wide")
 
 make_sidebar()
 
-    
-st.markdown("""
-    <style>
-    /* Set the entire background of the page to light gray */
-    body {
-        background-color: #f0f0f0;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-
 
 # Create two columns for the logo and title
 col1, col2 = st.columns([1, 4])  # Adjust the ratios as necessary
@@ -62,20 +51,20 @@ if 'show_popup_eliminar' not in st.session_state:
 
 with st.expander("Inventarios Pendientes",expanded=True):
 
-    st.title("Inventarios Pendientes")
+   # st.title("Inventarios Pendientes")
 
     #Obtener inventarios pendientes
     datos = DB.obtener_datos_inventarios_pendientes()
-    if len(datos) >0:
-        total_seconds =sum(row[3] for row in datos)/len(datos)
-    else:
-        total_seconds=0
+    #if len(datos) >0:
+    #    total_seconds =sum(row[3] for row in datos)/len(datos)
+    #else:
+    #    total_seconds=0
 
 
     #
     # Mostrar el total de inventarios pendientes
     
-
+    _ = '''
     st.markdown(f"""
     <div style="display: flex; align-items: center;">
     <div style="display:inline-block;background-color:orange;padding:10px;border-radius:10px;text-align:center;width:200px;margin-right:10px;">
@@ -95,7 +84,7 @@ with st.expander("Inventarios Pendientes",expanded=True):
     </div>
 
     """, unsafe_allow_html=True)
-
+    '''
 
 
     
@@ -103,38 +92,54 @@ with st.expander("Inventarios Pendientes",expanded=True):
     # Mostrar la tabla de inventarios pendientes
     
 
-    st.subheader("Detalles de Inventarios Pendientes")
-    headers = st.columns([1, 2, 2, 2, 2, 2,2,2], gap="small", vertical_alignment="top")
-    headers[0].write("ID")
-    headers[1].write("Fecha de Vuelo")
-    headers[2].write("Elementos Detectados")
-    headers[3].write("Tiempo de Vuelo[HH:MM:SS]")
-    headers[4].write("Tipo Inventario")
-    headers[5].write("Zona")
-    headers[6].write("Acción")
-    headers[7].write("Eliminar")
+    #st.subheader("Detalles de Inventarios Pendientes")
+    headers_Pendiente = st.columns([1, 2, 2, 2, 2, 2,1,1], gap="medium", vertical_alignment="center")
+    header_texts = [
+    "Nº",
+    "Fecha de Vuelo",
+    "Elementos Detectados",
+    "Tiempo de Vuelo [HH:MM:SS]",
+    "Tipo Inventario",
+    "Zona",
+    "",
+    "" # Empty string for the last column
+    ]
+    #headers_Pendiente[0].write("Nº")
+    #headers_Pendiente[1].write("Fecha de Vuelo")
+    #headers_Pendiente[2].write("Elementos Detectados")
+    #headers_Pendiente[3].write("Tiempo de Vuelo [HH:MM:SS]")
+    #headers_Pendiente[4].write("Tipo Inventario")
+    #headers_Pendiente[5].write("Zona")
+    #headers_Pendiente[6].write("")
+    #headers_Pendiente[7].write("")
 
+    for i, header in enumerate(headers_Pendiente):
+        with header:
+            st.markdown(f"<p style='text-align: center;'>{header_texts[i]}</p>", unsafe_allow_html=True) 
 
+  
 
+    fila = len(datos)
     if datos:
         for inventario in datos:
             # Each row of the table
-            col1, col2, col3, col4, col5, col6,col7,col8 = st.columns([1, 2, 2, 2,2, 2,2,2], gap="medium", vertical_alignment="center")
+            col1, col2, col3, col4, col5, col6,col7,col8 = st.columns([1, 2, 2, 2,2, 2,1,1], gap="medium", vertical_alignment="center")
 
             # Column 1: ID Inventario
-            col1.write(inventario[0])
+            col1.write(f"<p style='text-align: center;'>{fila}</p>", unsafe_allow_html=True)
+            fila -=1
 
             # Column 2: Fecha de Vuelo
-            col2.write(inventario[1])
+            col2.write(f"<p style='text-align: center;'>{inventario[1]}</p>", unsafe_allow_html=True)
 
             # Column 3: Elementos Detectador
-            col3.write(inventario[2])
+            col3.write(f"<p style='text-align: center;'>{inventario[2]}</p>", unsafe_allow_html=True)
             # Column 3: Elementos Detectador
             #minutes = str(inventario[3] // 60).zfill(2)
             #seconds = str(inventario[3] % 60).zfill(2)
             #col4.write(minutes+":"+seconds)
-            col4.write(DB.seconds_to_hhmmss(inventario[3]))
-
+            #col4.write(DB.seconds_to_hhmmss(inventario[3]))
+            col4.write(f"<p style='text-align: center;'>{DB.format_seconds_HHMMSS(inventario[3])}</p>", unsafe_allow_html=True)
             # Column 4: Tipo Inventario dropdown
             tipo_inventario = col5.selectbox("Tipo Inventario", ["Parcial", "Completo"], key=f"tipo_{inventario[0]}",label_visibility="collapsed")
 
@@ -143,7 +148,7 @@ with st.expander("Inventarios Pendientes",expanded=True):
             zona = col6.selectbox("Zona", ["SF0","SF1","SF2","PF1", "PF2", "PF3","PF4","PF5","PF6","PF7"], key=f"zona_{inventario[0]}", help="S= Shelving, P= Pasillo y F=Fila",label_visibility="collapsed",disabled=zona_disabled)
 
             # Column 6: Acción button
-            if col7.button("Iniciar Inventario", key=f"iniciar_{inventario[0]}", help="Enviar Inventario a JD Edwards"): #Si el boton es presionado entonces:
+            if col7.button("Iniciar", key=f"iniciar_{inventario[0]}", help="Enviar Inventario a JD Edwards"): #Si el boton es presionado entonces:
                 # When the button is clicked, refer to the inventory update page
                 # Disable the button
                 st.session_state.button_disabled = True
@@ -179,8 +184,8 @@ with st.expander("Inventarios Pendientes",expanded=True):
 with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inventario_Realizado):
 
         
-        st.title("Inventarios Realizados")
-        st.subheader("Patio 2 Mina")
+        #st.title("Inventarios Realizados")
+        #st.subheader("Patio 2 Mina")
         # Get the data
         datosJDE = DB.obtener_datos_inventarios_jde()
     
@@ -194,7 +199,7 @@ with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inven
     # Mostrar el total de inventarios pendientes
     
 
-        st.markdown(f"""
+        _ = ''' st.markdown(f"""
         <div style="display: flex; align-items: center;">
         <div style="display:inline-block;background-color:orange;padding:10px;border-radius:10px;text-align:center;width:200px;margin-right:10px;">
             <h1>{len(datosJDE)}</h1>
@@ -219,7 +224,7 @@ with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inven
         </div>
 
     """, unsafe_allow_html=True)
-        
+        '''
 
         # Pagination variables
         # Number of rows per page
@@ -237,14 +242,14 @@ with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inven
         # Show current page rows
         df_to_display = datosJDE.iloc[start_row:end_row]
 
-        st.subheader("Detalles de Inventarios Realizados")
+        #st.subheader("Detalles de Inventarios Realizados")
 
-        headers = st.columns([2, 1, 2, 2, 2, 2, 2, 2, 2,2,2], gap="small", vertical_alignment="top")
+        headers = st.columns([2, 1, 2, 2, 2, 2, 2, 2, 2,2,2], gap="medium", vertical_alignment="top")
         headers[0].write("Tipo Inventario")
         headers[1].write("Zona")
         headers[2].write("Fecha Inventario")
-        headers[3].write("Fecha de Vuelo")
-        headers[4].write("Tiempo de Vuelo[HH:MM:SS]")
+        headers[3].write("Hora Inventario")
+        headers[4].write("Tiempo de Vuelo [HH:MM:SS]")
         headers[5].write("Correctos")
         headers[6].write("Faltantes")
         headers[7].write("Sobrantes")
@@ -264,15 +269,23 @@ with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inven
             
                 col1.write(Tipo_inventario)
                 col2.write(inventario["Ubicacion"])
-                col3.write(inventario["Fecha_Inventario"])
-                col4.write(inventario["Fecha_Vuelo"])
+                col3.write(DB.format_date(inventario["Fecha_Inventario"]))
+                col4.write(DB.format_time(inventario["Fecha_Inventario"]))
                 #minutes = str(inventario["Tiempo_Vuelo"] // 60).zfill(2)
                 #seconds = str(inventario["Tiempo_Vuelo"] % 60).zfill(2)
                 #col5.write(minutes+":"+seconds)
-                col5.write(DB.seconds_to_hhmmss(inventario["Tiempo_Vuelo"]))
-                col6.write(inventario["Elementos_OK"])
-                col7.write(inventario["Elementos_Faltantes"])
-                col8.write(inventario["Elementos_Sobrantes"])
+                #col5.write(DB.seconds_to_hhmmss(inventario["Tiempo_Vuelo"]))
+                col5.write(DB.format_seconds_HHMMSS(inventario["Tiempo_Vuelo"]))
+
+                #col6.write(inventario["Elementos_OK"])
+                col6.write(f"<p style='color: green;font-weight: bold;'>{inventario["Elementos_OK"]}</p>", unsafe_allow_html=True)
+                
+                #col7.write(inventario["Elementos_Faltantes"])
+                col7.write(f"<p style='color: orange'>{inventario["Elementos_Faltantes"]}</p>", unsafe_allow_html=True)
+
+            
+                #col8.write(inventario["Elementos_Sobrantes"])
+                col8.write(f"<p style='color: yellow'>{inventario["Elementos_Sobrantes"]}</p>", unsafe_allow_html=True)
                 col9.write(str(inventario["Porcentaje_Lectura"])+"%")
                 col10.write(str(inventario["NumeroConteo"]))
 
@@ -305,7 +318,7 @@ with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inven
 
 with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_inventario):
 
-    st.title("Resumen Inventario")
+   # st.title("Resumen Inventario")
 
     if st.session_state.selected_inventory:          
         resumen_inventario = DB.obtener_elementos_jde(int(st.session_state.selected_inventory))
@@ -319,15 +332,15 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
         st.markdown(f"""
         <div style="display: flex; align-items: center;">
         <div style="display:inline-block;background-color:lightblue;padding:10px;border-radius:10px;text-align:center;width:40%;margin-right:10px;">
-            <h1>{Inventario_Realizado["Fecha_Inventario"]}</h1>
+            <h1>{DB.format_datetime(Inventario_Realizado["Fecha_Inventario"])}</h1>
             <p>Fecha de inventario</p>
         </div>
-        <div style="display:inline-block;background-color:lavender;padding:10px;border-radius:10px;text-align:center;width:20%;margin-right:10px;">
+        <div style="display:inline-block;background-color:#CDB0EE;padding:10px;border-radius:10px;text-align:center;width:20%;margin-right:10px;">
             <h1>{len(resumen_inventario)}</h1>
             <p>Elementos detectados</p>
         </div>
         <div style="display:inline-block;background-color:lightblue;padding:10px;border-radius:10px;text-align:center;width:40%;margin-right:10px;">
-            <h1>{Inventario_Realizado["Fecha_Vuelo"]}</h1>
+            <h1>{DB.format_datetime(Inventario_Realizado["Fecha_Vuelo"])}</h1>
             <p>Fecha de vuelo</p>
         </div>
         </div>""", unsafe_allow_html=True)
@@ -343,7 +356,7 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
             <h1>{Inventario_Realizado["Elementos_Faltantes"]}</h1>
             <p>Elementos faltantes</p>
         </div>
-        <div style="display:inline-block;background-color:yellow;padding:10px;border-radius:10px;text-align:center;width:25%;margin-right:10px;">
+        <div style="display:inline-block;background-color:#EFCC00;padding:10px;border-radius:10px;text-align:center;width:25%;margin-right:10px;">
             <h1>{Inventario_Realizado["Elementos_Sobrantes"]}</h1>
             <p>Elementos sobrantes</p>
         </div>

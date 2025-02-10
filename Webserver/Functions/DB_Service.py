@@ -1,5 +1,6 @@
 import datetime
 import os
+import re
 import pandas as pd
 import requests
 import streamlit as st
@@ -224,4 +225,62 @@ def seconds_to_hhmmss(seconds):
   except ValueError:
     # Handle potential errors, such as negative seconds
     return "Invalid input"
-  
+
+
+def format_seconds_HHMMSS(seconds):
+    """Formats seconds into HH:MM:SS, always showing two digits for hours."""
+    td = datetime.timedelta(seconds=seconds)
+    total_seconds = td.total_seconds()
+    hours = int(total_seconds // 3600)  # Integer division for hours
+    minutes = int((total_seconds % 3600) // 60) # Modulo and integer division for minutes
+    seconds = int(total_seconds % 60) #Modulo for seconds
+
+    try:
+        return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+    except ValueError:
+    # Handle potential errors, such as negative seconds
+        return "Invalid input"
+    
+
+def format_date(date_string):
+    
+    timestamp = pd.Timestamp(date_string)
+    formatted_date = timestamp.strftime('%d/%m/%Y')
+        # We don't need the time part for formatting to dd/mm/yyyy.
+    try:
+        if formatted_date:
+            return formatted_date
+        else: 
+            return None
+        
+    except ValueError:
+            return None #Handles invalid date values (like 30th of February)
+ 
+
+def format_time(date_string):
+    
+    timestamp = pd.Timestamp(date_string)
+    formatted_date = timestamp.strftime('%H:%M')
+        # We don't need the time part for formatting to dd/mm/yyyy.
+    try:
+        if formatted_date:
+            return formatted_date
+        else: 
+            return None
+        
+    except ValueError:
+            return None #Handles invalid date values (like 30th of February)
+    
+def format_datetime(date_string):
+    
+    timestamp = pd.Timestamp(date_string)
+    formatted_date = timestamp.strftime('%d/%m/%Y %H:%M')
+        # We don't need the time part for formatting to dd/mm/yyyy.
+    try:
+        if formatted_date:
+            return formatted_date
+        else: 
+            return None
+        
+    except ValueError:
+            return None #Handles invalid date values (like 30th of February)
