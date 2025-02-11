@@ -1,4 +1,5 @@
 
+import pandas as pd
 import streamlit as st
 import plotly.express as px
 from menu import make_sidebar
@@ -93,7 +94,7 @@ with st.expander("Inventarios Pendientes",expanded=True):
     
 
     #st.subheader("Detalles de Inventarios Pendientes")
-    headers_Pendiente = st.columns([1, 2, 2, 2, 2, 2,1,1], gap="medium", vertical_alignment="center")
+    headers_Pendiente = st.columns([1, 2, 1, 1, 2, 1,1,1], gap="medium", vertical_alignment="center")
     header_texts = [
     "Nº",
     "Fecha de Vuelo",
@@ -115,7 +116,7 @@ with st.expander("Inventarios Pendientes",expanded=True):
 
     for i, header in enumerate(headers_Pendiente):
         with header:
-            st.markdown(f"<p style='text-align: center;'>{header_texts[i]}</p>", unsafe_allow_html=True) 
+            st.markdown(f"<p style='text-align: center;font-weight: bold;'>{header_texts[i]}</p>", unsafe_allow_html=True) 
 
   
 
@@ -123,14 +124,14 @@ with st.expander("Inventarios Pendientes",expanded=True):
     if datos:
         for inventario in datos:
             # Each row of the table
-            col1, col2, col3, col4, col5, col6,col7,col8 = st.columns([1, 2, 2, 2,2, 2,1,1], gap="medium", vertical_alignment="center")
+            col1, col2, col3, col4, col5, col6,col7,col8 = st.columns([1, 2, 1, 1, 2, 1,1,1], gap="medium", vertical_alignment="center")
 
             # Column 1: ID Inventario
             col1.write(f"<p style='text-align: center;'>{fila}</p>", unsafe_allow_html=True)
             fila -=1
 
             # Column 2: Fecha de Vuelo
-            col2.write(f"<p style='text-align: center;'>{inventario[1]}</p>", unsafe_allow_html=True)
+            col2.write(f"<p style='text-align: center;'>{DB.format_datetime(inventario[1])}</p>", unsafe_allow_html=True)
 
             # Column 3: Elementos Detectador
             col3.write(f"<p style='text-align: center;'>{inventario[2]}</p>", unsafe_allow_html=True)
@@ -244,8 +245,9 @@ with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inven
 
         #st.subheader("Detalles de Inventarios Realizados")
 
-        headers = st.columns([2, 1, 2, 2, 2, 2, 2, 2, 2,2,2], gap="medium", vertical_alignment="top")
-        headers[0].write("Tipo Inventario")
+        headers_Procesado = st.columns([2, 1, 2, 2, 2, 2, 2, 2, 2,2,2], gap="medium", vertical_alignment="top")
+       
+        _= '''headers[0].write("Tipo Inventario")
         headers[1].write("Zona")
         headers[2].write("Fecha Inventario")
         headers[3].write("Hora Inventario")
@@ -255,8 +257,26 @@ with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inven
         headers[7].write("Sobrantes")
         headers[8].write("Lectura [%]")
         headers[9].write("Código JD")
-        headers[10].write("")
-        
+        headers[10].write("") '''
+
+        header_texts = [
+            "Tipo Inventario",
+            "Zona",
+            "Fecha Inventario",
+            "Hora Inventario",
+            "Tiempo de Vuelo [HH:MM:SS]",
+            "Correctos",
+            "Faltantes",
+            "Sobrantes",
+            "Lectura [%]",
+            "Código JD",
+            ""  # Empty string for the last column
+        ]        
+
+        for i, header in enumerate(headers_Procesado):
+            with header:
+                st.markdown(f"<p style='text-align: center;font-weight: bold;'>{header_texts[i]}</p>", unsafe_allow_html=True) 
+
 
         if not datosJDE.empty:  # Check if the DataFrame is not empty
             for index, inventario in df_to_display.iterrows():  # Iterate over rows using iterrows()
@@ -268,26 +288,26 @@ with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inven
 
             
                 col1.write(Tipo_inventario)
-                col2.write(inventario["Ubicacion"])
-                col3.write(DB.format_date(inventario["Fecha_Inventario"]))
-                col4.write(DB.format_time(inventario["Fecha_Inventario"]))
-                #minutes = str(inventario["Tiempo_Vuelo"] // 60).zfill(2)
-                #seconds = str(inventario["Tiempo_Vuelo"] % 60).zfill(2)
-                #col5.write(minutes+":"+seconds)
-                #col5.write(DB.seconds_to_hhmmss(inventario["Tiempo_Vuelo"]))
-                col5.write(DB.format_seconds_HHMMSS(inventario["Tiempo_Vuelo"]))
+                col2.write(f"<p style='text-align: center;'>{inventario['Ubicacion']}</p>", unsafe_allow_html=True) 
+                col3.write(f"<p style='text-align: center;'>{DB.format_date(inventario["Fecha_Inventario"])}</p>", unsafe_allow_html=True) 
+                col4.write(f"<p style='text-align: center;'>{DB.format_time(inventario["Fecha_Inventario"])}</p>", unsafe_allow_html=True) 
+                
+                col5.write(f"<p style='text-align: center;'>{DB.format_seconds_HHMMSS(inventario["Tiempo_Vuelo"])}</p>", unsafe_allow_html=True) 
+            
+        
 
                 #col6.write(inventario["Elementos_OK"])
-                col6.write(f"<p style='color: green;font-weight: bold;'>{inventario["Elementos_OK"]}</p>", unsafe_allow_html=True)
+                col6.write(f"<p style='text-align: center;color: lime;font-weight: bold;'>{inventario["Elementos_OK"]}</p>", unsafe_allow_html=True)
                 
                 #col7.write(inventario["Elementos_Faltantes"])
-                col7.write(f"<p style='color: orange'>{inventario["Elementos_Faltantes"]}</p>", unsafe_allow_html=True)
+                col7.write(f"<p style='text-align: center;color: orange'>{inventario["Elementos_Faltantes"]}</p>", unsafe_allow_html=True)
 
             
                 #col8.write(inventario["Elementos_Sobrantes"])
-                col8.write(f"<p style='color: yellow'>{inventario["Elementos_Sobrantes"]}</p>", unsafe_allow_html=True)
-                col9.write(str(inventario["Porcentaje_Lectura"])+"%")
-                col10.write(str(inventario["NumeroConteo"]))
+                col8.write(f"<p style='text-align: center;color: yellow'>{inventario["Elementos_Sobrantes"]}</p>", unsafe_allow_html=True)
+                col9.write(f"<p style='text-align: center;'>{str(inventario["Porcentaje_Lectura"])}%</p>", unsafe_allow_html=True) 
+                col10.write(f"<p style='text-align: center;'>{str(inventario["NumeroConteo"])}</p>", unsafe_allow_html=True) 
+               
 
                 # Botón de "Resumen"
                 if col11.button("Ver", key=f"resumen_{inventario['ID']}"):
@@ -327,19 +347,20 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
 
         Tipo_inventario_r = "Inventario Completo" if inventario["Ubicacion"] == "PT" else "Inventario Parcial, en " + inventario["Ubicacion"]
         st.subheader(Tipo_inventario_r +", Código JD : " + str(inventario["NumeroConteo"])   )
+        total_elementos=int(Inventario_Realizado["Elementos_OK"])+int(Inventario_Realizado["Elementos_Faltantes"])+int(Inventario_Realizado["Elementos_Sobrantes"])
      
-
+        
         st.markdown(f"""
         <div style="display: flex; align-items: center;">
-        <div style="display:inline-block;background-color:lightblue;padding:10px;border-radius:10px;text-align:center;width:40%;margin-right:10px;">
+        <div style="display:inline-block;background-color:gray;padding:10px;border-radius:10px;text-align:center;width:40%;margin-right:10px;">
             <h1>{DB.format_datetime(Inventario_Realizado["Fecha_Inventario"])}</h1>
             <p>Fecha de inventario</p>
         </div>
-        <div style="display:inline-block;background-color:#CDB0EE;padding:10px;border-radius:10px;text-align:center;width:20%;margin-right:10px;">
+        <div style="display:inline-block;background-color:gray;padding:10px;border-radius:10px;text-align:center;width:20%;margin-right:10px;">
             <h1>{len(resumen_inventario)}</h1>
-            <p>Elementos detectados</p>
+            <p>Elementos en Inventrio</p>
         </div>
-        <div style="display:inline-block;background-color:lightblue;padding:10px;border-radius:10px;text-align:center;width:40%;margin-right:10px;">
+        <div style="display:inline-block;background-color:gray;padding:10px;border-radius:10px;text-align:center;width:40%;margin-right:10px;">
             <h1>{DB.format_datetime(Inventario_Realizado["Fecha_Vuelo"])}</h1>
             <p>Fecha de vuelo</p>
         </div>
@@ -368,6 +389,83 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
 
         st.write('')
         st.write('')
+        _='''
+        data1 = {
+        "Lecturas": ["Correctos", "Faltantes", "Sobrantes", "Total"],
+        "": [
+            Inventario_Realizado["Elementos_OK"],
+            Inventario_Realizado["Elementos_Faltantes"],
+            Inventario_Realizado["Elementos_Sobrantes"],
+            total_elementos,
+        ],
+        "%": [
+            f'{int(Inventario_Realizado["Elementos_OK"] / total_elementos * 100)}%',  # Multiplicar por 100 para porcentaje
+            f'{int(Inventario_Realizado["Elementos_Faltantes"] / total_elementos * 100)}%',
+            f'{int(Inventario_Realizado["Elementos_Sobrantes"] / total_elementos* 100)}%',
+            "",
+        ],
+        }
+
+        Lecturas_df = pd.DataFrame(data1)
+
+        data2 = {
+        "Vuelo": ["Fecha", "Hora", "Fin", "Duración"],
+        "": [
+            DB.format_date(Inventario_Realizado["Fecha_Vuelo"]),
+            DB.format_time(Inventario_Realizado["Fecha_Vuelo"]),
+            DB.add_seconds_to_timestamp_string(Inventario_Realizado["Fecha_Vuelo"],Inventario_Realizado["Tiempo_Vuelo"]),
+            DB.format_seconds_HHMMSS(int(Inventario_Realizado["Tiempo_Vuelo"])),
+        ]
+    
+        }
+
+        info_df = pd.DataFrame(data2)'''
+        _='''
+        col1, col2 = st.columns([2,2],gap="medium")
+        with col1:
+            headers_lecturas = st.columns([2, 1, 1], gap="medium", vertical_alignment="top") 
+            columns = ["Lecturas", "",""]
+            for i, header in enumerate(headers_lecturas):
+                with header:
+                    st.markdown(f"<p style='text-align: center;font-weight: bold;'>{columns[i]}</p>", unsafe_allow_html=True) 
+
+            for index, row in Lecturas_df.iterrows():
+            # Each row of the table
+                col10, col20, col30 = st.columns([2, 1, 1], gap="medium", vertical_alignment="center")
+
+            # Column 1: ID Inventario
+                col10.write(f"<p style='text-align: center;'>{row['Lecturas']}</p>", unsafe_allow_html=True)
+                col20.write(f"<p style='text-align: center;'>{row['']}</p>", unsafe_allow_html=True)
+                col30.write(f"<p style='text-align: center;'>{row['%']}</p>", unsafe_allow_html=True)
+          
+
+        colA, colB = st.columns([2,2],gap="medium")
+
+        with colA:
+            st.markdown("""
+            <style>
+            .streamlit-table th:nth-child(1),  /* Hide index header */
+            .streamlit-table td:nth-child(1) { /* Hide index cells */
+                display: none;
+            }
+            .streamlit-table tr:nth-child(1) { /* Target the first row */
+                color: green !important; /* Make text green */
+            }            
+            </style>
+            """, unsafe_allow_html=True)
+            st.table(Lecturas_df)
+
+        with colB:
+            st.markdown("""
+            <style>
+            .streamlit-table th:nth-child(1),  /* Hide index header */
+            .streamlit-table td:nth-child(1) { /* Hide index cells */
+                display: none;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+            st.table(info_df)
+          '''
         # Example data
         data = {
             'Category': ['Correctos', 'Faltantes', 'Sobrantes'],

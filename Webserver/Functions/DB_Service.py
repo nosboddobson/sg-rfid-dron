@@ -63,7 +63,8 @@ def obtener_datos_inventarios_jde():
         SELECT j.ID, j.ID_Vuelo, v.Fecha_Vuelo, v.Tiempo_Vuelo, j.Fecha_Inventario, 
                j.Elementos_OK, j.Elementos_Faltantes, 
                j.Porcentaje_Lectura, j.NumeroConteo, j.Sucursal, j.Ubicacion, 
-               j.TransactionId, (v.N_elementos - j.Elementos_OK) AS Elementos_Sobrantes
+               j.TransactionId, (v.N_elementos - j.Elementos_OK) AS Elementos_Sobrantes,
+               v.N_elementos    
         FROM Inventarios_JDE j
         JOIN Inventario_Vuelos v ON j.ID_Vuelo = v.ID
         ORDER BY j.ID DESC
@@ -284,3 +285,32 @@ def format_datetime(date_string):
         
     except ValueError:
             return None #Handles invalid date values (like 30th of February)
+def add_seconds_to_timestamp_string(timestamp_str, seconds_str):
+    """Adds seconds to a timestamp string and returns the time in HH:MM format.
+
+    Args:
+        timestamp_str: A string representing the timestamp (YYYY-MM-DD HH:MM:SS).
+        seconds_str: A string representing the number of seconds to add.
+
+    Returns:
+        A string representing the new time in HH:MM format, or None if error.
+    """
+    try:
+        # 1. Create a Pandas Timestamp object from the string
+        timestamp = pd.Timestamp(timestamp_str)
+
+        # 2. Convert seconds_str to an integer
+        seconds_to_add = int(seconds_str)
+
+        # 3. Create a timedelta object
+        delta = datetime.timedelta(seconds=seconds_to_add)
+
+        # 4. Add the timedelta
+        new_timestamp = timestamp + delta
+
+        # 5. Format the new timestamp as HH:MM
+        new_time_str = new_timestamp.strftime("%H:%M")
+
+        return new_time_str
+    except (ValueError, TypeError):
+        return None
