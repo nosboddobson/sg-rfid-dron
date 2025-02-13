@@ -188,6 +188,8 @@ def actualizar_inventario():
                             Inventario_jed_id=dbService.insertar_inventario_jde(ID,ahora,resumen['OK Count'],resumen['FALTANTE Count'],resumen['Other Count'],resumen['Percentage OK'],NumeroConteo,Sucursal,Ubicacion,TransactionId)
                             print(dbService.insertar_elementos_jde(Inventario_jed_id,inventario_json))
 
+                            print (dbService.insertar_Fecha_Vuelo_Elementos_JED(ID,Inventario_jed_id))
+
                             print ("DB Actualizada con Exito")
                         return jsonify({'OK': 'Inventario en JD Actualizado con Éxito'}), 200 
                     

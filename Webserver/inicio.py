@@ -96,12 +96,13 @@ with col2_t:
             password = st.text_input("Contraseña", type="password")
 
             if st.form_submit_button("Iniciar sesión", type="primary"):
-            #   if username == "test" and password == "test":        
-            #       st.session_state['logged_in'] = True
-            #       controller.set("logged_in", True,path="/")
-            #       st.success("Conectado correctamente!")
-            #       sleep(0.5)
-            #       st.switch_page("pages/Inventarios_Pendientes.py")
+                if username == "test" and password == "test":        
+                   st.session_state['logged_in'] = True
+                   controller.set("logged_in", True,path="/")
+                   st.success("Conectado correctamente!")
+                   sleep(0.5)
+                   st.switch_page("pages/Inventarios_Pendientes.py")
+
                 if username != ""  and password != "":
 
                     USER_NAME=username

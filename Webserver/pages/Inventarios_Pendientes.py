@@ -6,6 +6,8 @@ from menu import make_sidebar
 
 from Functions import DB_Service as DB
 
+def toggle_content_advanced():
+        st.session_state.show_content_advanced = not st.session_state.show_content_advanced
 
 #Inicio Creacion de la Pagina -----------------------------------------------------------------------------------------
 
@@ -42,12 +44,17 @@ if 'expand_resumen_inventario' not in st.session_state:
 # Initialize session state for the expanders
 if 'expand_inventario_Realizado' not in st.session_state:
     st.session_state.expand_inventario_Realizado = False
-if 'selected_inventario_id' not in st.session_state:
+if 'expand_plano' not in st.session_state:
+    st.session_state.expand_plano = False
+if 'selected_inventory' not in st.session_state:
     st.session_state.selected_inventory = None
 if 'show_popup_eliminar' not in st.session_state:
     st.session_state['show_popup_eliminar'] = False
+if "show_content_advanced" not in st.session_state:
+            st.session_state.show_content_advanced = True
 
     # Crear la página "Inventarios Pendientes"
+
 
 
 with st.expander("Inventarios Pendientes",expanded=True):
@@ -345,50 +352,16 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
 
         Inventario_Realizado= datosJDE[datosJDE['ID'] == int(st.session_state.selected_inventory) ].squeeze()
 
-        Tipo_inventario_r = "Inventario Completo" if inventario["Ubicacion"] == "PT" else "Inventario Parcial, en " + inventario["Ubicacion"]
-        st.subheader(Tipo_inventario_r +", Código JD : " + str(inventario["NumeroConteo"])   )
+        
+        Tipo_inventario_r = "Completo" if Inventario_Realizado["Ubicacion"] == "PT" else "Parcial, en " + Inventario_Realizado["Ubicacion"]
+
+        st.subheader("Resumen Inventario JDE-" + str(inventario["NumeroConteo"]) +"{"+Tipo_inventario_r +"} " + DB.format_datetime(Inventario_Realizado["Fecha_Inventario"])    )
+      
+
+        
         total_elementos=int(Inventario_Realizado["Elementos_OK"])+int(Inventario_Realizado["Elementos_Faltantes"])+int(Inventario_Realizado["Elementos_Sobrantes"])
      
-        
-        st.markdown(f"""
-        <div style="display: flex; align-items: center;">
-        <div style="display:inline-block;background-color:gray;padding:10px;border-radius:10px;text-align:center;width:40%;margin-right:10px;">
-            <h1>{DB.format_datetime(Inventario_Realizado["Fecha_Inventario"])}</h1>
-            <p>Fecha de inventario</p>
-        </div>
-        <div style="display:inline-block;background-color:gray;padding:10px;border-radius:10px;text-align:center;width:20%;margin-right:10px;">
-            <h1>{len(resumen_inventario)}</h1>
-            <p>Elementos en Inventrio</p>
-        </div>
-        <div style="display:inline-block;background-color:gray;padding:10px;border-radius:10px;text-align:center;width:40%;margin-right:10px;">
-            <h1>{DB.format_datetime(Inventario_Realizado["Fecha_Vuelo"])}</h1>
-            <p>Fecha de vuelo</p>
-        </div>
-        </div>""", unsafe_allow_html=True)
-        st.write('')
-
-        st.markdown(f"""
-        <div style="display: flex; align-items: center;">
-        <div style="display:inline-block;background-color:green;padding:10px;border-radius:10px;text-align:center;width:25%;margin-right:10px;">
-            <h1>{Inventario_Realizado["Elementos_OK"]}</h1>
-            <p>Elementos correctos</p>
-        </div>
-        <div style="display:inline-block;background-color:orange;padding:10px;border-radius:10px;text-align:center;width:25%;margin-right:10px;">
-            <h1>{Inventario_Realizado["Elementos_Faltantes"]}</h1>
-            <p>Elementos faltantes</p>
-        </div>
-        <div style="display:inline-block;background-color:#EFCC00;padding:10px;border-radius:10px;text-align:center;width:25%;margin-right:10px;">
-            <h1>{Inventario_Realizado["Elementos_Sobrantes"]}</h1>
-            <p>Elementos sobrantes</p>
-        </div>
-        <div style="display:inline-block;background-color:gray;padding:10px;border-radius:10px;text-align:center;width:25%;margin-right:10px;">
-            <h1>{Inventario_Realizado["Porcentaje_Lectura"]}%</h1>
-            <p>Porcentaje lectura</p>
-        </div>
-        </div>""", unsafe_allow_html=True)
-
-        st.write('')
-        st.write('')
+     
         _='''
         data1 = {
         "Lecturas": ["Correctos", "Faltantes", "Sobrantes", "Total"],
@@ -420,25 +393,103 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
         }
 
         info_df = pd.DataFrame(data2)'''
+
+       
+
+        
+        
+
+
+        st.button("Cambiar Vista", on_click=toggle_content_advanced)
+
+        if st.session_state.show_content_advanced:
+            col1, col2 = st.columns([2,2],gap="medium")
+            with col1:
+            
+                headers_lecturas = st.columns([2, 1, 1], gap="small", vertical_alignment="top") 
+                columns = ["Lecturas", "Nº Elementos","%"]
+                for i, header in enumerate(headers_lecturas):
+                    with header:
+                        st.markdown(f"<p style='text-align: left;font-weight: bold;'>{columns[i]}</p>", unsafe_allow_html=True) 
+
+                # Each row of the table
+                col10, col20, col30 = st.columns([2, 1, 1], gap="small", vertical_alignment="center")
+                col10.write(f"<p style='text-align: left;color: lime;font-weight: bold;'>Correctos</p>", unsafe_allow_html=True)
+                col20.write(f"<p style='text-align: left;color: lime;'>{Inventario_Realizado["Elementos_OK"]}</p>", unsafe_allow_html=True)
+                col30.write(f"<p style='text-align: left;color: lime;'>{int(Inventario_Realizado["Elementos_OK"] / total_elementos * 100)}%</p>", unsafe_allow_html=True)
+                col10, col20, col30 = st.columns([2, 1, 1], gap="small", vertical_alignment="center")
+                col10.write(f"<p style='text-align: left;color: orange;font-weight: bold;'>Faltantes</p>", unsafe_allow_html=True)
+                col20.write(f"<p style='text-align: left;color: orange;'>{Inventario_Realizado["Elementos_Faltantes"]}</p>", unsafe_allow_html=True)
+                col30.write(f"<p style='text-align: left;color: orange;'>{int(Inventario_Realizado["Elementos_Faltantes"] / total_elementos * 100)}%</p>", unsafe_allow_html=True)
+                col10, col20, col30 = st.columns([2, 1, 1], gap="small", vertical_alignment="center")
+                col10.write(f"<p style='text-align: left;color: yellow;font-weight: bold;'>Sobrantes</p>", unsafe_allow_html=True)
+                col20.write(f"<p style='text-align: left;color: yellow;'>{Inventario_Realizado["Elementos_Sobrantes"]}</p>", unsafe_allow_html=True)
+                col30.write(f"<p style='text-align: left;color: yellow;'>{int(Inventario_Realizado["Elementos_Sobrantes"] / total_elementos * 100)}%</p>", unsafe_allow_html=True)
+            
+            with col2:
+                
+                headers_lecturas = st.columns([2, 1], gap="small", vertical_alignment="top") 
+                columns = ["Vuelo", ""]
+                for i, header in enumerate(headers_lecturas):
+                    with header:
+                        st.markdown(f"<p style='text-align: left;font-weight: bold;'>{columns[i]}</p>", unsafe_allow_html=True) 
+
+                # Each row of the table
+                col10, col20 = st.columns([2, 1], gap="small", vertical_alignment="center")
+                col10.write(f"<p style='text-align: left;font-weight: bold;'>Fecha</p>", unsafe_allow_html=True)
+                col20.write(f"<p style='text-align: left;'>{DB.format_date(Inventario_Realizado["Fecha_Vuelo"])}</p>", unsafe_allow_html=True)
+                col10, col20 = st.columns([2, 1], gap="small", vertical_alignment="center")
+                col10.write(f"<p style='text-align: left;font-weight: bold;'>Hora</p>", unsafe_allow_html=True)
+                col20.write(f"<p style='text-align: left;'>{DB.format_time(Inventario_Realizado["Fecha_Vuelo"])}</p>", unsafe_allow_html=True)
+                col10, col20 = st.columns([2, 1], gap="small", vertical_alignment="center")
+                col10.write(f"<p style='text-align: left;font-weight: bold;'>Fin</p>", unsafe_allow_html=True)
+                col20.write(f"<p style='text-align: left;'>{DB.add_seconds_to_timestamp_string(Inventario_Realizado["Fecha_Vuelo"],Inventario_Realizado["Tiempo_Vuelo"])}</p>", unsafe_allow_html=True)
+                col10, col20 = st.columns([2, 1], gap="small", vertical_alignment="center")
+                col10.write(f"<p style='text-align: left;font-weight: bold;'>Duración</p>", unsafe_allow_html=True)
+                col20.write(f"<p style='text-align: left;'>{DB.format_seconds_HHMMSS(int(Inventario_Realizado["Tiempo_Vuelo"]))}</p>", unsafe_allow_html=True)
+            st.write('')
+        else:
+            st.markdown(f"""
+            <div style="display: flex; align-items: center;">
+            <div style="display:inline-block;background-color:gray;padding:10px;border-radius:10px;text-align:center;width:40%;margin-right:10px;">
+                <h1>{DB.format_datetime(Inventario_Realizado["Fecha_Inventario"])}</h1>
+                <p>Fecha de inventario</p>
+            </div>
+            <div style="display:inline-block;background-color:gray;padding:10px;border-radius:10px;text-align:center;width:20%;margin-right:10px;">
+                <h1>{len(resumen_inventario)}</h1>
+                <p>Elementos en Inventrio</p>
+            </div>
+            <div style="display:inline-block;background-color:gray;padding:10px;border-radius:10px;text-align:center;width:40%;margin-right:10px;">
+                <h1>{DB.format_datetime(Inventario_Realizado["Fecha_Vuelo"])}</h1>
+                <p>Fecha de vuelo</p>
+            </div>
+            </div>""", unsafe_allow_html=True)
+            st.write('')
+
+            st.markdown(f"""
+            <div style="display: flex; align-items: center;">
+            <div style="display:inline-block;background-color:green;padding:10px;border-radius:10px;text-align:center;width:25%;margin-right:10px;">
+                <h1>{Inventario_Realizado["Elementos_OK"]}</h1>
+                <p>Elementos correctos</p>
+            </div>
+            <div style="display:inline-block;background-color:orange;padding:10px;border-radius:10px;text-align:center;width:25%;margin-right:10px;">
+                <h1>{Inventario_Realizado["Elementos_Faltantes"]}</h1>
+                <p>Elementos faltantes</p>
+            </div>
+            <div style="display:inline-block;background-color:#EFCC00;padding:10px;border-radius:10px;text-align:center;width:25%;margin-right:10px;">
+                <h1>{Inventario_Realizado["Elementos_Sobrantes"]}</h1>
+                <p>Elementos sobrantes</p>
+            </div>
+            <div style="display:inline-block;background-color:gray;padding:10px;border-radius:10px;text-align:center;width:25%;margin-right:10px;">
+                <h1>{Inventario_Realizado["Porcentaje_Lectura"]}%</h1>
+                <p>Porcentaje lectura</p>
+            </div>
+            </div>""", unsafe_allow_html=True)
+
+            st.write('')
+            st.write('')
+
         _='''
-        col1, col2 = st.columns([2,2],gap="medium")
-        with col1:
-            headers_lecturas = st.columns([2, 1, 1], gap="medium", vertical_alignment="top") 
-            columns = ["Lecturas", "",""]
-            for i, header in enumerate(headers_lecturas):
-                with header:
-                    st.markdown(f"<p style='text-align: center;font-weight: bold;'>{columns[i]}</p>", unsafe_allow_html=True) 
-
-            for index, row in Lecturas_df.iterrows():
-            # Each row of the table
-                col10, col20, col30 = st.columns([2, 1, 1], gap="medium", vertical_alignment="center")
-
-            # Column 1: ID Inventario
-                col10.write(f"<p style='text-align: center;'>{row['Lecturas']}</p>", unsafe_allow_html=True)
-                col20.write(f"<p style='text-align: center;'>{row['']}</p>", unsafe_allow_html=True)
-                col30.write(f"<p style='text-align: center;'>{row['%']}</p>", unsafe_allow_html=True)
-          
-
         colA, colB = st.columns([2,2],gap="medium")
 
         with colA:
@@ -502,7 +553,16 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
 
         # Mostrar detalles del inventario
         #st.write("OK")
+with st.expander("Plano Patio Mina 2",expanded=st.session_state.expand_plano):
 
+    st.write('')
+
+    left_co, cent_co,last_co = st.columns(3)
+    with cent_co:
+        st.image('images/P02-Plano.jpeg', caption="Patio Mina 2")  # Adjust the width as necessary
+
+    
+   
 
 
 #st.sidebar.title("Menú")

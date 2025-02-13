@@ -3,8 +3,9 @@ import pyodbc
 import pandas as pd
 import json
 from dotenv import load_dotenv
-from Services import DronService, LogService  # Assuming these modules are already defined
-#import DronService, LogService
+from Services import DronService, LogService, MsSQL_Service  # Assuming these modules are already defined
+
+#import LogService, MsSQL_Service
 # Load environment variables from .env
 load_dotenv(override=True)
 
@@ -212,6 +213,67 @@ def insertar_elementos_jde(id_inventario, inventario_json):
 
     return {"Success": f"Inserted {len(rows)} rows into Elementos_JDE table."}
 
+def insertar_Fecha_Vuelo_Elementos_JED(id_vuelo,id_inventario):
+
+    Ultimo_Archivo_Dron=MsSQL_Service.obtener_nombre_archivo(id_vuelo)
+    try :
+        #buscar ultimo archivo 
+        if Ultimo_Archivo_Dron:
+            Ultimo_Archivo_Dron_data = pd.read_csv(os.path.join(os.getenv('Dron_Folder'),Ultimo_Archivo_Dron ))
+         # 2. Clean the EPC column in the CSV (lowercase and remove spaces)
+        Ultimo_Archivo_Dron_data['EPC'] = Ultimo_Archivo_Dron_data['EPC'].str.lower().str.replace(' ', '')
+        Ultimo_Archivo_Dron_data['Timestamp'] = pd.to_datetime(Ultimo_Archivo_Dron_data['Timestamp']) #Convert to datetime
+
+        # 3. Establish a connection to the SQL Server database
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        
+        # 4. Read the SQL Server table into a Pandas DataFrame (for efficient matching)
+        
+        sql_query  = '''SELECT EPC, ID_Inventario, Fecha_Lectura FROM Elementos_JDE Where ID_Inventario = ?'''
+        df_sql = pd.read_sql_query(sql_query, conn, params=(id_inventario,))  # Parameterize the query
+
+
+        # 5. Clean the EPC column in the SQL Server DataFrame (lowercase and remove spaces)
+        df_sql['EPC'] = df_sql['EPC'].str.lower().str.replace(' ', '')
+
+        # 6. Merge the DataFrames based on the cleaned EPC column
+        merged_df = pd.merge(df_sql, Ultimo_Archivo_Dron_data, on='EPC', how='left')
+
+        # 7. Update the SQL Server table in batches for efficiency
+        batch_size = 100  # Adjust batch size as needed
+
+        for i in range(0, len(merged_df), batch_size):
+            batch = merged_df[i:i + batch_size]
+            for _, row in batch.iterrows():
+                epc = row['EPC']
+                id_inventario = row['ID_Inventario']
+                fecha_lectura = row['Timestamp']
+
+                if pd.notna(fecha_lectura):  # Only update if Timestamp is not NaN
+                    try:
+                        update_query = f"""
+                            UPDATE Elementos_JDE
+                            SET Fecha_Lectura = ?
+                            WHERE EPC = ? AND ID_Inventario = ?
+                        """
+                        cursor.execute(update_query, fecha_lectura, epc, id_inventario)
+                        conn.commit()  # Commit after each batch
+                    except Exception as e:
+                        print(f"Error updating row: EPC={epc}, ID_Inventario={id_inventario}, Error: {e}")
+                        conn.rollback() #Rollback in case of error
+                        # Optionally break here if you want to stop on the first error
+                        # break
+        conn.close()
+        #print("Update Complete")
+
+    
+        return True
+    except Exception as e:
+        print(f"Error Actualizando estdo Inventario. Error: {e}")
+        return None
+       
 
 def delete_inventario_vuelo_row(id_to_delete):
 
@@ -261,8 +323,8 @@ def obtener_nombre_archivo(ID):
 if __name__ == "__main__":
 
     print("OK")
-    print (obtener_nombre_archivo(135))
-
+    #print (obtener_nombre_archivo(135))
+    insertar_Fecha_Vuelo_Elementos_JED(1166,37)
    # with open("output_inventario.json", "r") as file:
    #     json_content = file.read()
     
