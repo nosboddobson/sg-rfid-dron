@@ -3,9 +3,9 @@ import pyodbc
 import pandas as pd
 import json
 from dotenv import load_dotenv
-from Services import DronService, LogService, MsSQL_Service  # Assuming these modules are already defined
+#from Services import DronService, LogService, MsSQL_Service  # Assuming these modules are already defined
 
-#import LogService, MsSQL_Service
+import LogService, MsSQL_Service
 # Load environment variables from .env
 load_dotenv(override=True)
 
@@ -274,7 +274,31 @@ def insertar_Fecha_Vuelo_Elementos_JED(id_vuelo,id_inventario):
         print(f"Error Actualizando estdo Inventario. Error: {e}")
         return None
        
+def Exportar_Elementos_JED_a_csv(id_inventario):
 
+    try:
+        # 3. Establish a connection to the SQL Server database
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        
+        # 4. Read the SQL Server table into a Pandas DataFrame (for efficient matching)
+        
+        sql_query  = '''SELECT * FROM Elementos_JDE Where ID_Inventario = ? and Resultado='Ok' ORDER BY Fecha_lectura asc  '''
+        df_sql = pd.read_sql_query(sql_query, conn, params=(id_inventario,))  # Parameterize the query
+
+        df_sql.to_csv(str(id_inventario) + "_Elementos_JDE.csv",index=False,sep=";", encoding="utf-8", decimal=",")
+
+       
+        conn.close()
+        #print("Update Complete")
+
+    
+        return True
+    except Exception as e:
+        print(f"Error Obteniendo  Inventario. Error: {e}")
+        return None
+       
 def delete_inventario_vuelo_row(id_to_delete):
 
     try:
@@ -324,7 +348,8 @@ if __name__ == "__main__":
 
     print("OK")
     #print (obtener_nombre_archivo(135))
-    insertar_Fecha_Vuelo_Elementos_JED(1166,37)
+    #insertar_Fecha_Vuelo_Elementos_JED(1167,35)
+    Exportar_Elementos_JED_a_csv(35)
    # with open("output_inventario.json", "r") as file:
    #     json_content = file.read()
     
