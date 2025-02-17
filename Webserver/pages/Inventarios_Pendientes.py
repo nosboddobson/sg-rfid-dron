@@ -399,7 +399,7 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
         
 
 
-        st.button("Cambiar Vista", on_click=toggle_content_advanced)
+        st.button("Cambiar Vista", on_click=DB.toggle_content_advanced)
 
         if st.session_state.show_content_advanced:
             col1, col2 = st.columns([2,2],gap="medium")
