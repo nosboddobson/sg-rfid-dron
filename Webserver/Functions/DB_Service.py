@@ -29,6 +29,10 @@ def get_connection():
     )
     return conn
 
+def toggle_content_advanced():
+        st.session_state.show_content_advanced = not st.session_state.show_content_advanced
+
+
 def seconds_to_hhmmss(seconds):
   """Converts seconds to a string in HH:MM:SS format."""
   try:
@@ -64,7 +68,7 @@ def obtener_datos_inventarios_jde():
                j.Elementos_OK, j.Elementos_Faltantes, 
                j.Porcentaje_Lectura, j.NumeroConteo, j.Sucursal, j.Ubicacion, 
                j.TransactionId, (v.N_elementos - j.Elementos_OK) AS Elementos_Sobrantes,
-               v.N_elementos    
+               v.N_elementos, j.Imagen_Vuelo, j.Video_Vuelo    
         FROM Inventarios_JDE j
         JOIN Inventario_Vuelos v ON j.ID_Vuelo = v.ID
         ORDER BY j.ID DESC

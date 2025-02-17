@@ -1,4 +1,5 @@
 
+
 import pandas as pd
 import streamlit as st
 import plotly.express as px
@@ -6,8 +7,6 @@ from menu import make_sidebar
 
 from Functions import DB_Service as DB
 
-def toggle_content_advanced():
-        st.session_state.show_content_advanced = not st.session_state.show_content_advanced
 
 #Inicio Creacion de la Pagina -----------------------------------------------------------------------------------------
 
@@ -59,7 +58,7 @@ if "show_content_advanced" not in st.session_state:
 
 with st.expander("Inventarios Pendientes",expanded=True):
 
-   # st.title("Inventarios Pendientes")
+# st.title("Inventarios Pendientes")
 
     #Obtener inventarios pendientes
     datos = DB.obtener_datos_inventarios_pendientes()
@@ -125,7 +124,7 @@ with st.expander("Inventarios Pendientes",expanded=True):
         with header:
             st.markdown(f"<p style='text-align: center;font-weight: bold;'>{header_texts[i]}</p>", unsafe_allow_html=True) 
 
-  
+
 
     fila = len(datos)
     if datos:
@@ -171,7 +170,7 @@ with st.expander("Inventarios Pendientes",expanded=True):
                     except Exception as e:
                         st.error(f"invp Error Conectado a Servidor, por favor, intenta mas tarde!" + str(e))
                         st.session_state.button_disabled = False
-           
+        
             
             if col8.button("Eliminar", key=f"Eliminar_{inventario[0]}", help="Eliminar inventario"): #Si el boton es presionado entonces:
                     
@@ -253,7 +252,7 @@ with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inven
         #st.subheader("Detalles de Inventarios Realizados")
 
         headers_Procesado = st.columns([2, 1, 2, 2, 2, 2, 2, 2, 2,2,2], gap="medium", vertical_alignment="top")
-       
+    
         _= '''headers[0].write("Tipo Inventario")
         headers[1].write("Zona")
         headers[2].write("Fecha Inventario")
@@ -314,7 +313,7 @@ with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inven
                 col8.write(f"<p style='text-align: center;color: yellow'>{inventario["Elementos_Sobrantes"]}</p>", unsafe_allow_html=True)
                 col9.write(f"<p style='text-align: center;'>{str(inventario["Porcentaje_Lectura"])}%</p>", unsafe_allow_html=True) 
                 col10.write(f"<p style='text-align: center;'>{str(inventario["NumeroConteo"])}</p>", unsafe_allow_html=True) 
-               
+            
 
                 # Botón de "Resumen"
                 if col11.button("Ver", key=f"resumen_{inventario['ID']}"):
@@ -345,7 +344,7 @@ with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inven
 
 with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_inventario):
 
-   # st.title("Resumen Inventario")
+# st.title("Resumen Inventario")
 
     if st.session_state.selected_inventory:          
         resumen_inventario = DB.obtener_elementos_jde(int(st.session_state.selected_inventory))
@@ -356,12 +355,12 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
         Tipo_inventario_r = "Completo" if Inventario_Realizado["Ubicacion"] == "PT" else "Parcial, en " + Inventario_Realizado["Ubicacion"]
 
         st.subheader("Resumen Inventario JDE-" + str(inventario["NumeroConteo"]) +"{"+Tipo_inventario_r +"} " + DB.format_datetime(Inventario_Realizado["Fecha_Inventario"])    )
-      
+    
 
         
         total_elementos=int(Inventario_Realizado["Elementos_OK"])+int(Inventario_Realizado["Elementos_Faltantes"])+int(Inventario_Realizado["Elementos_Sobrantes"])
-     
-     
+    
+    
         _='''
         data1 = {
         "Lecturas": ["Correctos", "Faltantes", "Sobrantes", "Total"],
@@ -394,7 +393,7 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
 
         info_df = pd.DataFrame(data2)'''
 
-       
+    
 
         
         
@@ -516,7 +515,7 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
             </style>
             """, unsafe_allow_html=True)
             st.table(info_df)
-          '''
+        '''
         # Example data
         data = {
             'Category': ['Correctos', 'Faltantes', 'Sobrantes'],
@@ -543,8 +542,12 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
             pagination.dataframe(data=resumen_inventario, use_container_width=True)
 
         st.write('')
-        
-            
+
+        if Inventario_Realizado["Imagen_Vuelo"] is not None:
+            left_co, cent_co,last_co = st.columns(3)
+            with cent_co:
+                    st.image(Inventario_Realizado["Imagen_Vuelo"], caption="Representación Vuelo")            
+    
     else:
         st.write("Ningún Inventario selecionado")
         st.write('')
@@ -557,12 +560,13 @@ with st.expander("Plano Patio Mina 2",expanded=st.session_state.expand_plano):
 
     st.write('')
 
+    
     left_co, cent_co,last_co = st.columns(3)
     with cent_co:
         st.image('images/P02-Plano.jpeg', caption="Patio Mina 2")  # Adjust the width as necessary
 
     
-   
+
 
 
 #st.sidebar.title("Menú")

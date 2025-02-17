@@ -1,28 +1,21 @@
 import base64
-import os
 from dotenv import load_dotenv
 import streamlit as st
 from time import sleep
 #from menu import make_sidebar
-from ldap3 import Server, Connection, ALL, SUBTREE
-from streamlit_cookies_controller import CookieController
+import streamlit_authenticator as stauth
+from Functions import AD_Service as AD
+import extra_streamlit_components as stx
+
+
+
 
 
 st.set_page_config(page_title="Inicio",layout="wide",initial_sidebar_state="collapsed")
 
+cookie_manager = stx.CookieManager()
 
-
-
-load_dotenv(override=True)
-
-AD_SERVER = Server(os.getenv('AD_ADDRESS'), use_ssl=True, get_info=ALL)
-USER_NAME = 'nombre_usuario'
-USER_NAME_DOMAIN = os.getenv('AD_DOMAIN')+"\\{USER_NAME}"
-USER_PASSWORD = "contraseña_usuario"  # checkear
-SEARCH_BASE = os.getenv('AD_SEARCH_BASE')
-
-
-
+@st.cache_resource
 
 
 def set_bg_hack_url():
@@ -34,29 +27,30 @@ def set_bg_hack_url():
     '''
         
     st.markdown(
-         f"""
-         <style>
-         .stApp {{
-             background: url(data:image/jpeg;base64,{base64.b64encode(open("images/PM2_Dron.jpg", "rb").read()).decode()});
-             background-size: cover;s
+        f"""
+        <style>
+        .stApp {{
+            background: url(data:image/jpeg;base64,{base64.b64encode(open("images/PM2_Dron.jpg", "rb").read()).decode()});
+            background-size: cover;s
             
-         }}
-         </style>
-         """,
-         unsafe_allow_html=True
-     )
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
     
+if cookie_manager.get(cookie='logged_in') is True:
+    st.session_state['logged_in'] = True
+    st.success("Conectado correctamente!")
+    #sleep(0.5)
+    st.switch_page("pages/Inventarios_Pendientes.py")
 
+
+    
 
 #make_sidebar()
 set_bg_hack_url()
-controller = CookieController()
 
-#redirigir si ya esta logeado
-if st.session_state.get('logged_in',False):
-    #st.session_state['logged_in'] = True
-    #controller.set("logged_in", True)
-    st.switch_page("pages/Inventarios_Pendientes.py")
     
 # Create two columns for the logo and title
 col1, col2 = st.columns([1, 6])  # Adjust the ratios as necessary
@@ -97,58 +91,32 @@ with col2_t:
 
             if st.form_submit_button("Iniciar sesión", type="primary"):
                 if username == "test" and password == "test":        
-                   st.session_state['logged_in'] = True
-                   controller.set("logged_in", True,path="/")
-                   st.success("Conectado correctamente!")
-                   sleep(0.5)
-                   st.switch_page("pages/Inventarios_Pendientes.py")
+                    st.session_state['logged_in'] = True
+                    cookie_manager.set('logged_in', True)
+                    #cookie_manager.set('username', "test")
+                    st.success("Conectado correctamente!")
+                    sleep(0.5)
+                    st.switch_page("pages/Inventarios_Pendientes.py")
 
                 if username != ""  and password != "":
 
-                    USER_NAME=username
-                    USER_PASSWORD=password
-                    USER_NAME_DOMAIN=f'quadra\\{USER_NAME}'
-                    # Crear una conexión
-                    conn = Connection(AD_SERVER, user=USER_NAME_DOMAIN,
-                            password=USER_PASSWORD,
-                            authentication='SIMPLE'
-                            )
+                    login = AD.ldap_authenticate(username,password)
                     
-                    try:
-                        #print(f'User name: {USER_NAME}')
-                        #print(f'User password: {USER_PASSWORD}')
-                        print(f'Estado conexión: {conn.bind()}')
+                    if login is not False:
                         
-                        if conn.bind():
-                            search_filter = f'(SAMAccountName={USER_NAME})'
+                        st.session_state['username'] = login
+                        st.session_state['logged_in'] = True
+                        st.success("Conectado correctamente!")
+                        sleep(0.5)
+                        st.switch_page("pages/Inventarios_Pendientes.py")
 
-                            search_result = conn.search(search_base=SEARCH_BASE,
-                                                        search_filter=search_filter,
-                                                        attributes=["cn"],
-                                                        )
-                            #print(search_result)
-                            if conn.entries:
-                                user_info = conn.entries[0]
-                                user_name = user_info.cn
-                                #print(user_name)
-                                st.session_state['username']=user_name
-                                controller.set("logged_in", True,path="/")
-                                st.session_state['logged_in'] = True
-                                st.success("Conectado correctamente!")
-                                sleep(0.5)
-                                st.switch_page("pages/Inventarios_Pendientes.py")
-                            print("Conexión cerrada")
-                            conn.unbind()
-                        else:
-                            st.error(f"Actualmente presentamos problemas para conectarnos al servidor.")
-                    except Exception as e:
-                        print(f"Error en la conexión: {e}")
+                            
+                    else:
+                        st.error(f"Actualmente presentamos problemas para conectarnos al servidor.")
 
                     
 
                 else:
                     st.error("Nombre de usuario o contraseña incorrectos")
-
-   
 
 

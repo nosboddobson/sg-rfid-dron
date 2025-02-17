@@ -3,10 +3,12 @@ import streamlit as st
 from time import sleep
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 from streamlit.source_util import get_pages
-from streamlit_cookies_controller import CookieController
+import extra_streamlit_components as stx
 
-controller = CookieController()
+cookie_manager = stx.CookieManager()
 
+
+@st.cache_resource   
 
 def get_current_page_name():
     ctx = get_script_run_ctx()
@@ -58,9 +60,9 @@ def logout():
     if st.session_state.get('logged_in',True):  
        
         del st.session_state["logged_in"]  # Update session state
-        if controller.get("logged_in"):
-            controller.remove("logged_in")
-            
+        cookie_manager.delete("logged_in")
+
+        st.query_params.clear()    
         st.info("Sesión Cerrada correctamente!")
         sleep(0.5)
         st.switch_page("inicio.py")
