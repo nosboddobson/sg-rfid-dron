@@ -106,6 +106,7 @@ with col2_t:
                         
                         st.session_state['username'] = login
                         st.session_state['logged_in'] = True
+                        cookie_manager.set('logged_in', True)
                         st.success("Conectado correctamente!")
                         sleep(0.5)
                         st.switch_page("pages/Inventarios_Pendientes.py")
