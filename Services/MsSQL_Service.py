@@ -140,33 +140,20 @@ def Resumen_de_Conteo_desde_Json(inventario_json):
         "Percentage OK": round(percentage_ok, 2)
     }
 
-def insertar_inventario_jde(ID_Vuelo, Fecha_Inventario, Elementos_OK, Elementos_Faltantes, 
-                            Elementos_Sobrantes, Porcentaje_Lectura, NumeroConteo, 
-                            Sucursal, Ubicacion, TransactionId):
+def insertar_ruta_video_inventario_jde(ID_Vuelo, ruta_video):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        insert_query = '''
-            INSERT INTO Inventarios_JDE (ID_Vuelo, Fecha_Inventario, Elementos_OK, Elementos_Faltantes,
-                                         Elementos_Sobrantes, Porcentaje_Lectura, NumeroConteo, 
-                                         Sucursal, Ubicacion, TransactionId)
-            OUTPUT INSERTED.ID  -- This line retrieves the ID of the newly inserted row
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        update_query = '''
+            UPDATE Inventarios_JDE
+            SET Video_Vuelo = ?
+            WHERE ID = ?
         '''
-
-        data = (ID_Vuelo, Fecha_Inventario, int(Elementos_OK), int(Elementos_Faltantes), 
-                int(Elementos_Sobrantes), float(Porcentaje_Lectura), int(NumeroConteo), 
-                Sucursal, Ubicacion, TransactionId)
-
-        cursor.execute(insert_query, data)
-        
-        # Fetch the inserted ID
-        inserted_id = cursor.fetchone()[0]  # Get the first column from the fetched row
-        
+        cursor.execute(update_query, (ruta_video,ID_Vuelo))
         conn.commit()
-        print("Inventario JDE insertado correctamente.")
-        return inserted_id  # Return the inserted ID
+
+        return True  # Return the inserted ID
     except pyodbc.Error as e:
         print(f"Error en la inserción: {e}")
         return None  # Return None if there is an error
@@ -273,7 +260,8 @@ def insertar_Fecha_Vuelo_Elementos_JED(id_vuelo,id_inventario):
     except Exception as e:
         print(f"Error Actualizando estdo Inventario. Error: {e}")
         return None
-       
+
+
 def Exportar_Elementos_JED_a_csv(id_inventario):
 
     try:
@@ -294,11 +282,34 @@ def Exportar_Elementos_JED_a_csv(id_inventario):
         #print("Update Complete")
 
     
-        return True
+        return (str(id_inventario) + "_Elementos_JDE.csv")
     except Exception as e:
         print(f"Error Obteniendo  Inventario. Error: {e}")
         return None
-       
+
+
+
+def Exportar_Elementos_JED_a_df(id_inventario):
+
+    try:
+        # 3. Establish a connection to the SQL Server database
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        
+        # 4. Read the SQL Server table into a Pandas DataFrame (for efficient matching)
+        
+        sql_query  = '''SELECT * FROM Elementos_JDE Where ID_Inventario = ? and Resultado='Ok' ORDER BY Fecha_lectura asc  '''
+        df_sql = pd.read_sql_query(sql_query, conn, params=(id_inventario,))  # Parameterize the query
+
+        conn.close()
+        #print("Update Complete")
+
+    
+        return df_sql
+    except Exception as e:
+        print(f"Error Obteniendo  Inventario. Error: {e}")
+        return None
 def delete_inventario_vuelo_row(id_to_delete):
 
     try:

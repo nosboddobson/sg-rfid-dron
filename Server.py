@@ -6,6 +6,7 @@ import jsonschema
 from Services import JDService, LogService as SaveExecutions
 from Services import DronService
 from Services import MsSQL_Service as dbService
+from Services import Video_Service 
 import os
 import json 
 import datetime
@@ -178,18 +179,33 @@ def actualizar_inventario():
                         #Actualizar DB
                         if (ID):
                            
+                            #Camiar estado de inventario en Inventario de Vuelos de Pendiente a OK
                             dbService.Actuaizar_Estado_inventario_vuelos(int(ID))
+
+                            #obtener array con resumen de inventario
                             resumen=dbService.Resumen_de_Conteo_desde_Json(inventario_json)
                             print (resumen)
 
                             ahora = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
                             #print (ahora)
-
+                            
+                            #Crear Registro en Inventario_JDE
                             Inventario_jed_id=dbService.insertar_inventario_jde(ID,ahora,resumen['OK Count'],resumen['FALTANTE Count'],resumen['Other Count'],resumen['Percentage OK'],NumeroConteo,Sucursal,Ubicacion,TransactionId)
+                            
+                            #Insertar elementos en  Elementos JDE
                             print(dbService.insertar_elementos_jde(Inventario_jed_id,inventario_json))
 
+                            #21/02/2025
+                            #agregar hora de lectura  a los elementos de JDE
                             print (dbService.insertar_Fecha_Vuelo_Elementos_JED(ID,Inventario_jed_id))
 
+                            elementos_jed_df=dbService.Exportar_Elementos_JED_a_df(Inventario_jed_id)
+
+                            if elementos_jed_df is not None:
+                                ruta_video=Video_Service.create_dron_video(elementos_jed_df,Inventario_jed_id)
+                                if ruta_video is not None:
+                                    dbService.insertar_ruta_video_inventario_jde(Inventario_jed_id,ruta_video)
+                                    
                             print ("DB Actualizada con Exito")
                         return jsonify({'OK': 'Inventario en JD Actualizado con Éxito'}), 200 
                     

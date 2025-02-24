@@ -563,7 +563,7 @@ with st.expander("Plano Patio Mina 2",expanded=st.session_state.expand_plano):
     
     left_co, cent_co,last_co = st.columns(3)
     with cent_co:
-        st.image('images/P02-Plano.jpeg', caption="Patio Mina 2")  # Adjust the width as necessary
+        st.image('images/P02-Plano2.jpeg', caption="Patio Mina 2")  # Adjust the width as necessary
 
     
 
