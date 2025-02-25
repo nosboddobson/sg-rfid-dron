@@ -8,7 +8,7 @@ __pycache__/
 /Resultados
 /images/vuelos
 *.mp4
-API_Excecutions.csv
+Api_Executions.csv
 # C extensions
 *.so
 .venv
