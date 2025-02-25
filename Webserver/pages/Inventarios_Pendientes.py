@@ -1,5 +1,6 @@
 
 
+import os
 import pandas as pd
 import streamlit as st
 import plotly.express as px
@@ -547,7 +548,14 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
             left_co, cent_co,last_co = st.columns(3)
             with cent_co:
                     st.image(Inventario_Realizado["Imagen_Vuelo"], caption="Representación Vuelo")            
-    
+       
+
+        if Inventario_Realizado["Video_Vuelo"] is not None:
+          #  left_co, cent_co,last_co = st.columns(3)
+          #  with cent_co:
+                    st.video(data=os.path.relpath(Inventario_Realizado["Video_Vuelo"], 'Webserver'),format="video/mp4", autoplay=False)    
+
+        #st.video(data="videos/42_inventario_vuelo.mp4",format="video/mp4", autoplay=False)    
     else:
         st.write("Ningún Inventario selecionado")
         st.write('')

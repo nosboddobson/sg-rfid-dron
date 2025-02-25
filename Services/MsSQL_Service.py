@@ -3,9 +3,9 @@ import pyodbc
 import pandas as pd
 import json
 from dotenv import load_dotenv
-#from Services import DronService, LogService, MsSQL_Service  # Assuming these modules are already defined
+from Services import DronService, LogService, MsSQL_Service  # Assuming these modules are already defined
 
-import LogService, MsSQL_Service
+#import LogService, MsSQL_Service
 # Load environment variables from .env
 load_dotenv(override=True)
 
@@ -139,6 +139,39 @@ def Resumen_de_Conteo_desde_Json(inventario_json):
         "Other Count": other_count,
         "Percentage OK": round(percentage_ok, 2)
     }
+
+def insertar_inventario_jde(ID_Vuelo, Fecha_Inventario, Elementos_OK, Elementos_Faltantes, 
+                            Elementos_Sobrantes, Porcentaje_Lectura, NumeroConteo, 
+                            Sucursal, Ubicacion, TransactionId):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        insert_query = '''
+            INSERT INTO Inventarios_JDE (ID_Vuelo, Fecha_Inventario, Elementos_OK, Elementos_Faltantes,
+                                         Elementos_Sobrantes, Porcentaje_Lectura, NumeroConteo, 
+                                         Sucursal, Ubicacion, TransactionId)
+            OUTPUT INSERTED.ID  -- This line retrieves the ID of the newly inserted row
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        '''
+
+        data = (ID_Vuelo, Fecha_Inventario, int(Elementos_OK), int(Elementos_Faltantes), 
+                int(Elementos_Sobrantes), float(Porcentaje_Lectura), int(NumeroConteo), 
+                Sucursal, Ubicacion, TransactionId)
+
+        cursor.execute(insert_query, data)
+
+        # Fetch the inserted ID
+        inserted_id = cursor.fetchone()[0]  # Get the first column from the fetched row
+
+        conn.commit()
+        print("Inventario JDE insertado correctamente.")
+        return inserted_id  # Return the inserted ID
+    except pyodbc.Error as e:
+        print(f"Error en la inserción: {e}")
+        return None  # Return None if there is an error
+    finally:
+        conn.close()
 
 def insertar_ruta_video_inventario_jde(ID_Vuelo, ruta_video):
     try:

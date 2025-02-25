@@ -202,7 +202,7 @@ def actualizar_inventario():
                             elementos_jed_df=dbService.Exportar_Elementos_JED_a_df(Inventario_jed_id)
 
                             if elementos_jed_df is not None:
-                                ruta_video=Video_Service.create_dron_video(elementos_jed_df,Inventario_jed_id)
+                                ruta_video=Video_Service.create_dron_video_3d(elementos_jed_df,Inventario_jed_id)
                                 if ruta_video is not None:
                                     dbService.insertar_ruta_video_inventario_jde(Inventario_jed_id,ruta_video)
                                     
