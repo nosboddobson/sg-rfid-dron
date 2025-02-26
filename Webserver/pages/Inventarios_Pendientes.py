@@ -537,7 +537,8 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
 
         # Display the table in the second column
         with col2:
-            
+            st.write('')
+            st.write('')
             st.markdown("**Elementos de inventario**")
             pagination = st.container()
             pagination.dataframe(data=resumen_inventario, use_container_width=True)
@@ -551,8 +552,9 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
        
 
         if Inventario_Realizado["Video_Vuelo"] is not None:
-          #  left_co, cent_co,last_co = st.columns(3)
-          #  with cent_co:
+            left_co, cent_co,last_co = st.columns([1, 3, 1])
+            with cent_co:
+                    st.write("Representación de vuelo realizado")
                     st.video(data=os.path.relpath(Inventario_Realizado["Video_Vuelo"], 'Webserver'),format="video/mp4", autoplay=False)    
 
         #st.video(data="videos/42_inventario_vuelo.mp4",format="video/mp4", autoplay=False)    
@@ -571,7 +573,7 @@ with st.expander("Plano Patio Mina 2",expanded=st.session_state.expand_plano):
     
     left_co, cent_co,last_co = st.columns(3)
     with cent_co:
-        st.image('images/P02-Plano2.jpeg', caption="Patio Mina 2")  # Adjust the width as necessary
+        st.image('images/PM2_3d_20250226.jpg', caption="Patio Mina 2")  # Adjust the width as necessary
 
     
 

@@ -393,7 +393,7 @@ if __name__ == "__main__":
     print("OK")
     #print (obtener_nombre_archivo(135))
     #insertar_Fecha_Vuelo_Elementos_JED(1167,35)
-    Exportar_Elementos_JED_a_csv(35)
+    Exportar_Elementos_JED_a_csv(48)
    # with open("output_inventario.json", "r") as file:
    #     json_content = file.read()
     

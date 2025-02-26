@@ -1,173 +1,8 @@
-import pandas as pd
 import cv2
-import matplotlib.pyplot as plt
-import numpy as np
 import json
+import numpy as np
 import os
-from datetime import datetime
-
-    
-def parse_location(location_code):
-    """Extrae fila y sección de un código de ubicación P02FFFCCC"""
-    if not location_code or not isinstance(location_code, str):
-        return None, None
-    
-    try:
-        if len(location_code) >= 9 and location_code.startswith('P02'):
-            # Extraer fila y sección (columna)
-            fila = location_code[3:6]  # Ejemplo: "009"
-            seccion = location_code[6:9]  # Ejemplo: "001"
-        
-            row = seccion 
-            column = fila.lstrip('0') 
-            
-            return row, column
-    except Exception as e:
-        print(f"Error al parsear ubicación '{location_code}': {e}")
-    return None, None
-
-def load_route_from_csv(csv_path):
-    """Carga el CSV y construye una ruta basada en las ubicaciones"""
-    # Cargar el CSV
-    df = pd.read_csv(csv_path, sep=';')
-    
-    # Verificar que exista la columna Ubicacion
-    if 'Ubicacion' not in df.columns:
-        print("Error: El CSV no contiene la columna 'Ubicacion'")
-        return []
-    
-    unique_locations = df['Ubicacion'].dropna().unique()
-    route_points = []
-    
-    for loc in unique_locations:
-        row, section = parse_location(loc)
-        if row and section:
-            # Convertir a formato "fila-columna" para el bounding box
-            route_point = f"{row.zfill(3)}-{int(int(section)-1)}"
-            route_points.append(route_point)
-    
-    # Eliminar duplicados manteniendo el orden
-    route_points = list(dict.fromkeys(route_points))
-    
-    return route_points
-
-
-
-def load_route_from_df(df):
-
-    # Verificar que exista la columna Ubicacion
-    if 'Ubicacion' not in df.columns:
-        print("Error: El Dataframe no contiene la columna 'Ubicacion'")
-        return []
-    
-    unique_locations = df['Ubicacion'].dropna().unique()
-    route_points = []
-    
-    for loc in unique_locations:
-        row, section = parse_location(loc)
-        if row and section:
-            # Convertir a formato "fila-columna" para el bounding box
-            route_point = f"{row.zfill(3)}-{int(int(section)-1)}"
-            route_points.append(route_point)
-    
-    # Eliminar duplicados manteniendo el orden
-    route_points = list(dict.fromkeys(route_points))
-    
-    return route_points
-
-
-        
-
-def create_dron_video_3d(df_jde,ID_Vuelo):
-
-    output_video_path_base = 'Webserver/videos/'
-    json_path = 'Video_Vuelos/Video_Json/PM2_bounding-boxes_3d_20250226.json'
-    image_path = 'Video_Vuelos/layout/PM2_3d_20250226.jpg'
-    output_video_path = output_video_path_base + str(ID_Vuelo) +'_inventario_vuelo.mp4'
-    drone_img_path = 'Video_Vuelos/dji_matrice_350_transparent.png'  # Ruta a la imagen del dron con fondo transparente
-
-    #route=load_route_from_df(df_jde)
-    route=df_jde
-    
-    if not route:
-        print("No se pudo crear una ruta válida desde el DF")
-        return None
-
-    for path, desc in [(json_path, "JSON de bounding boxes"), 
-                        (image_path, "imagen del layout")]:
-        if not os.path.exists(path):
-            print(f"Error: No se encontró el archivo {desc} en {path}")
-            return None
-
-        if create_drone_flight_video(json_path,image_path,drone_img_path,output_video_path,route) is True:
-
-            return output_video_path
-        else:
-            return None
-        
-def create_dron_video_3d_test(ID_Vuelo):
-
-    output_video_path_base = 'Webserver/videos/'
-    json_path = 'Video_Vuelos/Video_Json/PM2_bounding-boxes_3d_20250226.json'
-    image_path = 'Video_Vuelos/layout/PM2_3d_20250226.jpg'
-    output_video_path = output_video_path_base + str(ID_Vuelo) +'_inventario_vuelo.mp4'
-    drone_img_path = 'Video_Vuelos/dji_matrice_350_transparent.png'  # Ruta a la imagen del dron con fondo transparente
-
-    # OPCIÓN 1: Usando las coordenadas fila-columna
-    route_by_position = [
-        "004-1",  # Inicio en el polígono 1
-        "004-2",  # Ir al polígono 2
-        "004-3",  # Ir al polígono 3
-        "003-4",  # Ir al polígono 13
-        "003-5",  # Ir al polígono 14
-        "003-6",  # Ir al polígono 15
-        "002-7",  # Ir al polígono 25
-        "002-8",  # Ir al polígono 26
-        "001-9",  # Ir al polígono 36
-        "001-1",  # Ir al polígono 28
-        "004-1"   # Volver al polígono 1
-    ]
-    
-    # OPCIÓN 2: Usando directamente los IDs de los polígonos
-    route_by_ids = [
-        "poligono_36",  # Inicio en 36
-        "poligono_27",  # Ir a 27
-        "poligono_18",  # Ir a 18
-        "poligono_9",   # Ir a 9
-        "poligono_8",   # Ir a 8
-        "poligono_17",  # Ir a 17
-        "poligono_26",  # Ir a 26
-        "poligono_35",  # Ir a 35
-        "poligono_35",  # Permanecer en 35 (repetido en la ruta)
-        "poligono_26",  # Volver a 26
-        "poligono_17",  # Volver a 17
-        "poligono_8",   # Volver a 8
-        "poligono_7",   # Ir a 7
-        "poligono_16",  # Ir a 16
-        "poligono_25",  # Ir a 25
-        "poligono_34"   # Finalizar en 34
-    ]
-    
-    # Selecciona la ruta que prefieras usar
-    route = route_by_ids  # o route_by_position
-
-    if not route:
-        print("No se pudo crear una ruta válida desde el DF")
-        return None
-
-    for path, desc in [(json_path, "JSON de bounding boxes"), 
-                        (image_path, "imagen del layout")]:
-        if not os.path.exists(path):
-            print(f"Error: No se encontró el archivo {desc} en {path}")
-            return None
-
-        if create_drone_flight_video(json_path,image_path,drone_img_path,output_video_path,route) is True:
-        
-        #if create_drone_flight_video_3d(json_path, image_path, output_video_path, route) is True:
-            return output_video_path
-        else:
-            return None
-
+from tqdm import tqdm
 
 def create_drone_flight_video(json_path, image_path, drone_img_path, output_video_path, route):
     # Cargar el JSON con los bounding boxes
@@ -189,21 +24,30 @@ def create_drone_flight_video(json_path, image_path, drone_img_path, output_vide
     img = cv2.imread(image_path)
     if img is None:
         print(f"Error: No se pudo cargar la imagen desde {image_path}")
-        return None
-    height, width, channels = img.shape
-    # video
-    #fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    fourcc = cv2.VideoWriter_fourcc(*'X264')
-    fps = 30
-    video_out = cv2.VideoWriter(output_video_path, fourcc, fps, (width, height))
-    # Obtener dimensiones de la imagen
+        return
     
+    height, width, channels = img.shape
     print(f"Dimensiones de la imagen: {width}x{height}")
     
-
+    # Configurar el video con un códec más compatible
+    fourcc = cv2.VideoWriter_fourcc(*'H264')  # Alternativa más compatible
+    
+    # Configurar el VideoWriter
+    fps = 30
+    video_out = cv2.VideoWriter(output_video_path, fourcc, fps, (width, height))
+    
+    # Verificar si el VideoWriter se inicializó correctamente
     if not video_out.isOpened():
-        print("Error crítico: No se puede crear el archivo de video con ningún códec.")
-        return None
+        print("Error: No se pudo crear el objeto VideoWriter. Probando con otro códec...")
+        # Intentar con otro códec como respaldo
+        if output_video_path.endswith('.avi'):
+            output_video_path = output_video_path.replace('.avi', '.mp4')
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Códec MP4 genérico
+        video_out = cv2.VideoWriter(output_video_path, fourcc, fps, (width, height))
+        
+        if not video_out.isOpened():
+            print("Error crítico: No se puede crear el archivo de video con ningún códec.")
+            return
     
     print(f"Configuración de video: {width}x{height}, {fps} fps, códec: {chr(fourcc & 0xFF) + chr((fourcc >> 8) & 0xFF) + chr((fourcc >> 16) & 0xFF) + chr((fourcc >> 24) & 0xFF)}")
     
@@ -560,17 +404,66 @@ def create_drone_flight_video(json_path, image_path, drone_img_path, output_vide
     
     if os.path.exists(output_video_path) and os.path.getsize(output_video_path) > 0:
         print(f"archivo de video se creó correctamente ({os.path.getsize(output_video_path)/1024/1024:.2f} MB)")
-        return True
     else:
         print(f"Error: archivo de video no se creó o está vacío.")
-        return None
 
 if __name__ == "__main__":
-    
-    json_path= "44_Elementos_JDE.csv"
 
-        # Cargar el JSON con los bounding boxes
-    route= load_route_from_csv(json_path)
-    print (route)
-    create_dron_video_3d(route,44)
-    #create_dron_video_3d_test(37)
+    json_path = 'locations/bounding-boxes.json'
+    image_path = 'images/layout.jpeg'
+    drone_img_path = 'images/dji_matrice_350_transparent.png'  # Ruta a la imagen del dron con fondo transparente
+    output_video_path = 'simulacion_dron_ruta_circular_v3.mp4'
+    
+    # OPCIÓN 2: Usando directamente los IDs de los polígonos
+    route_by_ids = [
+        "poligono_36",  # Inicio en 36
+        "poligono_27",  # Ir a 27
+        "poligono_18",  # Ir a 18
+        "poligono_9",   # Ir a 9
+        "poligono_8",   # Ir a 8
+        "poligono_17",  # Ir a 17
+        "poligono_26",  # Ir a 26
+        "poligono_35",  # Ir a 35
+        "poligono_35",  # Permanecer en 35 (repetido en la ruta)
+        "poligono_26",  # Volver a 26
+        "poligono_17",  # Volver a 17
+        "poligono_8",   # Volver a 8
+        "poligono_7",   # Ir a 7
+        "poligono_16",  # Ir a 16
+        "poligono_25",  # Ir a 25
+        "poligono_34",   # Finalizar en 34
+        "poligono_33",
+        "poligono_32",
+        "poligono_23",
+        "poligono_14",
+        "poligono_5",
+        "poligono_4",
+        "poligono_3",
+        "poligono_12",
+        "poligono_21",
+        "poligono_30",
+        "poligono_29",
+        "poligono_20",
+        "poligono_11",
+        "poligono_2",
+        "poligono_1",
+        "poligono_10",
+        "poligono_19",
+        "poligono_28",
+    ]
+    
+
+    route = route_by_ids  
+    
+    if not os.path.exists(json_path):
+        print(f"Error: No se encontró el archivo JSON en {json_path}")
+    elif not os.path.exists(image_path):
+        print(f"Error: No se encontró la imagen en {image_path}")
+    else:
+        create_drone_flight_video(
+            json_path=json_path,
+            image_path=image_path,
+            drone_img_path=drone_img_path,  # parametro
+            output_video_path=output_video_path,
+            route=route_by_ids
+        )
