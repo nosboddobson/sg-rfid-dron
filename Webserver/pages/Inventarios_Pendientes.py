@@ -16,16 +16,8 @@ st.set_page_config(page_title="Inventario Sierra Gorda",layout="wide")
 make_sidebar()
 
 
-# Create two columns for the logo and title
-col1, col2 = st.columns([1, 4])  # Adjust the ratios as necessary
-# Add logo
-with col1:
-    
-    st.image('images/SG_Logo.png', width=250)  # Adjust the width as necessary
-# Add title in the second column
-with col2:
-    #st.title("Inventarios Patio Mina 2")
-    st.markdown("<h1 style='text-align: center;'>Inventarios Patio Mina 2</h1>", unsafe_allow_html=True)
+
+st.markdown("<h1 style='text-align: center;'>Inventarios Pendientes Patio Mina 2</h1>", unsafe_allow_html=True)
 
 
 css_style = """
@@ -52,6 +44,9 @@ if 'show_popup_eliminar' not in st.session_state:
     st.session_state['show_popup_eliminar'] = False
 if "show_content_advanced" not in st.session_state:
             st.session_state.show_content_advanced = True
+if 'page' not in st.session_state:
+            st.session_state.page = 0
+            print ("st.session_state.page = 0")
 
     # Crear la página "Inventarios Pendientes"
 
@@ -236,9 +231,8 @@ with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inven
 
         # Pagination variables
         # Number of rows per page
-        rows_per_page = 8
-        if 'page' not in st.session_state:
-            st.session_state.page = 0
+        rows_per_page = 5
+        
 
         # Calculate total pages
         total_pages = (len(datosJDE) + rows_per_page - 1) // rows_per_page  # Ceiling division
@@ -246,9 +240,10 @@ with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inven
         # Update start_row and end_row based on the current page
         start_row = st.session_state.page * rows_per_page
         end_row = start_row + rows_per_page
-
+        #print("start_row: " + str(start_row))
         # Show current page rows
         df_to_display = datosJDE.iloc[start_row:end_row]
+        #print (df_to_display)
 
         #st.subheader("Detalles de Inventarios Realizados")
 
@@ -331,16 +326,18 @@ with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inven
 
         with col3:  # Next button column (left)
             if st.button("Siguiente Página"):
-                if st.session_state.page < total_pages - 1:
+                if st.session_state.page < total_pages -1:
                     st.session_state.page += 1
+                    st.rerun()
 
         with col2:  # Page indicator column (center)
-            st.markdown(f"<p style='text-align: center;'>Página {st.session_state.page + 1} de {total_pages}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='text-align: center;'>Página {st.session_state.page +1} de {total_pages}</p>", unsafe_allow_html=True)
 
         with col1:  # Previous button column (right)
             if st.button("Página Anterior"):
                 if st.session_state.page > 0:
                     st.session_state.page -= 1
+                    st.rerun()
         st.write('')
 
 with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_inventario):
@@ -552,7 +549,7 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
        
 
         if Inventario_Realizado["Video_Vuelo"] is not None:
-            left_co, cent_co,last_co = st.columns([1, 3, 1])
+            left_co, cent_co,last_co = st.columns([1, 7, 1])
             with cent_co:
                     st.write("Representación de vuelo realizado")
                     st.video(data=os.path.relpath(Inventario_Realizado["Video_Vuelo"], 'Webserver'),format="video/mp4", autoplay=False)    
@@ -571,7 +568,7 @@ with st.expander("Plano Patio Mina 2",expanded=st.session_state.expand_plano):
     st.write('')
 
     
-    left_co, cent_co,last_co = st.columns(3)
+    left_co, cent_co,last_co = st.columns([1, 7, 1])
     with cent_co:
         st.image('images/PM2_3d_20250226.jpg', caption="Patio Mina 2")  # Adjust the width as necessary
 

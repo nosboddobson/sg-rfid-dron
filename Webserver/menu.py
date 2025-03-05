@@ -31,6 +31,9 @@ def make_sidebar():
     st.markdown(no_sidebar_style, unsafe_allow_html=True)
 
     with st.sidebar:
+  
+        st.image('images/SG_Logo.png', width=250)  # Adjust the width as necessary
+
         st.title("Inventarios Patio SG")
         st.write("")
         st.page_link("inicio.py", label="Inicio", icon="🏠")
@@ -38,8 +41,11 @@ def make_sidebar():
 
         #if controller.get("logged_in"):
         if st.session_state.get("logged_in", False):
-            st.page_link("pages/Inventarios_Pendientes.py", label="Patio Mina 2", icon="🕵️")
+            st.page_link("pages/Inventarios_Pendientes.py", label="Inventarios Pendientes", icon="🕵️")
     
+            st.write("")
+            st.page_link("pages/Inventarios_Realizados.py", label="Inventarios Realizados", icon="🕵️")
+            st.write("")
 
             st.write("")
             st.page_link("pages/Inventarios_Log.py", label="Log de Vuelos", icon="📃")

@@ -25,16 +25,8 @@ st.markdown("""
 
 
 
-# Create two columns for the logo and title
-col1, col2 = st.columns([1, 4])  # Adjust the ratios as necessary
-# Add logo
-with col1:
-    
-    st.image('images/SG_Logo.png', width=250)  # Adjust the width as necessary
-# Add title in the second column
-with col2:
-    #st.title("Inventarios Patio Mina 2")
-    st.markdown("<h1 style='text-align: center;'>Log de Vuelos</h1>", unsafe_allow_html=True)
+
+st.markdown("<h1 style='text-align: center;'>Log de Vuelos</h1>", unsafe_allow_html=True)
 
 
 css_style = """

@@ -64,7 +64,7 @@ def obtener_datos_inventarios_jde():
 
     # Query to fetch all data from the table
     cursor.execute('''
-        SELECT j.ID, j.ID_Vuelo, v.Fecha_Vuelo, v.Tiempo_Vuelo, j.Fecha_Inventario, 
+        SELECT TOP (100) j.ID, j.ID_Vuelo, v.Fecha_Vuelo, v.Tiempo_Vuelo, j.Fecha_Inventario, 
                j.Elementos_OK, j.Elementos_Faltantes, 
                j.Porcentaje_Lectura, j.NumeroConteo, j.Sucursal, j.Ubicacion, 
                j.TransactionId, (v.N_elementos - j.Elementos_OK) AS Elementos_Sobrantes,
