@@ -329,6 +329,8 @@ On success: JSON response {'message': 'ok'} with a 200 status code.
 On failure: JSON response {'Error': <error_message>} with a 500 status code.
 
 '''
+
+
 @app.route('/printer/<msg>', methods=['POST'])
 def show_message(msg):
     try:

@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 import pandas as pd
 
 from Services import DronService
-
+#import DronService
 
 
 load_dotenv(override=True)

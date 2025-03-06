@@ -3,7 +3,7 @@ import pandas as pd
 import streamlit as st
 import plotly.express as px
 #import matplotlib.pyplot as plt
-from pywaffle import Waffle
+#from pywaffle import Waffle
 
 from menu import make_sidebar
 
@@ -345,7 +345,7 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
                             values='Values',
                             color='Category',
                             color_discrete_map=color_map,
-                            title=f"Fila: {int(row['Fila'])}, Sección: {int(row['Rack'])}",
+                          #  title=f"Fila: {int(row['Fila'])}, Sección: {int(row['Rack'])}",
                             hover_name='Category',
                         )  # Agrega un título
 
@@ -355,7 +355,7 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
                                 values='Values', 
                                 parents='Parents',
                                 labels='Category',
-                                title=f"Fila: {int(row['Fila'])}, Sección: {int(row['Rack'])}",
+                               # title=f"Fila: {int(row['Fila'])}, Sección: {int(row['Rack'])}",
                                 color='Category',
                                 color_discrete_map=color_mapn,
                                 height=250,
