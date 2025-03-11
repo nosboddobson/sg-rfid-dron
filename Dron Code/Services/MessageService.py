@@ -27,7 +27,10 @@ def srv_printer(msg):
             data=msg,
             timeout=(3, 5)  # (tiempo para conectar, tiempo para leer)
         )
-        
+        if respuesta.status_code == 201:
+            flag = True
+            logging.info(f"Solicitud recibida de enviar Inventario Ahora: {msg}")
+
         if respuesta.status_code == 200:
             flag = True
             logging.info(f"Mensaje enviado exitosamente: {msg}")

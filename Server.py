@@ -330,16 +330,21 @@ def upload_file():
 Funcion utilizada por  el Dron como Keep Alive, para determinar si hay conectividad al servidor
 Outputs
 On success: JSON response {'message': 'ok'} with a 200 status code.
+Si se presiona un boton en el sitio web para que el dron envie el los datos leidos, el json response es 201
 On failure: JSON response {'Error': <error_message>} with a 500 status code.
 
 '''
 
-
 @app.route('/printer/<msg>', methods=['POST'])
 def show_message(msg):
     try:
-        print(msg)
-        return jsonify({'message': 'ok'}), 200
+
+        #now = datetime.datetime.now()
+        #print (now)
+        if  dbService.Dron_GET_Boton_Envio_Datos(): 
+            return jsonify({'message': 'ok'}), 201
+        else:
+            return jsonify({'message': 'ok'}), 200
     except Exception as e:
         return jsonify({'Error': str(e)}), 500
 

@@ -319,4 +319,23 @@ def add_seconds_to_timestamp_string(timestamp_str, seconds_str):
     except (ValueError, TypeError):
         return None
     
-    
+def Dron_SET_Boton_Envio_Datos_Hora(ID_Usuario):
+    try :
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        now = datetime.datetime.now()
+        #print (str(now))
+        query = '''
+                INSERT INTO Dron_Stop_Button (USUARIO, Fecha)
+                VALUES (?, ?)
+            '''
+        
+        cursor.execute(query, (ID_Usuario,str(now)))
+        conn.commit()
+      
+        conn.close()
+        return True
+        
+    except (ValueError, TypeError):
+        return None

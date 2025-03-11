@@ -57,7 +57,7 @@ with col1:
     if os.path.exists(logo_path):
         # Cargar la imagen con PIL para garantizar que funciona
         logo_img = Image.open(logo_path)
-        st.image(logo_img, use_column_width=True)
+        st.image(logo_img, use_container_width=True)
     else:
         st.error(f"No se encontró el logo en: {logo_path}")
         
@@ -71,7 +71,7 @@ with col1:
         
         for alt_path in alternative_paths:
             if os.path.exists(alt_path):
-                st.image(alt_path, use_column_width=True)
+                st.image(alt_path, use_container_widthh=True)
                 st.success(f"Logo encontrado en ruta alternativa: {alt_path}")
                 break
 
@@ -103,9 +103,11 @@ with col2_t:
         password = st.text_input("Contraseña", type="password")
 
         if st.form_submit_button("Iniciar sesión", type="primary"):
-            if username == "test" and password == "test":        
+            if username == "test" and password == "test":  
+                st.session_state['username'] = "Test"      
                 st.session_state['logged_in'] = True
-                cookie_manager.set('logged_in', True)
+                cookie_manager.set('logged_in', True,key='logged_in_cookie')
+                cookie_manager.set('username', "Test",key='username_cookie')
                 st.success("Conectado correctamente!")
                 sleep(0.5)
                 st.switch_page("pages/Inventarios_Pendientes.py")
@@ -114,9 +116,10 @@ with col2_t:
                 login = AD.ldap_authenticate(username, password)
                 
                 if login is not False:
-                    st.session_state['username'] = login
+                    st.session_state['username'] = username
                     st.session_state['logged_in'] = True
-                    cookie_manager.set('logged_in', True)
+                    cookie_manager.set('logged_in', True,key='logged_in_cookie')
+                    cookie_manager.set('username', username,key='username_cookie')
                     st.success("Conectado correctamente!")
                     sleep(0.5)
                     st.switch_page("pages/Inventarios_Pendientes.py")

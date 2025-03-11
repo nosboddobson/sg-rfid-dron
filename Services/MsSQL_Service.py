@@ -1,11 +1,12 @@
+import datetime
 import os
 import pyodbc
 import pandas as pd
 import json
 from dotenv import load_dotenv
-from Services import DronService, LogService, MsSQL_Service  # Assuming these modules are already defined
+from Services import LogService  # Assuming these modules are already defined
 
-#import LogService, MsSQL_Service
+#import LogService
 # Load environment variables from .env
 load_dotenv(override=True)
 
@@ -389,12 +390,52 @@ def obtener_nombre_archivo(ID):
         conn.close()
         return None
     
+
+def Dron_GET_Boton_Envio_Datos():
+    
+    time_to_wait=60
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        query='''
+        SELECT TOP 1  FORMAT(Fecha,'yyyy-MM-dd HH:mm:ss.ff') as Fecha FROM Dron_Stop_Button ORDER BY Fecha desc'''
+        
+        cursor.execute(query)
+        
+        result = cursor.fetchone()
+        conn.close()
+        if result:
+            Hora = datetime.datetime.strptime(str(result[0]),'%Y-%m-%d %H:%M:%S.%f')
+            now = datetime.datetime.now()
+            #print (Hora)
+            time_difference = abs((now - Hora).total_seconds())
+            #print (time_difference)
+            
+            return time_difference <= time_to_wait
+        else:
+            
+            return False
+    except:
+        print ('Error')
+        return False
+
+
+    
 if __name__ == "__main__":
 
     print("OK")
     #print (obtener_nombre_archivo(135))
     #insertar_Fecha_Vuelo_Elementos_JED(1167,35)
-    Exportar_Elementos_JED_a_csv(48)
+    #Exportar_Elementos_JED_a_csv(48)
+    #now = datetime.datetime.now()
+    #print (now)
+    #dron=Dron_GET_Boton_Envio_Datos()
+    #print (dron)
+    #if now > dron:
+    #    print("OK")
+
    # with open("output_inventario.json", "r") as file:
    #     json_content = file.read()
     

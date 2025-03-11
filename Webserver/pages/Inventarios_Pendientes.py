@@ -1,27 +1,28 @@
 
 
 import os
+import time
 import pandas as pd
 import streamlit as st
 import plotly.express as px
-from menu import make_sidebar
+
+import extra_streamlit_components as stx
 
 from Functions import DB_Service as DB
 from Functions import Reuse_Service as Reuse
 
 
-
 #Inicio Creacion de la Pagina -----------------------------------------------------------------------------------------
-
 st.set_page_config(page_title="Inventario Sierra Gorda",layout="wide")
-
+from menu import make_sidebar
 make_sidebar()
-
+cookie_manager = stx.CookieManager()
 
 
 st.markdown("<h1 style='text-align: center;'>Inventarios Pendientes Patio Mina 2</h1>", unsafe_allow_html=True)
 
 Reuse.Load_css('Functions/CSS_General.css')
+
 
 
 # Initialize session state for the expanders
@@ -42,9 +43,58 @@ if 'page' not in st.session_state:
             st.session_state.page = 0
             print ("st.session_state.page = 0")
 
+if 'run_button' in st.session_state and st.session_state.run_button == True:
+    st.session_state.running = True
+else:
+    st.session_state.running = False
     # Crear la página "Inventarios Pendientes"
 
 
+
+
+cold1, cold2,cold3 = st.columns([2, 2,4],gap="small",vertical_alignment="center")  # Adjust column widths as needed
+datos1 = DB.obtener_datos_inventarios_pendientes()
+
+with cold1:
+    if st.button("Solicitar a Dron Enviar Inventario",disabled=st.session_state.running, key='run_button'):
+        
+        DB.Dron_SET_Boton_Envio_Datos_Hora(cookie_manager.get(cookie='username'))
+
+        with cold3: #use the second column for the message.
+            for i in range(2):
+                st.toast("Esperando Inventario...")
+                time.sleep(5)
+                datos2 = DB.obtener_datos_inventarios_pendientes()
+                if len(datos2)>len(datos1):
+                   st.toast("¡Inventario Recibido!", icon='🎉')
+                   st.balloons()
+                   time.sleep(5)
+                   success=True
+                   break
+                success=False   
+            if not success:
+                      st.toast("¡Ningún Inventario Recibido!", icon='😞')
+
+
+            #st.rerun()
+
+        with cold2: #use the second column for the message.
+            with st.spinner("Esperando Inventario...", show_time=True):
+                time.sleep(10)
+                datos2 = DB.obtener_datos_inventarios_pendientes()
+                message_placeholder = st.empty()
+                if len(datos2)>len(datos1):
+                    message_placeholder.success("¡Inventario Recibido!")
+                else:
+                     message_placeholder.error("¡Ningún Inventario Recibido!")
+            time.sleep(5)
+            message_placeholder.empty()
+            st.rerun()
+
+        
+                
+                
+            
 
 with st.expander("Inventarios Pendientes",expanded=True):
 

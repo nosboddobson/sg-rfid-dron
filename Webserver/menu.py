@@ -45,7 +45,7 @@ def make_sidebar():
 
     with st.sidebar:
 
-        st.image('images/SG_Logo.png', use_column_width=True)
+        st.image('images/SG_Logo.png', use_container_width=True)
         
         #st.page_link("inicio.py", label="Inicio")
         st.write("")
