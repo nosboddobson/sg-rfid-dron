@@ -37,7 +37,7 @@ Reuse.Load_css('Functions/CSS_General.css')
 
 def create_waffle_chart(correctos, faltantes, fila, seccion, num_columnas=10):
     """
-    Crea un gráfico waffle para visualizar correctos y faltantes.
+    Crea un gráfico waffle responsive para visualizar correctos y faltantes.
     """
     total = correctos + faltantes
     
@@ -54,8 +54,8 @@ def create_waffle_chart(correctos, faltantes, fila, seccion, num_columnas=10):
     n_correctos = round(prop_correctos * n_cuadrados)
     n_faltantes = n_cuadrados - n_correctos
     
-    # Crear matriz para el waffle - IMPORTANTE: inicializar todos los valores
-    waffle = np.ones((n_filas, n_columnas))  # Cambio aquí: todos son 1 por defecto
+    # Crear matriz para el waffle
+    waffle = np.ones((n_filas, n_columnas))
     
     # Llenar matriz con valores (1 para correctos, 2 para faltantes)
     count = 0
@@ -67,37 +67,44 @@ def create_waffle_chart(correctos, faltantes, fila, seccion, num_columnas=10):
                 waffle[i, j] = 2  # Faltantes = 2
             count += 1
     
-    color_correctos = '#2bb534'  # Verde más brillante
-    color_faltantes = '#f89256'  # Naranja personalizado
+    color_correctos = '#2bb534'  # Verde
+    color_faltantes = '#f89256'  # Naranja
+    
     # Crear heatmap para representar el waffle
     fig = go.Figure(data=go.Heatmap(
         z=waffle,
         colorscale = [
-            [0, 'green'],     # Para valor 0 (no debería existir ninguno)
-            [0.3, 'green'],   # Para valor 0 (no debería existir ninguno)
-            [0.3, 'green'],   # Transición a verde
-            [0.5, 'green'],   # Para valor 1 (Correctos)
-            [0.5, 'orange'],  # Transición a naranja
-            [1.0, 'orange']   # Para valor 2 (Faltantes)
+            [0, 'green'],
+            [0.3, 'green'],
+            [0.3, 'green'],
+            [0.5, 'green'],
+            [0.5, 'orange'],
+            [1.0, 'orange']
         ],
         showscale=False,
         hoverongaps=False,
         hovertemplate='<extra></extra>'
     ))
     
-    # Formato y diseño
+    # responsive
     fig.update_layout(
-        title=f"Fila: {fila}, Sección: {seccion}",
-        title_x=0.5,
+         
+        title={
+            'text': f"Fila: {fila}, Sección: {seccion}",
+            'x': 0.5,
+            'xanchor': 'center',
+            'yanchor': 'top'
+        },
         title_font=dict(size=16, color="white", weight="bold"),
-        height=300,
-        paper_bgcolor="#1E2029",  # azul-gris oscuro para la tarjeta
-        plot_bgcolor="#1E2029", 
+        paper_bgcolor="#1E2029",
+        plot_bgcolor="#1E2029",
         margin=dict(t=50, l=10, r=10, b=70),
+        autosize=True,  
+        height=None,    
         annotations=[
             dict(
-                x=0.25,
-                y=-0.15,
+                x=0.5,  # Centrado horizontalmente
+                y=-0.15,  # Primera anotación (Correctos)
                 xref="paper",
                 yref="paper",
                 text=f"Correctos: {correctos} ({round(prop_correctos*100)}%)",
@@ -106,28 +113,28 @@ def create_waffle_chart(correctos, faltantes, fila, seccion, num_columnas=10):
                 align="center"
             ),
             dict(
-                x=0.75,
-                y=-0.15,
+                x=0.5,  # Centrado horizontalmente
+                y=-0.20,  # Segunda anotación (Faltantes), más abajo
                 xref="paper",
                 yref="paper",
                 text=f"Faltantes: {faltantes} ({round(prop_faltantes*100)}%)",
                 showarrow=False,
-                font=dict(color=color_faltantes, size=15,weight="bold"),
+                font=dict(color=color_faltantes, size=15, weight="bold"),
                 align="center"
             )
-        ]
+        ],
+
+        yaxis=dict(scaleanchor="x", scaleratio=1)
     )
     
-    # Eliminar los espacios entre cuadrados
     fig.update_traces(
-        xgap=1,  # Reducir espacio horizontal entre cuadrados
-        ygap=1   # Reducir espacio vertical entre cuadrados
+        xgap=1,
+        ygap=1
     )
     
-    # Eliminar ejes y cuadrícula
     fig.update_xaxes(showticklabels=False, showgrid=False, zeroline=False)
     fig.update_yaxes(showticklabels=False, showgrid=False, zeroline=False)
-    
+        
     return fig
 # Initialize session state for the expanders
 if 'expand_resumen_inventario' not in st.session_state:
@@ -217,28 +224,28 @@ with st.expander("Inventarios",expanded=st.session_state.expand_inventario_Reali
         headers_Procesado = st.columns([1, 2, 2, 2, 2, 2, 2, 2, 2,2,2], gap="medium", vertical_alignment="top")
     
         _= '''headers[0].write("Tipo Inventario")
-        headers[1].write("Zona")
-        headers[2].write("Fecha Inventario")
-        headers[3].write("Hora Inventario")
-        headers[4].write("Tiempo de Vuelo [HH:MM:SS]")
+        headers[1].write("Ubicación")
+        headers[2].write("Fecha")
+        headers[3].write("Inicio")
+        headers[4].write("Duración")
         headers[5].write("Correctos")
         headers[6].write("Faltantes")
         headers[7].write("Sobrantes")
-        headers[8].write("Lectura [%]")
-        headers[9].write("Código JD")
+        headers[8].write("Lectura")
+        headers[9].write("N Conteo")
         headers[10].write("") '''
 
         header_texts = [
             "Zona",
-            "Fecha Inventario",
-            "Hora Inventario",
-            "Fecha de Vuelo",
+            "Fecha",
+            "Inicio",
+            "Fecha Vuelo",
             "Hora de Vuelo",
-            "Tiempo de Vuelo",
+            "Duración",
             "Correctos",
             "Faltantes",
             "Sobrantes",
-            "Lectura [%]",
+            "Lectura",
             ""  # Empty string for the last column
         ]        
 
@@ -326,7 +333,7 @@ with st.expander("Ver detalle",expanded=st.session_state.expand_resumen_inventar
         
         Tipo_inventario_r = "Completo" if Inventario_Realizado["Ubicacion"] == "PT" else "Parcial, en " + Inventario_Realizado["Ubicacion"]
 
-        st.subheader("Inventario " + Tipo_inventario_r + ", realizado el " + DB.format_datetime(Inventario_Realizado["Fecha_Inventario"]) + ", " + " ID: JDE-" +  str(Inventario_Realizado["NumeroConteo"])    )
+        st.subheader("Inventario " + Tipo_inventario_r + ", realizado el " + DB.format_datetime(Inventario_Realizado["Fecha_Inventario"]) + ", " + " Número conteo: " +  str(Inventario_Realizado["NumeroConteo"])    )
     
 
         

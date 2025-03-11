@@ -86,8 +86,8 @@ def create_dron_video_3d(df_jde,ID_Vuelo):
     output_video_path = output_video_path_base + str(ID_Vuelo) +'_inventario_vuelo.mp4'
     drone_img_path = 'Video_Vuelos/dji_matrice_350_transparent.png'  # Ruta a la imagen del dron con fondo transparente
 
-    #route=load_route_from_df(df_jde)
-    route=df_jde
+    route=load_route_from_df(df_jde)
+    #route=df_jde
     
     if not route:
         print("No se pudo crear una ruta válida desde el DF")
@@ -171,6 +171,7 @@ def create_dron_video_3d_test(ID_Vuelo):
 
 def create_drone_flight_video(json_path, image_path, drone_img_path, output_video_path, route):
     # Cargar el JSON con los bounding boxes
+    print('create_drone_flight_video iniciado')
     with open(json_path, 'r') as f:
         data = json.load(f)
     
@@ -186,6 +187,7 @@ def create_drone_flight_video(json_path, image_path, drone_img_path, output_vide
         cell_dict_by_id[key_id] = cell['bbox']
     
     # Cargar la imagen
+    print('Cargando Imagen base para Video')
     img = cv2.imread(image_path)
     if img is None:
         print(f"Error: No se pudo cargar la imagen desde {image_path}")

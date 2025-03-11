@@ -1,4 +1,3 @@
-
 import streamlit as st
 from time import sleep
 from streamlit.runtime.scriptrunner import get_script_run_ctx
@@ -9,7 +8,6 @@ cookie_manager = stx.CookieManager()
 
 
 @st.cache_resource   
-
 def get_current_page_name():
     ctx = get_script_run_ctx()
     if ctx is None:
@@ -26,51 +24,63 @@ def make_sidebar():
     no_sidebar_style = """
     <style>
         div[data-testid="stSidebarNav"] {display: none;}
+        
+        /* Estilo responsive para la imagen del logo */
+        .sidebar-logo {
+            width: 100%;
+            max-width: 250px; 
+            height: auto;
+            margin-bottom: 20px;
+        }
+        
+        /* Ajustes para pantallas pequeñas */
+        @media screen and (max-width: 768px) {
+            .sidebar-logo {
+                max-width: 150px;
+            }
+        }
     </style>
     """
     st.markdown(no_sidebar_style, unsafe_allow_html=True)
 
     with st.sidebar:
-  
-        st.image('images/SG_Logo.png', width=250)  # Adjust the width as necessary
 
-        st.title("Inventarios Patio SG")
+        st.image('images/SG_Logo.png', use_column_width=True)
+        
+        #st.page_link("inicio.py", label="Inicio")
         st.write("")
-        st.page_link("inicio.py", label="Inicio", icon="🏠")
         st.write("")
-
-        #if controller.get("logged_in"):
         if st.session_state.get("logged_in", False):
-            st.page_link("pages/Inventarios_Pendientes.py", label="Inventarios Pendientes", icon="🕵️")
-    
-            st.write("")
-            st.page_link("pages/Inventarios_Realizados.py", label="Inventarios Realizados", icon="🕵️")
-            st.write("")
-
-            st.write("")
-            st.page_link("pages/Inventarios_Log.py", label="Log de Vuelos", icon="📃")
-            st.write("")
-
-            if st.button("Cerrar Sesión"):
-                logout()
-
+            st.page_link("pages/Inventarios_Pendientes.py", label="Inventarios Pendientes" )
+            st.page_link("pages/Inventarios_Realizados.py", label="Inventarios Realizados")
+            st.page_link("pages/Inventarios_Log.py", label="Log de Vuelos")
+            st.page_link("pages/logout.py", label="Cerrar sesión")
+       
         elif get_current_page_name() != "inicio":
-            # If anyone tries to access a secret page without being logged in,
-            # redirect them to the login page
+
             st.switch_page("inicio.py")
 
-        print (str())
-def logout():
+        print(str())
 
+def main():
+    # Mostrar el logo de manera responsive
+    col1, col2, col3 = st.columns([1, 2, 1])
+    
+    with col2:
+        st.image('images/SG_Logo.png', use_column_width=True)
+    
+    if "logged_in" in st.session_state:
+        del st.session_state["logged_in"]
 
-    if st.session_state.get('logged_in',True):  
-       
-        del st.session_state["logged_in"]  # Update session state
+    try:
         cookie_manager.delete("logged_in")
+    except KeyError:
+        pass
+    
+    st.query_params.clear()    
+    st.info("Sesión Cerrada correctamente!")
+    sleep(0.5)
+    st.switch_page("inicio.py")
 
-        st.query_params.clear()    
-        st.info("Sesión Cerrada correctamente!")
-        sleep(0.5)
-        st.switch_page("inicio.py")
-    else: 
-        st.warning("Aún no inicias sesión")
+if __name__ == "__main__":
+    main()

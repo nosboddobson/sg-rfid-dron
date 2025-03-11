@@ -191,17 +191,21 @@ def actualizar_inventario():
                             
                             #Crear Registro en Inventario_JDE
                             Inventario_jed_id=dbService.insertar_inventario_jde(ID,ahora,resumen['OK Count'],resumen['FALTANTE Count'],resumen['Other Count'],resumen['Percentage OK'],NumeroConteo,Sucursal,Ubicacion,TransactionId)
-                            
+                            print ('Inventario JDE Insertado')
                             #Insertar elementos en  Elementos JDE
                             print(dbService.insertar_elementos_jde(Inventario_jed_id,inventario_json))
+                            print ('Elementos JDE Insertados')
 
                             #21/02/2025
                             #agregar hora de lectura  a los elementos de JDE
                             print (dbService.insertar_Fecha_Vuelo_Elementos_JED(ID,Inventario_jed_id))
+                            print ('Fecha de vuelo insertada en Elementos JDE')
 
                             elementos_jed_df=dbService.Exportar_Elementos_JED_a_df(Inventario_jed_id)
+                            print ('Elementos de Inventario exportados a Dataframe para Generar Video')
 
                             if elementos_jed_df is not None:
+                                print('Generando Video...')
                                 ruta_video=Video_Service.create_dron_video_3d(elementos_jed_df,Inventario_jed_id)
                                 if ruta_video is not None:
                                     dbService.insertar_ruta_video_inventario_jde(Inventario_jed_id,ruta_video)
@@ -234,8 +238,8 @@ def actualizar_inventario():
     except Exception as e:
         end_time = time.time()
         SaveExecutions.Guardar_Ejecucion_a_csv(start_time,end_time,"actualizar-inventario",500)
-        print ({'Error': str(e)})
-        return jsonify({'Error': str(e)}), 500
+        print ({'Error General': str(e)})
+        return jsonify({'Error General': str(e)}), 500
     finally:
         DronService.disconnect_from_share_folder(os.getenv('JD_REMOTE_FOLDER'))
 
