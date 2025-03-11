@@ -1,0 +1,39 @@
+
+.stApp {
+    background-color: #121620;
+}
+.stHeader {
+    background-color: #1E2338;
+}
+
+
+.stHorizontalBlock2  {
+    border-bottom: 1px solid #ccc;
+}
+
+.table-header{
+  color:#D3D3D3;
+  font-weight: bold;
+}
+.fly-data{
+  color:#D3D3D3;
+  font-weight: bold;
+}
+.fly-data-detail{
+  color:#A9A9A9;
+  font-weight: bold;
+}
+.data-ok {
+  color: #2bb534 !important; /* Green for correct items */
+  font-weight: bold;
+}
+.data-missing {
+  color: #f89256 !important; /* Orange for missing items */
+  font-weight: bold;
+}
+.data-excess {
+  color: #dfb52c !important; /* Yellow for excess items */
+  font-weight: bold;
+}
+/* Estilos para la tabla paginada */
+ 

@@ -3,6 +3,8 @@ import streamlit as st
 import plotly.express as px
 from menu import make_sidebar
 from Functions import DB_Service as DB
+from Functions import Reuse_Service as Reuse
+
 
 
 
@@ -13,31 +15,8 @@ st.set_page_config(page_title="Log de Vuelos Sierra Gorda",layout="wide")
 
 make_sidebar()
 
-    
-st.markdown("""
-    <style>
-    /* Set the entire background of the page to light gray */
-    body {
-        background-color: #f0f0f0;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+Reuse.Load_css('Functions/CSS_General.css')
 
-
-
-
-st.markdown("<h1 style='text-align: center;'>Log de Vuelos</h1>", unsafe_allow_html=True)
-
-
-css_style = """
-<style>
-.stHorizontalBlock2  {
-    border-bottom: 1px solid #ccc;
-}
-</style>
-"""
-
-st.markdown(css_style, unsafe_allow_html=True)
 
 
 

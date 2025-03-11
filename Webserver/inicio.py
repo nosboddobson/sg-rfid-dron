@@ -31,9 +31,10 @@ def set_bg_hack_url():
         <style>
         .stApp {{
             background: url(data:image/jpeg;base64,{base64.b64encode(open("images/PM2_Dron.jpg", "rb").read()).decode()});
-            background-size: cover;s
-            
+            background-size: cover;
+
         }}
+
         </style>
         """,
         unsafe_allow_html=True

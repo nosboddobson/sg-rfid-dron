@@ -2,12 +2,16 @@ import os
 import pandas as pd
 import streamlit as st
 import plotly.express as px
+import plotly.graph_objects as go
+import numpy as np
+import math
 #import matplotlib.pyplot as plt
 #from pywaffle import Waffle
 
 from menu import make_sidebar
 
 from Functions import DB_Service as DB
+from Functions import Reuse_Service as Reuse
 
 
 #Inicio Creacion de la Pagina -----------------------------------------------------------------------------------------
@@ -29,17 +33,102 @@ make_sidebar()
     #st.title("Inventarios Patio Mina 2")
 st.markdown("<h1 style='text-align: center;'>Inventarios Realizados Patio Mina 2</h1>", unsafe_allow_html=True)
 
+Reuse.Load_css('Functions/CSS_General.css')
 
-css_style = """
-<style>
-.stHorizontalBlock2  {
-    border-bottom: 1px solid #ccc;
-}
-</style>
-"""
-
-st.markdown(css_style, unsafe_allow_html=True)
-
+def create_waffle_chart(correctos, faltantes, fila, seccion, num_columnas=10):
+    """
+    Crea un gráfico waffle para visualizar correctos y faltantes.
+    """
+    total = correctos + faltantes
+    
+    # Calcular proporciones
+    prop_correctos = correctos / total if total > 0 else 0
+    prop_faltantes = faltantes / total if total > 0 else 1
+    
+    # Determinar tamaño de la cuadrícula (100 cuadrados)
+    n_cuadrados = 100
+    n_columnas = num_columnas
+    n_filas = n_cuadrados // n_columnas
+    
+    # Calcular número de cuadrados para cada categoría
+    n_correctos = round(prop_correctos * n_cuadrados)
+    n_faltantes = n_cuadrados - n_correctos
+    
+    # Crear matriz para el waffle - IMPORTANTE: inicializar todos los valores
+    waffle = np.ones((n_filas, n_columnas))  # Cambio aquí: todos son 1 por defecto
+    
+    # Llenar matriz con valores (1 para correctos, 2 para faltantes)
+    count = 0
+    for i in range(n_filas):
+        for j in range(n_columnas):
+            if count < n_correctos:
+                waffle[i, j] = 1  # Correctos = 1
+            else:
+                waffle[i, j] = 2  # Faltantes = 2
+            count += 1
+    
+    color_correctos = '#2bb534'  # Verde más brillante
+    color_faltantes = '#f89256'  # Naranja personalizado
+    # Crear heatmap para representar el waffle
+    fig = go.Figure(data=go.Heatmap(
+        z=waffle,
+        colorscale = [
+            [0, 'green'],     # Para valor 0 (no debería existir ninguno)
+            [0.3, 'green'],   # Para valor 0 (no debería existir ninguno)
+            [0.3, 'green'],   # Transición a verde
+            [0.5, 'green'],   # Para valor 1 (Correctos)
+            [0.5, 'orange'],  # Transición a naranja
+            [1.0, 'orange']   # Para valor 2 (Faltantes)
+        ],
+        showscale=False,
+        hoverongaps=False,
+        hovertemplate='<extra></extra>'
+    ))
+    
+    # Formato y diseño
+    fig.update_layout(
+        title=f"Fila: {fila}, Sección: {seccion}",
+        title_x=0.5,
+        title_font=dict(size=16, color="white", weight="bold"),
+        height=300,
+        paper_bgcolor="#1E2029",  # azul-gris oscuro para la tarjeta
+        plot_bgcolor="#1E2029", 
+        margin=dict(t=50, l=10, r=10, b=70),
+        annotations=[
+            dict(
+                x=0.25,
+                y=-0.15,
+                xref="paper",
+                yref="paper",
+                text=f"Correctos: {correctos} ({round(prop_correctos*100)}%)",
+                showarrow=False,
+                font=dict(color=color_correctos, size=16, weight="bold"),
+                align="center"
+            ),
+            dict(
+                x=0.75,
+                y=-0.15,
+                xref="paper",
+                yref="paper",
+                text=f"Faltantes: {faltantes} ({round(prop_faltantes*100)}%)",
+                showarrow=False,
+                font=dict(color=color_faltantes, size=15,weight="bold"),
+                align="center"
+            )
+        ]
+    )
+    
+    # Eliminar los espacios entre cuadrados
+    fig.update_traces(
+        xgap=1,  # Reducir espacio horizontal entre cuadrados
+        ygap=1   # Reducir espacio vertical entre cuadrados
+    )
+    
+    # Eliminar ejes y cuadrícula
+    fig.update_xaxes(showticklabels=False, showgrid=False, zeroline=False)
+    fig.update_yaxes(showticklabels=False, showgrid=False, zeroline=False)
+    
+    return fig
 # Initialize session state for the expanders
 if 'expand_resumen_inventario' not in st.session_state:
     st.session_state.expand_resumen_inventario = False
@@ -63,7 +152,7 @@ if 'page2' not in st.session_state:
 
 
 
-with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inventario_Realizado):
+with st.expander("Inventarios",expanded=st.session_state.expand_inventario_Realizado):
 
         
         #st.title("Inventarios Realizados")
@@ -155,7 +244,7 @@ with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inven
 
         for i, header in enumerate(headers_Procesado):
             with header:
-                st.markdown(f"<p style='text-align: center;font-weight: bold;'>{header_texts[i]}</p>", unsafe_allow_html=True) 
+                st.markdown(f"<p class='table-header' style='text-align: center;'>{header_texts[i]}</p>", unsafe_allow_html=True) 
 
 
         if not datosJDE.empty:  # Check if the DataFrame is not empty
@@ -168,7 +257,7 @@ with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inven
 
 
                 #col1.write(Tipo_inventario)
-                col2.write(f"<p style='text-align: center;'>{inventario['Ubicacion']}</p>", unsafe_allow_html=True) 
+                col2.write(f"<p  style='text-align: center;'>{inventario['Ubicacion']}</p>", unsafe_allow_html=True) 
                 col3.write(f"<p style='text-align: center;'>{DB.format_date(inventario["Fecha_Inventario"])}</p>", unsafe_allow_html=True) 
                 col4.write(f"<p style='text-align: center;'>{DB.format_time(inventario["Fecha_Inventario"])}</p>", unsafe_allow_html=True) 
 
@@ -180,14 +269,14 @@ with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inven
         
 
                 #col6.write(inventario["Elementos_OK"])
-                col6.write(f"<p style='text-align: center;color: lime;font-weight: bold;'>{inventario["Elementos_OK"]}</p>", unsafe_allow_html=True)
+                col6.write(f"<p class='data-ok' style='text-align: center;'>{inventario["Elementos_OK"]}</p>", unsafe_allow_html=True)
                 
                 #col7.write(inventario["Elementos_Faltantes"])
-                col7.write(f"<p style='text-align: center;color: orange'>{inventario["Elementos_Faltantes"]}</p>", unsafe_allow_html=True)
+                col7.write(f"<p class='data-missing' style='text-align: center;'>{inventario["Elementos_Faltantes"]}</p>", unsafe_allow_html=True)
 
             
                 #col8.write(inventario["Elementos_Sobrantes"])
-                col8.write(f"<p style='text-align: center;color: yellow'>{inventario["Elementos_Sobrantes"]}</p>", unsafe_allow_html=True)
+                col8.write(f"<p class='data-excess' style='text-align: center;'>{inventario["Elementos_Sobrantes"]}</p>", unsafe_allow_html=True)
                 col9.write(f"<p style='text-align: center;'>{str(inventario["Porcentaje_Lectura"])}%</p>", unsafe_allow_html=True) 
                 #col10.write(f"<p style='text-align: center;'>{str(inventario["NumeroConteo"])}</p>", unsafe_allow_html=True) 
             
@@ -225,9 +314,9 @@ with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inven
 
         st.write('')
 
-with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_inventario):
+with st.expander("Ver detalle",expanded=st.session_state.expand_resumen_inventario):
 
-# st.title("Resumen Inventario")
+#st.title("Resumen Inventario")
 
     if st.session_state.selected_inventory:          
         resumen_inventario = DB.obtener_elementos_jde(int(st.session_state.selected_inventory))
@@ -237,7 +326,7 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
         
         Tipo_inventario_r = "Completo" if Inventario_Realizado["Ubicacion"] == "PT" else "Parcial, en " + Inventario_Realizado["Ubicacion"]
 
-        st.subheader("Resumen Inventario JDE-" + str(Inventario_Realizado["NumeroConteo"]) +" {"+Tipo_inventario_r +"} " + DB.format_datetime(Inventario_Realizado["Fecha_Inventario"])    )
+        st.subheader("Inventario " + Tipo_inventario_r + ", realizado el " + DB.format_datetime(Inventario_Realizado["Fecha_Inventario"]) + ", " + " ID: JDE-" +  str(Inventario_Realizado["NumeroConteo"])    )
     
 
         
@@ -247,20 +336,67 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
 
         st.write('')
 
+        if st.session_state.show_content_advanced:
+            col1, col2 = st.columns([2,2],gap="medium")
+            with col1:
+            
+                headers_lecturas = st.columns([2, 1, 1], gap="small", vertical_alignment="top") 
+                columns = ["Lecturas", "Nº Elementos","%"]
+                for i, header in enumerate(headers_lecturas):
+                    with header:
+                        st.markdown(f"<p class='table-header' style='text-align: left;'>{columns[i]}</p>", unsafe_allow_html=True) 
 
+                # Each row of the table
+                col10, col20, col30 = st.columns([2, 1, 1], gap="small", vertical_alignment="center")
+                col10.write(f"<p class='data-ok' style='text-align: left;'>Correctos</p>", unsafe_allow_html=True)
+                col20.write(f"<p class='data-ok' style='text-align: left;'>{Inventario_Realizado['Elementos_OK']}</p>", unsafe_allow_html=True)
+                col30.write(f"<p class='data-ok' style='text-align: left;'>{int(Inventario_Realizado['Elementos_OK'] / total_elementos * 100)}%</p>", unsafe_allow_html=True)
+
+                col10, col20, col30 = st.columns([2, 1, 1], gap="small", vertical_alignment="center")
+                col10.write(f"<p class='data-missing' style='text-align: left;'>Faltantes</p>", unsafe_allow_html=True)
+                col20.write(f"<p class='data-missing' style='text-align: left;'>{Inventario_Realizado['Elementos_Faltantes']}</p>", unsafe_allow_html=True)
+                col30.write(f"<p class='data-missing' style='text-align: left;'>{int(Inventario_Realizado['Elementos_Faltantes'] / total_elementos * 100)}%</p>", unsafe_allow_html=True)
+
+                col10, col20, col30 = st.columns([2, 1, 1], gap="small", vertical_alignment="center")
+                col10.write(f"<p class='data-excess' style='text-align: left;'>Sobrantes</p>", unsafe_allow_html=True)
+                col20.write(f"<p class='data-excess' style='text-align: left;'>{Inventario_Realizado['Elementos_Sobrantes']}</p>", unsafe_allow_html=True)
+                col30.write(f"<p class='data-excess' style='text-align: left;'>{int(Inventario_Realizado['Elementos_Sobrantes'] / total_elementos * 100)}%</p>", unsafe_allow_html=True)
+            
+            with col2:
+                
+                headers_lecturas = st.columns([2, 1], gap="small", vertical_alignment="top") 
+                columns = ["Vuelo", ""]
+                for i, header in enumerate(headers_lecturas):
+                    with header:
+                        st.markdown(f"<p class='fly-data' style='text-align: left;'>{columns[i]}</p>", unsafe_allow_html=True) 
+
+                # Each row of the table
+                col10, col20 = st.columns([2, 1], gap="small", vertical_alignment="center")
+                col10.write(f"<p class='fly-data' style='text-align: left;'>Fecha</p>", unsafe_allow_html=True)
+                col20.write(f"<p class='fly-data' style='text-align: left;'>{DB.format_date(Inventario_Realizado["Fecha_Vuelo"])}</p>", unsafe_allow_html=True)
+                col10, col20 = st.columns([2, 1], gap="small", vertical_alignment="center")
+                col10.write(f"<p class='fly-data' style='text-align: left;'>Hora</p>", unsafe_allow_html=True)
+                col20.write(f"<p class='fly-data' style='text-align: left;'>{DB.format_time(Inventario_Realizado["Fecha_Vuelo"])}</p>", unsafe_allow_html=True)
+                col10, col20 = st.columns([2, 1], gap="small", vertical_alignment="center")
+                col10.write(f"<p class='fly-data' style='text-align: left;'>Fin</p>", unsafe_allow_html=True)
+                col20.write(f"<p class='fly-data' style='text-align: left;'>{DB.add_seconds_to_timestamp_string(Inventario_Realizado["Fecha_Vuelo"],Inventario_Realizado["Tiempo_Vuelo"])}</p>", unsafe_allow_html=True)
+                col10, col20 = st.columns([2, 1], gap="small", vertical_alignment="center")
+                col10.write(f"<p class='fly-data' style='text-align: left;f'>Duración</p>", unsafe_allow_html=True)
+                col20.write(f"<p class='fly-data' style='text-align: left;'>{DB.format_seconds_HHMMSS(int(Inventario_Realizado["Tiempo_Vuelo"]))}</p>", unsafe_allow_html=True)
+            st.write('')
        
-        left_co, cent_co,last_co = st.columns([5,0.2,3])
+        left_co, cent_co,last_co = st.columns([8,0.1,0.1])
         
        
         with left_co:
                     #with st.container(height=420,border=False): 
                         
-                        if Inventario_Realizado["Video_Vuelo"] is not None:
-                            st.write("Representación de vuelo realizado")
-                            st.video(data=os.path.relpath(Inventario_Realizado["Video_Vuelo"], 'Webserver'),format="video/mp4", autoplay=False)  
-                        else:
-                               st.write("Representación NO encontrada")
-    
+                    if Inventario_Realizado["Video_Vuelo"] is not None:
+                        #st.write("Representación de vuelo realizado") #eliminar-pv
+                        st.video(data=os.path.relpath(Inventario_Realizado["Video_Vuelo"], 'Webserver'),format="video/mp4", autoplay=False)  
+                    else:
+                        st.write("Representación NO encontrada")
+
 
 
         # datos para grafico
@@ -294,11 +430,11 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
         
      
 
-        with last_co:
+        #with last_co:
                 #with st.container(height=420,border=False): 
-                    st.write("Distribución de elementos")
+                    #st.write("Distribución de elementos")
                     #with _lock:
-                    st.plotly_chart(figd)
+                    #st.plotly_chart(figd)
                 
    
         # Display the pie chart in Streamlit
@@ -307,72 +443,63 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
         
 
         st.write('')
-        st.markdown("**Existencias por Fila**")
+        st.markdown("**Detalle por Fila**")
         def procesar_ubicacion(ubicacion):
-            fila = ubicacion[3:6]  # Extrae los caracteres del 4 al 6 (inclusive)
-            rack = ubicacion[6:]   # Extrae los caracteres del 7 en adelante
-            return pd.Series([fila, rack])  # Retorna una Serie de Pandas
-       
-        # Aplica la función a la columna 'Ubicacion'
-        resumen_inventario[['Fila', 'Rack']] = resumen_inventario['Ubicación'].apply(procesar_ubicacion)
+            fila = ubicacion[3:6]
+            rack = ubicacion[6:]
+            return pd.Series([fila, rack])
 
-        # Cuenta 'Correctos' y 'Faltantes' por 'Fila' y 'Rack'
+        # Procesamiento de datos igual que antes
+        resumen_inventario[['Fila', 'Rack']] = resumen_inventario['Ubicación'].apply(procesar_ubicacion)
         conteo = resumen_inventario.groupby(['Fila', 'Rack', 'Resultado']).size().unstack(fill_value=0)
-        #print(conteo)
-        conteo.columns = ['Faltantes', 'Correctos']  # Renombra las columnas
+        conteo.columns = ['Faltantes', 'Correctos']
         nuevo_df = conteo.reset_index()
 
-        #print(nuevo_df)
-        
-        cols = st.columns(4)  # Create 4 columns
+        # Definir número de columnas por fila
+        num_cols = 4
 
-        for index,row in nuevo_df.iterrows():
+        # Calcular cuántas filas de la UI necesitamos
+        num_filas_ui = (len(nuevo_df) + num_cols - 1) // num_cols  # División con redondeo hacia arriba
+
+        for fila_ui in range(num_filas_ui):
+            # Crear una fila de columnas en Streamlit
+            cols = st.columns(num_cols)
             
-                with cols[index % 4]: 
-                    data = {
-                    'Category': ['Correctos', 'Faltantes'],
-                    'Values': [row['Correctos'], row['Faltantes']],
-                    
-                    }
-                    data2 = {
-                    'Category': [f"Fila: {int(row['Fila'])}, Sección: {int(row['Rack'])}",'Correctos', 'Faltantes'],
-                    'Values': [0,row['Correctos'], row['Faltantes']],
-                    'Parents': ["",f"Fila: {int(row['Fila'])}, Sección: {int(row['Rack'])}", f"Fila: {int(row['Fila'])}, Sección: {int(row['Rack'])}"]
-                    }
+            # Iterar sobre los elementos de esta fila
+            for col_idx in range(num_cols):
+                # Calcular el índice en el dataframe
+                df_idx = fila_ui * num_cols + col_idx
                 
-                    fign = px.pie(data,
-                            names='Category',
-                            values='Values',
-                            color='Category',
-                            color_discrete_map=color_map,
-                          #  title=f"Fila: {int(row['Fila'])}, Sección: {int(row['Rack'])}",
-                            hover_name='Category',
-                        )  # Agrega un título
-
-                    color_mapn = {'Correctos': 'green', 'Faltantes': 'orange', 'Total': 'black',}
-
-                    figd=px.treemap(data2,names='Category',
-                                values='Values', 
-                                parents='Parents',
-                                labels='Category',
-                               # title=f"Fila: {int(row['Fila'])}, Sección: {int(row['Rack'])}",
-                                color='Category',
-                                color_discrete_map=color_mapn,
-                                height=250,
-                                color_discrete_sequence=['black']
-                                )
-                    figd.update_layout(margin = dict(t=50, l=25, r=25, b=10))
-                    figd.update_traces(textinfo = "label+value", sort=False,textposition='middle center',hovertemplate='')
-
-                
+                # Verificar que no nos pasemos del final del dataframe
+                if df_idx < len(nuevo_df):
+                    row = nuevo_df.iloc[df_idx]
                     
-                    st.plotly_chart(figd)
-                    #st.plotly_chart(fign)
+                    # Mostrar el gráfico en la columna correspondiente
+                    with cols[col_idx]:
+                        fig = create_waffle_chart(
+                            correctos=row['Correctos'], 
+                            faltantes=row['Faltantes'], 
+                            fila=int(row['Fila']), 
+                            seccion=int(row['Rack'])
+                        )
+                        st.plotly_chart(fig)
+
+        def highlight_resultado(row):
+            # Estilo base para todas las celdas
+            styles = ['background-color: black; color: #D3D3D3; font-size: 30px; font-weight: bold; border: 2px solid #444'] * len(row)
+  
+            return styles
+
+        # Aplicar solo este método de estilo
+        styled_df = resumen_inventario.style.apply(highlight_resultado, axis=1)
+
+
+        styled_df = styled_df.apply(highlight_resultado, axis=1)
 
         st.write('')
-        st.markdown("**Elementos de inventario**")
+        st.markdown("**Detalle**")
         pagination = st.container()
-        pagination.dataframe(data=resumen_inventario, use_container_width=True)      
+        pagination.dataframe(data=styled_df, use_container_width=True)      
                
         #st.video(data="videos/42_inventario_vuelo.mp4",format="video/mp4", autoplay=False)    
     else:

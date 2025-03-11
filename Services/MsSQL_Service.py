@@ -217,7 +217,8 @@ def insertar_elementos_jde(id_inventario, inventario_json):
         '''
 
         for elemento in rows:
-            epc = elemento.get("NumeroEtiqueta", "").strip().upper() if elemento.get("NumeroEtiqueta") is not None else ""
+
+            epc = elemento.get("NumeroEtiqueta", "").strip().upper() if elemento.get("NumeroEtiqueta") is not None else "SIN ETIQUETA"
             resultado = elemento.get('ResultadoConteo').capitalize()
             ubicacion = elemento.get('Ubicacion').strip().upper()
             codigo_articulo = elemento.get("CodigoArticulo").strip().upper()
