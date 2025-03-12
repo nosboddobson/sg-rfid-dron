@@ -51,50 +51,59 @@ else:
 
 
 
+####Comunicacion y estado de Dron
+Dron_Status = DB.get_last_heartbeat_and_compare()
+cold1, cold2,cold3,cold4 = st.columns([1, 1,1,3],gap="small",vertical_alignment="center")  # Adjust column widths as needed
+st.write('') 
 
-cold1, cold2,cold3 = st.columns([2, 2,4],gap="small",vertical_alignment="center")  # Adjust column widths as needed
-datos1 = DB.obtener_datos_inventarios_pendientes()
+cold1.write(f"<p style='text-align: right;'>Estado de Dron :</p>", unsafe_allow_html=True)
+     
+if Dron_Status:
 
-with cold1:
-    if st.button("Solicitar a Dron Enviar Inventario",disabled=st.session_state.running, key='run_button'):
-        
-        DB.Dron_SET_Boton_Envio_Datos_Hora(cookie_manager.get(cookie='username'))
+    cold2.write(f"<p style='text-align: left;'>En Linea ✔️</p>", unsafe_allow_html=True)
 
-        with cold3: #use the second column for the message.
-            for i in range(2):
-                st.toast("Esperando Inventario...")
+    datos1 = DB.obtener_datos_inventarios_pendientes()
+
+    with cold3:
+        if st.button("Solicitar a Dron Enviar Inventario",disabled=st.session_state.running, key='run_button'):
+            
+            DB.Dron_SET_Boton_Envio_Datos_Hora(cookie_manager.get(cookie='username'))
+   
+            # for i in range(6):
+            #     st.toast("Esperando Inventario...")
+            #     time.sleep(5)
+            #     datos2 = DB.obtener_datos_inventarios_pendientes()
+            #     if len(datos2)>len(datos1):
+            #         st.toast("¡Inventario Recibido!", icon='🎉')
+            #         st.balloons()
+            #         time.sleep(5)
+            #         success=True
+            #         break
+            #     success=False   
+            # if not success:
+            #         st.toast("¡Ningún Inventario Recibido!", icon='😞')
+            #         time.sleep(5)
+
+
+            # st.rerun()
+
+            with cold4:
+                with st.spinner("Esperando Inventario...", show_time=True):
+                    time.sleep(10)
+                    datos2 = DB.obtener_datos_inventarios_pendientes()
+                    message_placeholder = st.empty()
+                    if len(datos2)>len(datos1):
+                        message_placeholder.success("¡Inventario Recibido!")
+                    else:
+                        message_placeholder.error("¡Ningún Inventario Recibido!")
                 time.sleep(5)
-                datos2 = DB.obtener_datos_inventarios_pendientes()
-                if len(datos2)>len(datos1):
-                   st.toast("¡Inventario Recibido!", icon='🎉')
-                   st.balloons()
-                   time.sleep(5)
-                   success=True
-                   break
-                success=False   
-            if not success:
-                      st.toast("¡Ningún Inventario Recibido!", icon='😞')
-                      time.sleep(5)
+                message_placeholder.empty()
+                st.rerun()
 
-
-            #st.rerun()
-
-        with cold2: #use the second column for the message.
-            with st.spinner("Esperando Inventario...", show_time=True):
-                time.sleep(10)
-                datos2 = DB.obtener_datos_inventarios_pendientes()
-                message_placeholder = st.empty()
-                if len(datos2)>len(datos1):
-                    message_placeholder.success("¡Inventario Recibido!")
-                else:
-                     message_placeholder.error("¡Ningún Inventario Recibido!")
-            time.sleep(5)
-            message_placeholder.empty()
-            st.rerun()
-
-        
+else:
+            cold2.write(f"<p style='text-align: left;'>Fuera de Linea ❌</p>", unsafe_allow_html=True)
                 
-                
+st.write('')                    
             
 
 with st.expander("Inventarios Pendientes",expanded=True):

@@ -339,3 +339,42 @@ def Dron_SET_Boton_Envio_Datos_Hora(ID_Usuario):
         
     except (ValueError, TypeError):
         return None
+    
+def get_last_heartbeat_and_compare():
+    """
+    Retrieves the last heartbeat from the Dron_Heartbeats table, compares its timestamp
+    with the current time, and returns True if the difference is within 60 seconds,
+    False otherwise.
+    """
+    conn = None
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        # Get the last heartbeat
+        cursor.execute("SELECT TOP 1 HeartbeatTime FROM Dron_Heartbeats ORDER BY HeartbeatTime DESC")
+        last_heartbeat_row = cursor.fetchone()
+
+        if last_heartbeat_row:
+            last_heartbeat_time = last_heartbeat_row[0]  # Extract the datetime object
+            current_time = datetime.datetime.now()
+
+            time_difference = abs((current_time - last_heartbeat_time).total_seconds())
+
+            return time_difference <= 60
+        else:
+            # No heartbeats found
+            return False
+
+    except pyodbc.Error as db_err:
+        print(f"Heartbeat Database error occurred: {db_err}")
+        return False
+
+    except Exception as e:
+        print(f"Heartbeat An unexpected error occurred: {e}")
+        return False
+
+    finally:
+        if conn:
+            cursor.close()
+            conn.close()

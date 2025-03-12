@@ -339,6 +339,8 @@ On failure: JSON response {'Error': <error_message>} with a 500 status code.
 def show_message(msg):
     try:
 
+        client_ip = request.remote_addr
+        dbService.insert_client_ip_to_heartbeats(client_ip)
         #now = datetime.datetime.now()
         #print (now)
         if  dbService.Dron_GET_Boton_Envio_Datos(): 

@@ -421,7 +421,41 @@ def Dron_GET_Boton_Envio_Datos():
         print ('Error')
         return False
 
+def insert_client_ip_to_heartbeats(client_ip):
+    """Inserts the client IP into the Dron_Heartbeats table."""
 
+    conn = get_db_connection() #Get the connection.
+    if conn is None:
+        return False #exit if connection failed.
+
+    try:
+        cursor = conn.cursor()
+
+        query = '''
+            INSERT INTO Dron_Heartbeats (Source)
+            VALUES (?)
+        '''
+
+        cursor.execute(query, client_ip)
+        conn.commit()
+
+        print(f"Client IP '{client_ip}' Insertado correctamente")
+        return True
+
+    except pyodbc.Error as db_err:
+        print(f"Error insertando Heartbeat: {db_err}")
+        if conn:
+            conn.rollback()
+        return False
+
+    except Exception as e:
+        print(f"Exception insertando Heartbeat {e}")
+        return False
+
+    finally:
+        if conn:
+            cursor.close()
+            conn.close()
     
 if __name__ == "__main__":
 
