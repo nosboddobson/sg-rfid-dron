@@ -74,6 +74,7 @@ with cold1:
                 success=False   
             if not success:
                       st.toast("¡Ningún Inventario Recibido!", icon='😞')
+                      time.sleep(5)
 
 
             #st.rerun()
