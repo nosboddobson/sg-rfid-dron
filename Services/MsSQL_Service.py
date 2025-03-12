@@ -237,7 +237,7 @@ def insertar_elementos_jde(id_inventario, inventario_json):
 
 def insertar_Fecha_Vuelo_Elementos_JED(id_vuelo,id_inventario):
 
-    Ultimo_Archivo_Dron=MsSQL_Service.obtener_nombre_archivo(id_vuelo)
+    Ultimo_Archivo_Dron=obtener_nombre_archivo(id_vuelo)
     try :
         #buscar ultimo archivo 
         if Ultimo_Archivo_Dron:
