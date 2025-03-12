@@ -69,36 +69,36 @@ if Dron_Status:
             
             DB.Dron_SET_Boton_Envio_Datos_Hora(cookie_manager.get(cookie='username'))
    
-            # for i in range(6):
-            #     st.toast("Esperando Inventario...")
-            #     time.sleep(5)
-            #     datos2 = DB.obtener_datos_inventarios_pendientes()
-            #     if len(datos2)>len(datos1):
-            #         st.toast("¡Inventario Recibido!", icon='🎉')
-            #         st.balloons()
-            #         time.sleep(5)
-            #         success=True
-            #         break
-            #     success=False   
-            # if not success:
-            #         st.toast("¡Ningún Inventario Recibido!", icon='😞')
-            #         time.sleep(5)
-
-
-            # st.rerun()
-
-            with cold4:
-                with st.spinner("Esperando Inventario...", show_time=True):
-                    time.sleep(10)
-                    datos2 = DB.obtener_datos_inventarios_pendientes()
-                    message_placeholder = st.empty()
-                    if len(datos2)>len(datos1):
-                        message_placeholder.success("¡Inventario Recibido!")
-                    else:
-                        message_placeholder.error("¡Ningún Inventario Recibido!")
+            for i in range(6):
+                st.toast("Esperando Inventario...")
                 time.sleep(5)
-                message_placeholder.empty()
-                st.rerun()
+                datos2 = DB.obtener_datos_inventarios_pendientes()
+                if len(datos2)>len(datos1):
+                    st.toast("¡Inventario Recibido!", icon='🎉')
+                    st.balloons()
+                    time.sleep(5)
+                    success=True
+                    break
+                success=False   
+            if not success:
+                    st.toast("¡Ningún Inventario Recibido!", icon='😞')
+                    time.sleep(5)
+
+
+            st.rerun()
+
+            # with cold4:
+            #     with st.spinner("Esperando Inventario...", show_time=True):
+            #         time.sleep(10)
+            #         datos2 = DB.obtener_datos_inventarios_pendientes()
+            #         message_placeholder = st.empty()
+            #         if len(datos2)>len(datos1):
+            #             message_placeholder.success("¡Inventario Recibido!")
+            #         else:
+            #             message_placeholder.error("¡Ningún Inventario Recibido!")
+            #     time.sleep(5)
+            #     message_placeholder.empty()
+            #     st.rerun()
 
 else:
             cold2.write(f"<p style='text-align: left;'>Fuera de Linea ❌</p>", unsafe_allow_html=True)
