@@ -75,7 +75,7 @@ if Dron_Status:
                 datos2 = DB.obtener_datos_inventarios_pendientes()
                 if len(datos2)>len(datos1):
                     st.toast("¡Inventario Recibido!", icon='🎉')
-                    st.balloons()
+                    #st.balloons()
                     time.sleep(5)
                     success=True
                     break
@@ -202,7 +202,7 @@ with st.expander("Inventarios Pendientes",expanded=True):
 
             zona_disabled = True if tipo_inventario == "Completo" else False
             # Column 5: Zona dropdown
-            zona = col6.selectbox("Zona", ["SF0","SF1","SF2","PF1", "PF2", "PF3","PF4","PF5","PF6","PF7"], key=f"zona_{inventario[0]}", help="S= Shelving, P= Pasillo y F=Fila",label_visibility="collapsed",disabled=zona_disabled)
+            zona = col6.selectbox("Zona", ["PF1", "PF2", "PF3","PF4","PF5"], key=f"zona_{inventario[0]}", help="S= Shelving, P= Pasillo y F=Fila",label_visibility="collapsed",disabled=zona_disabled)
 
             # Column 6: Acción button
             if col7.button("Iniciar", key=f"iniciar_{inventario[0]}", help="Enviar Inventario a JD Edwards"): #Si el boton es presionado entonces:
@@ -573,10 +573,10 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
         
         # Example data
         data = {
-            'Category': ['Correctos', 'Faltantes', 'Sobrantes'],
-            'Values': [int(Inventario_Realizado["Elementos_OK"]), int(Inventario_Realizado["Elementos_Faltantes"]), int(Inventario_Realizado["Elementos_Sobrantes"])]
+            'Category': ['Correctos', 'Faltantes'],
+            'Values': [int(Inventario_Realizado["Elementos_OK"]), int(Inventario_Realizado["Elementos_Faltantes"])]
         }
-        color_map = {'Correctos': '#2bb534', 'Faltantes': '#f89256', 'Sobrantes': '#dfb52c'}
+        color_map = {'Correctos': '#2bb534', 'Faltantes': '#f89256'}
         # Create a pie chart using Plotly
         fig = px.pie(data, names='Category', values='Values', title='Distribución de Elementos', color='Category',color_discrete_map=color_map)
 
