@@ -457,12 +457,60 @@ def insert_client_ip_to_heartbeats(client_ip):
             cursor.close()
             conn.close()
     
+
+
+def obtener_datos_inventarios_jde(ID_Vuelo):
+    
+    conn = get_db_connection() #Get the connection.
+    if conn is None:
+        return False #exit if connection failed.
+
+    try:
+        cursor = conn.cursor()
+            # Query to fetch all data from the table
+        query = '''
+             SELECT TOP 1 j.ID, j.ID_Vuelo,  v.Tiempo_Vuelo, j.Fecha_Inventario,
+                CAST(FORMAT(v.Fecha_Vuelo, 'dd/MM/yyyy') AS VARCHAR(16)) AS Fecha_Vuelo,
+                CAST(FORMAT(v.Fecha_Vuelo, 'HH:mm') AS VARCHAR(16)) AS Hora_Vuelo,
+                j.Elementos_OK, j.Elementos_Faltantes, 
+                j.Porcentaje_Lectura, j.NumeroConteo, j.Sucursal, j.Ubicacion,
+                (v.N_elementos - j.Elementos_OK) AS Elementos_Sobrantes 
+            FROM Inventarios_JDE j
+            JOIN Inventario_Vuelos v ON j.ID_Vuelo = v.ID
+            WHERE j.ID=?
+            '''
+        cursor.execute(query, (ID_Vuelo,) )
+
+        columns = [column[0] for column in cursor.description]
+
+        # Obtener resultados como una lista de tuplas
+        results = cursor.fetchall()
+
+        # Crear DataFrame solo si hay resultados
+        df = pd.DataFrame([list(row) for row in results], columns=columns) if results else pd.DataFrame(columns=columns)
+
+        # Close the connection
+        #print (df)
+
+        return df
+    
+    except Exception as e:
+            print(f"Error obteniendo informacion de vuelo : {e}")
+            return False
+
+    finally:
+        if conn:
+            cursor.close()
+            conn.close()
+
+
 if __name__ == "__main__":
 
     print("OK")
+    #print (obtener_datos_inventarios_jde(46))
     #print (obtener_nombre_archivo(135))
     #insertar_Fecha_Vuelo_Elementos_JED(1167,35)
-    #Exportar_Elementos_JED_a_csv(48)
+    #Exportar_Elementos_JED_a_csv(46                             )
     #now = datetime.datetime.now()
     #print (now)
     #dron=Dron_GET_Boton_Envio_Datos()

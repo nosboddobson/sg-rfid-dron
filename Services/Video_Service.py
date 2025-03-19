@@ -5,6 +5,8 @@ import numpy as np
 import json
 import os
 from datetime import datetime
+#import MsSQL_Service as DB
+from Services import  MsSQL_Service as DB
 
     
 def parse_location(location_code):
@@ -85,9 +87,9 @@ def create_dron_video_3d(df_jde,ID_Vuelo):
     image_path = 'Video_Vuelos/layout/PM2_3d_20250226.jpg'
     output_video_path = output_video_path_base + str(ID_Vuelo) +'_inventario_vuelo.mp4'
     drone_img_path = 'Video_Vuelos/dji_matrice_350_transparent.png'  # Ruta a la imagen del dron con fondo transparente
-
-    route=load_route_from_df(df_jde)
-    #route=df_jde
+    Flight_Info=DB.obtener_datos_inventarios_jde(ID_Vuelo)
+    #route=load_route_from_df(df_jde)
+    route=df_jde
     
     if not route:
         print("No se pudo crear una ruta válida desde el DF")
@@ -99,7 +101,7 @@ def create_dron_video_3d(df_jde,ID_Vuelo):
             print(f"Error: No se encontró el archivo {desc} en {path}")
             return None
 
-        if create_drone_flight_video(json_path,image_path,drone_img_path,output_video_path,route) is True:
+        if create_drone_flight_video(json_path,image_path,drone_img_path,output_video_path,route,Flight_Info) is True:
 
             return output_video_path
         else:
@@ -112,7 +114,8 @@ def create_dron_video_3d_test(ID_Vuelo):
     image_path = 'Video_Vuelos/layout/PM2_3d_20250226.jpg'
     output_video_path = output_video_path_base + str(ID_Vuelo) +'_inventario_vuelo.mp4'
     drone_img_path = 'Video_Vuelos/dji_matrice_350_transparent.png'  # Ruta a la imagen del dron con fondo transparente
-
+    Flight_Info=DB.obtener_datos_inventarios_jde(ID_Vuelo)
+   
     # OPCIÓN 1: Usando las coordenadas fila-columna
     route_by_position = [
         "004-1",  # Inicio en el polígono 1
@@ -135,17 +138,8 @@ def create_dron_video_3d_test(ID_Vuelo):
         "poligono_18",  # Ir a 18
         "poligono_9",   # Ir a 9
         "poligono_8",   # Ir a 8
-        "poligono_17",  # Ir a 17
-        "poligono_26",  # Ir a 26
-        "poligono_35",  # Ir a 35
-        "poligono_35",  # Permanecer en 35 (repetido en la ruta)
-        "poligono_26",  # Volver a 26
-        "poligono_17",  # Volver a 17
-        "poligono_8",   # Volver a 8
-        "poligono_7",   # Ir a 7
-        "poligono_16",  # Ir a 16
-        "poligono_25",  # Ir a 25
-        "poligono_34"   # Finalizar en 34
+        "poligono_17"  # Ir a 17
+
     ]
     
     # Selecciona la ruta que prefieras usar
@@ -161,7 +155,7 @@ def create_dron_video_3d_test(ID_Vuelo):
             print(f"Error: No se encontró el archivo {desc} en {path}")
             return None
 
-        if create_drone_flight_video(json_path,image_path,drone_img_path,output_video_path,route) is True:
+        if create_drone_flight_video(json_path,image_path,drone_img_path,output_video_path,route,Flight_Info) is True:
         
         #if create_drone_flight_video_3d(json_path, image_path, output_video_path, route) is True:
             return output_video_path
@@ -169,7 +163,7 @@ def create_dron_video_3d_test(ID_Vuelo):
             return None
 
 
-def create_drone_flight_video(json_path, image_path, drone_img_path, output_video_path, route):
+def create_drone_flight_video(json_path, image_path, drone_img_path, output_video_path, route,Flight_Info):
     # Cargar el JSON con los bounding boxes
     print('create_drone_flight_video iniciado')
     with open(json_path, 'r') as f:
@@ -266,6 +260,7 @@ def create_drone_flight_video(json_path, image_path, drone_img_path, output_vide
     
         foreground_region = foreground[fg_y1:fg_y2, fg_x1:fg_x2]
 
+        
         if background.shape[2] == 3:
             background_region = background[y1:y2, x1:x2]
             background_region_alpha = np.ones((y2-y1, x2-x1), dtype=np.uint8) * 255
@@ -276,6 +271,7 @@ def create_drone_flight_video(json_path, image_path, drone_img_path, output_vide
                 background_region_alpha
             ])
         else:
+            #print ("Background Image has Alpha")
             background_region_with_alpha = background[y1:y2, x1:x2]
         
 
@@ -288,9 +284,16 @@ def create_drone_flight_video(json_path, image_path, drone_img_path, output_vide
   
         result = alpha * foreground_region[:, :, :3] + inv_alpha * background_region_with_alpha[:, :, :3]
 
+        #print(f"result shape: {result.shape}, dtype: {result.dtype}")
+        #print(f"background_region_with_alpha[:,:,3] shape: {background_region_with_alpha[:,:,3].shape}, dtype: {background_region_with_alpha[:,:,3].dtype}")
+
         if background.shape[2] == 3:
             background[y1:y2, x1:x2] = result
         else:
+            #result = (result * 255).astype(np.uint8) #multiplies by 255 and converts to uint8.
+            #print(f"result shape: {result.shape}, dtype: {result.dtype}")
+            #print(f"background_region_with_alpha[:,:,3] shape: {background_region_with_alpha[:,:,3].shape}, dtype: {background_region_with_alpha[:,:,3].dtype}")
+
             result_with_alpha = cv2.merge([
                 result[:,:,0],
                 result[:,:,1],
@@ -439,6 +442,8 @@ def create_drone_flight_video(json_path, image_path, drone_img_path, output_vide
         return positions
     
     print("Generando video de la ruta del dron...")
+    
+    ##Guardar los puntos centrales de cada poligono a visitar.
     route_centers = []
     for location in route:
         center = get_box_center(location)
@@ -446,10 +451,60 @@ def create_drone_flight_video(json_path, image_path, drone_img_path, output_vide
             polygon_id = get_polygon_by_position(location) if "-" in location else location
             route_centers.append((location, center, polygon_id))
 
-    base_img = draw_all_boxes(img)
+    #modificando imagen base con información del vuelo.
     
-   
+    base_img = draw_all_boxes(img)
+
+
+    if Flight_Info is not False:
+
+        #if base_img.shape[2] < 4:  # Si no tiene canal alfa
+        #    print("Advertencia: La imagen del dron no tiene canal de transparencia, convirtiéndola...")
+        #    base_img = cv2.cvtColor(base_img, cv2.COLOR_BGR2BGRA)
+            #base_img = base_img.astype(np.float64)
+        
+        # Inicializa el canal alfa a 0 (transparente)
+        #base_img[:, :, 3] = 0
+        #alpha_channel = base_img[:, :, 3].copy()
+
+        Info_de_inventario_Escala_Fuente=0.8
+        Info_de_inventario_Escala_color=(0,0,0)
+        Info_de_inventario_Texto_W=width//20 + 1450
+        Info_de_inventario_Texto_H=width//13 -110
+
+
+        ## Dibuja el rectángulo de fondo en el canal alpha
+
+        #cv2.rectangle(alpha_channel, (Info_de_inventario_Texto_W - 5, Info_de_inventario_Texto_H - 20),(Info_de_inventario_Texto_W + 410, Info_de_inventario_Texto_H + 130),128, -1)  
+        #base_img[:,:,3] = alpha_channel
+
+        #cv2.rectangle(base_img,(Info_de_inventario_Texto_W - 5, Info_de_inventario_Texto_H - 20),(Info_de_inventario_Texto_W + 410, Info_de_inventario_Texto_H + 130),(192, 192, 192), -1)
+
+        cv2.putText(base_img, "Correctos : "  + str(Flight_Info["Elementos_OK"][0]) + " (" + str(round(Flight_Info["Porcentaje_Lectura"][0],2))+ '%)' , (Info_de_inventario_Texto_W, Info_de_inventario_Texto_H), 
+                cv2.FONT_HERSHEY_SIMPLEX, Info_de_inventario_Escala_Fuente, (52, 181, 43) , 2)
+        
+        cv2.putText(base_img, "Faltantes : " + str(Flight_Info["Elementos_Faltantes"][0]) + " (" + str(round(100-Flight_Info["Porcentaje_Lectura"][0],2))+ '%)' , (Info_de_inventario_Texto_W, Info_de_inventario_Texto_H+30), 
+                cv2.FONT_HERSHEY_SIMPLEX, Info_de_inventario_Escala_Fuente, (86, 146, 248), 2)
+
+    
+
+        cv2.putText(base_img, "Fecha de Vuelo : " + str(Flight_Info["Fecha_Vuelo"][0]) , (Info_de_inventario_Texto_W, Info_de_inventario_Texto_H+30*2), 
+                cv2.FONT_HERSHEY_SIMPLEX, Info_de_inventario_Escala_Fuente, Info_de_inventario_Escala_color, 2)
+    
+        cv2.putText(base_img, "Hora de Vuelo : "  + str(Flight_Info["Hora_Vuelo"][0]), (Info_de_inventario_Texto_W, Info_de_inventario_Texto_H+30*3), 
+                cv2.FONT_HERSHEY_SIMPLEX, Info_de_inventario_Escala_Fuente, Info_de_inventario_Escala_color, 2)
+        
+        # Aplica la máscara al canal alfa
+        #alpha_value = 128  # Ajusta este valor para la transparencia deseada
+        #base_img[:, :, 3] = np.where(mask == 255, alpha_value, base_img[:, :, 3])
+        
     preview_img = base_img.copy()
+
+    
+    #cv2.putText(preview_img, "Ruta Completada", (width//20, height//15), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
+    
+
+
     for i in range(len(route_centers) - 1):
         _, current_pos, _ = route_centers[i]
         _, next_pos, _ = route_centers[i + 1]
@@ -551,11 +606,11 @@ def create_drone_flight_video(json_path, image_path, drone_img_path, output_vide
     final_frame = draw_drone_with_image(final_frame, path_history[-1], drone_img_path, final_drone_size, highlight=True)
     
     # texto de finalización
-    cv2.putText(final_frame, "Ruta Completada", (width//20, height//15), 
-               cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 3)
+    # cv2.putText(final_frame, "Ruta Completada", (width//20, height//15), 
+    #            cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 3)
     
-    for _ in range(fps * 5):  # 5 segundos en posición final
-        video_out.write(final_frame)
+    # for _ in range(fps * 5):  # 5 segundos en posición final
+    #     video_out.write(final_frame)
     
     video_out.release()
     print(f"Video guardado en: {output_video_path}")
@@ -569,10 +624,11 @@ def create_drone_flight_video(json_path, image_path, drone_img_path, output_vide
 
 if __name__ == "__main__":
     
-    json_path= "44_Elementos_JDE.csv"
+    json_path= "55_Elementos_JDE.csv"
 
         # Cargar el JSON con los bounding boxes
     route= load_route_from_csv(json_path)
-    print (route)
-    create_dron_video_3d(route,44)
-    #create_dron_video_3d_test(37)
+    #print (route)
+    create_dron_video_3d(route,55)
+    
+    #create_dron_video_3d_test(46)
