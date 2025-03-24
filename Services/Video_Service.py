@@ -5,8 +5,8 @@ import numpy as np
 import json
 import os
 from datetime import datetime
-#import MsSQL_Service as DB
-from Services import  MsSQL_Service as DB
+import MsSQL_Service as DB
+#from Services import  MsSQL_Service as DB
 
     
 def parse_location(location_code):
@@ -483,16 +483,23 @@ def create_drone_flight_video(json_path, image_path, drone_img_path, output_vide
         cv2.putText(base_img, "Correctos : "  + str(Flight_Info["Elementos_OK"][0]) + " (" + str(round(Flight_Info["Porcentaje_Lectura"][0],2))+ '%)' , (Info_de_inventario_Texto_W, Info_de_inventario_Texto_H), 
                 cv2.FONT_HERSHEY_SIMPLEX, Info_de_inventario_Escala_Fuente, (52, 181, 43) , 2)
         
-        cv2.putText(base_img, "Faltantes : " + str(Flight_Info["Elementos_Faltantes"][0]) + " (" + str(round(100-Flight_Info["Porcentaje_Lectura"][0],2))+ '%)' , (Info_de_inventario_Texto_W, Info_de_inventario_Texto_H+30), 
+        cv2.putText(base_img, "Faltantes  : " + str(Flight_Info["Elementos_Faltantes"][0]) + " (" + str(round(100-Flight_Info["Porcentaje_Lectura"][0],2))+ '%)' , (Info_de_inventario_Texto_W, Info_de_inventario_Texto_H+30), 
                 cv2.FONT_HERSHEY_SIMPLEX, Info_de_inventario_Escala_Fuente, (86, 146, 248), 2)
 
     
 
-        cv2.putText(base_img, "Fecha de Vuelo : " + str(Flight_Info["Fecha_Vuelo"][0]) , (Info_de_inventario_Texto_W, Info_de_inventario_Texto_H+30*2), 
-                cv2.FONT_HERSHEY_SIMPLEX, Info_de_inventario_Escala_Fuente, Info_de_inventario_Escala_color, 2)
+        cv2.putText(base_img, "Fecha de Vuelo : " + str(Flight_Info["Fecha_Vuelo"][0]) , (Info_de_inventario_Texto_W, Info_de_inventario_Texto_H+30*3), 
+                cv2.FONT_HERSHEY_SIMPLEX, Info_de_inventario_Escala_Fuente, Info_de_inventario_Escala_color, 1)
     
-        cv2.putText(base_img, "Hora de Vuelo : "  + str(Flight_Info["Hora_Vuelo"][0]), (Info_de_inventario_Texto_W, Info_de_inventario_Texto_H+30*3), 
-                cv2.FONT_HERSHEY_SIMPLEX, Info_de_inventario_Escala_Fuente, Info_de_inventario_Escala_color, 2)
+        cv2.putText(base_img, "Inicio de Vuelo : "  + str(Flight_Info["Hora_Vuelo"][0]), (Info_de_inventario_Texto_W, Info_de_inventario_Texto_H+30*4), 
+                cv2.FONT_HERSHEY_SIMPLEX, Info_de_inventario_Escala_Fuente, Info_de_inventario_Escala_color, 1)
+        
+        cv2.putText(base_img, "Fin de Vuelo : "  + str(Flight_Info["Hora_Fin"][0]), (Info_de_inventario_Texto_W, Info_de_inventario_Texto_H+30*5), 
+                cv2.FONT_HERSHEY_SIMPLEX, Info_de_inventario_Escala_Fuente, Info_de_inventario_Escala_color, 1)
+        cv2.putText(base_img, "Duracion  : "  + str(Flight_Info["Tiempo_Vuelo_Formateado"][0]), (Info_de_inventario_Texto_W, Info_de_inventario_Texto_H+30*6), 
+                cv2.FONT_HERSHEY_SIMPLEX, Info_de_inventario_Escala_Fuente, Info_de_inventario_Escala_color, 1)
+        
+    
         
         # Aplica la máscara al canal alfa
         #alpha_value = 128  # Ajusta este valor para la transparencia deseada
@@ -609,8 +616,8 @@ def create_drone_flight_video(json_path, image_path, drone_img_path, output_vide
     # cv2.putText(final_frame, "Ruta Completada", (width//20, height//15), 
     #            cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 3)
     
-    # for _ in range(fps * 5):  # 5 segundos en posición final
-    #     video_out.write(final_frame)
+    for _ in range(fps * 3):  # 5 segundos en posición final
+         video_out.write(final_frame)
     
     video_out.release()
     print(f"Video guardado en: {output_video_path}")
@@ -624,11 +631,13 @@ def create_drone_flight_video(json_path, image_path, drone_img_path, output_vide
 
 if __name__ == "__main__":
     
-    json_path= "55_Elementos_JDE.csv"
+    for number in range(53, 58):  # range(53, 58) genera los números 53, 54, 55, 56, 57
+        json_path = f"{number}_Elementos_JDE.csv"
 
         # Cargar el JSON con los bounding boxes
-    route= load_route_from_csv(json_path)
-    #print (route)
-    create_dron_video_3d(route,55)
+        route = load_route_from_csv(json_path)
+
+        # Crear el video 3D
+        create_dron_video_3d(route, number)
     
     #create_dron_video_3d_test(46)

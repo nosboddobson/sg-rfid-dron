@@ -343,54 +343,54 @@ with st.expander("Ver detalle",expanded=st.session_state.expand_resumen_inventar
 
         st.write('')
 
-        if st.session_state.show_content_advanced:
-            col1, col2 = st.columns([2,2],gap="medium")
-            with col1:
+        # if st.session_state.show_content_advanced:
+        #     col1, col2 = st.columns([2,2],gap="medium")
+        #     with col1:
             
-                headers_lecturas = st.columns([2, 1, 1], gap="small", vertical_alignment="top") 
-                columns = ["Lecturas", "Nº Elementos","%"]
-                for i, header in enumerate(headers_lecturas):
-                    with header:
-                        st.markdown(f"<p class='table-header' style='text-align: left;'>{columns[i]}</p>", unsafe_allow_html=True) 
+        #         headers_lecturas = st.columns([2, 1, 1], gap="small", vertical_alignment="top") 
+        #         columns = ["Lecturas", "Nº Elementos","%"]
+        #         for i, header in enumerate(headers_lecturas):
+        #             with header:
+        #                 st.markdown(f"<p class='table-header' style='text-align: left;'>{columns[i]}</p>", unsafe_allow_html=True) 
 
-                # Each row of the table
-                col10, col20, col30 = st.columns([2, 1, 1], gap="small", vertical_alignment="center")
-                col10.write(f"<p class='data-ok' style='text-align: left;'>Correctos</p>", unsafe_allow_html=True)
-                col20.write(f"<p class='data-ok' style='text-align: left;'>{Inventario_Realizado['Elementos_OK']}</p>", unsafe_allow_html=True)
-                col30.write(f"<p class='data-ok' style='text-align: left;'>{int(Inventario_Realizado['Elementos_OK'] / total_elementos * 100)}%</p>", unsafe_allow_html=True)
+        #         # Each row of the table
+        #         col10, col20, col30 = st.columns([2, 1, 1], gap="small", vertical_alignment="center")
+        #         col10.write(f"<p class='data-ok' style='text-align: left;'>Correctos</p>", unsafe_allow_html=True)
+        #         col20.write(f"<p class='data-ok' style='text-align: left;'>{Inventario_Realizado['Elementos_OK']}</p>", unsafe_allow_html=True)
+        #         col30.write(f"<p class='data-ok' style='text-align: left;'>{int(Inventario_Realizado['Elementos_OK'] / total_elementos * 100)}%</p>", unsafe_allow_html=True)
 
-                col10, col20, col30 = st.columns([2, 1, 1], gap="small", vertical_alignment="center")
-                col10.write(f"<p class='data-missing' style='text-align: left;'>Faltantes</p>", unsafe_allow_html=True)
-                col20.write(f"<p class='data-missing' style='text-align: left;'>{Inventario_Realizado['Elementos_Faltantes']}</p>", unsafe_allow_html=True)
-                col30.write(f"<p class='data-missing' style='text-align: left;'>{int(Inventario_Realizado['Elementos_Faltantes'] / total_elementos * 100)}%</p>", unsafe_allow_html=True)
+        #         col10, col20, col30 = st.columns([2, 1, 1], gap="small", vertical_alignment="center")
+        #         col10.write(f"<p class='data-missing' style='text-align: left;'>Faltantes</p>", unsafe_allow_html=True)
+        #         col20.write(f"<p class='data-missing' style='text-align: left;'>{Inventario_Realizado['Elementos_Faltantes']}</p>", unsafe_allow_html=True)
+        #         col30.write(f"<p class='data-missing' style='text-align: left;'>{int(Inventario_Realizado['Elementos_Faltantes'] / total_elementos * 100)}%</p>", unsafe_allow_html=True)
 
-                col10, col20, col30 = st.columns([2, 1, 1], gap="small", vertical_alignment="center")
-                col10.write(f"<p class='data-excess' style='text-align: left;'>Sobrantes</p>", unsafe_allow_html=True)
-                col20.write(f"<p class='data-excess' style='text-align: left;'>{Inventario_Realizado['Elementos_Sobrantes']}</p>", unsafe_allow_html=True)
-                col30.write(f"<p class='data-excess' style='text-align: left;'>{int(Inventario_Realizado['Elementos_Sobrantes'] / total_elementos * 100)}%</p>", unsafe_allow_html=True)
+        #         col10, col20, col30 = st.columns([2, 1, 1], gap="small", vertical_alignment="center")
+        #         col10.write(f"<p class='data-excess' style='text-align: left;'>Sobrantes</p>", unsafe_allow_html=True)
+        #         col20.write(f"<p class='data-excess' style='text-align: left;'>{Inventario_Realizado['Elementos_Sobrantes']}</p>", unsafe_allow_html=True)
+        #         col30.write(f"<p class='data-excess' style='text-align: left;'>{int(Inventario_Realizado['Elementos_Sobrantes'] / total_elementos * 100)}%</p>", unsafe_allow_html=True)
             
-            with col2:
+        #     with col2:
                 
-                headers_lecturas = st.columns([2, 1], gap="small", vertical_alignment="top") 
-                columns = ["Vuelo", ""]
-                for i, header in enumerate(headers_lecturas):
-                    with header:
-                        st.markdown(f"<p class='fly-data' style='text-align: left;'>{columns[i]}</p>", unsafe_allow_html=True) 
+        #         headers_lecturas = st.columns([2, 1], gap="small", vertical_alignment="top") 
+        #         columns = ["Vuelo", ""]
+        #         for i, header in enumerate(headers_lecturas):
+        #             with header:
+        #                 st.markdown(f"<p class='fly-data' style='text-align: left;'>{columns[i]}</p>", unsafe_allow_html=True) 
 
-                # Each row of the table
-                col10, col20 = st.columns([2, 1], gap="small", vertical_alignment="center")
-                col10.write(f"<p class='fly-data' style='text-align: left;'>Fecha</p>", unsafe_allow_html=True)
-                col20.write(f"<p class='fly-data' style='text-align: left;'>{DB.format_date(Inventario_Realizado["Fecha_Vuelo"])}</p>", unsafe_allow_html=True)
-                col10, col20 = st.columns([2, 1], gap="small", vertical_alignment="center")
-                col10.write(f"<p class='fly-data' style='text-align: left;'>Hora</p>", unsafe_allow_html=True)
-                col20.write(f"<p class='fly-data' style='text-align: left;'>{DB.format_time(Inventario_Realizado["Fecha_Vuelo"])}</p>", unsafe_allow_html=True)
-                col10, col20 = st.columns([2, 1], gap="small", vertical_alignment="center")
-                col10.write(f"<p class='fly-data' style='text-align: left;'>Fin</p>", unsafe_allow_html=True)
-                col20.write(f"<p class='fly-data' style='text-align: left;'>{DB.add_seconds_to_timestamp_string(Inventario_Realizado["Fecha_Vuelo"],Inventario_Realizado["Tiempo_Vuelo"])}</p>", unsafe_allow_html=True)
-                col10, col20 = st.columns([2, 1], gap="small", vertical_alignment="center")
-                col10.write(f"<p class='fly-data' style='text-align: left;f'>Duración</p>", unsafe_allow_html=True)
-                col20.write(f"<p class='fly-data' style='text-align: left;'>{DB.format_seconds_HHMMSS(int(Inventario_Realizado["Tiempo_Vuelo"]))}</p>", unsafe_allow_html=True)
-            st.write('')
+        #         # Each row of the table
+        #         col10, col20 = st.columns([2, 1], gap="small", vertical_alignment="center")
+        #         col10.write(f"<p class='fly-data' style='text-align: left;'>Fecha</p>", unsafe_allow_html=True)
+        #         col20.write(f"<p class='fly-data' style='text-align: left;'>{DB.format_date(Inventario_Realizado["Fecha_Vuelo"])}</p>", unsafe_allow_html=True)
+        #         col10, col20 = st.columns([2, 1], gap="small", vertical_alignment="center")
+        #         col10.write(f"<p class='fly-data' style='text-align: left;'>Hora</p>", unsafe_allow_html=True)
+        #         col20.write(f"<p class='fly-data' style='text-align: left;'>{DB.format_time(Inventario_Realizado["Fecha_Vuelo"])}</p>", unsafe_allow_html=True)
+        #         col10, col20 = st.columns([2, 1], gap="small", vertical_alignment="center")
+        #         col10.write(f"<p class='fly-data' style='text-align: left;'>Fin</p>", unsafe_allow_html=True)
+        #         col20.write(f"<p class='fly-data' style='text-align: left;'>{DB.add_seconds_to_timestamp_string(Inventario_Realizado["Fecha_Vuelo"],Inventario_Realizado["Tiempo_Vuelo"])}</p>", unsafe_allow_html=True)
+        #         col10, col20 = st.columns([2, 1], gap="small", vertical_alignment="center")
+        #         col10.write(f"<p class='fly-data' style='text-align: left;f'>Duración</p>", unsafe_allow_html=True)
+        #         col20.write(f"<p class='fly-data' style='text-align: left;'>{DB.format_seconds_HHMMSS(int(Inventario_Realizado["Tiempo_Vuelo"]))}</p>", unsafe_allow_html=True)
+        #     st.write('')
        
         left_co, cent_co,last_co = st.columns([8,0.1,0.1])
         

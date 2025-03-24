@@ -4,9 +4,9 @@ import pyodbc
 import pandas as pd
 import json
 from dotenv import load_dotenv
-from Services import LogService  # Assuming these modules are already defined
+#from Services import LogService  # Assuming these modules are already defined
 
-#import LogService
+import LogService
 # Load environment variables from .env
 load_dotenv(override=True)
 
@@ -472,6 +472,8 @@ def obtener_datos_inventarios_jde(ID_Vuelo):
              SELECT TOP 1 j.ID, j.ID_Vuelo,  v.Tiempo_Vuelo, j.Fecha_Inventario,
                 CAST(FORMAT(v.Fecha_Vuelo, 'dd/MM/yyyy') AS VARCHAR(16)) AS Fecha_Vuelo,
                 CAST(FORMAT(v.Fecha_Vuelo, 'HH:mm') AS VARCHAR(16)) AS Hora_Vuelo,
+                CAST(FORMAT(DATEADD(second, v.Tiempo_Vuelo, v.Fecha_Vuelo), 'HH:mm') AS VARCHAR(16)) AS Hora_Fin,
+                RIGHT('0' + CONVERT(VARCHAR, Tiempo_Vuelo / 3600), 2) + ':' + RIGHT('0' + CONVERT(VARCHAR, (Tiempo_Vuelo % 3600) / 60), 2) AS Tiempo_Vuelo_Formateado,
                 j.Elementos_OK, j.Elementos_Faltantes, 
                 j.Porcentaje_Lectura, j.NumeroConteo, j.Sucursal, j.Ubicacion,
                 (v.N_elementos - j.Elementos_OK) AS Elementos_Sobrantes 
