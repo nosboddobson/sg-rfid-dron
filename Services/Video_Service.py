@@ -5,8 +5,8 @@ import numpy as np
 import json
 import os
 from datetime import datetime
-import MsSQL_Service as DB
-#from Services import  MsSQL_Service as DB
+#import MsSQL_Service as DB
+from Services import  MsSQL_Service as DB
 
     
 def parse_location(location_code):
@@ -88,8 +88,9 @@ def create_dron_video_3d(df_jde,ID_Vuelo):
     output_video_path = output_video_path_base + str(ID_Vuelo) +'_inventario_vuelo.mp4'
     drone_img_path = 'Video_Vuelos/dji_matrice_350_transparent.png'  # Ruta a la imagen del dron con fondo transparente
     Flight_Info=DB.obtener_datos_inventarios_jde(ID_Vuelo)
-    #route=load_route_from_df(df_jde)
-    route=df_jde
+    
+    route=load_route_from_df(df_jde)
+    #route=df_jde
     
     if not route:
         print("No se pudo crear una ruta válida desde el DF")
