@@ -106,7 +106,7 @@ else:
 st.write('')                    
             
 
-with st.expander("Inventarios Pendientes",expanded=True):
+with st.expander("Inventarios Pendientes",expanded=True,):
 
 # st.title("Inventarios Pendientes")
 
@@ -123,6 +123,7 @@ with st.expander("Inventarios Pendientes",expanded=True):
     
     _ = '''
     st.markdown(f"""
+    
     <div style="display: flex; align-items: center;">
     <div style="display:inline-block;background-color:orange;padding:10px;border-radius:10px;text-align:center;width:200px;margin-right:10px;">
         <h1>{len(datos)}</h1>
@@ -138,12 +139,12 @@ with st.expander("Inventarios Pendientes",expanded=True):
         <h1>{DB.seconds_to_hhmmss(total_seconds)}</h1>
         <p>Tiempo de Vuelo Promedio</p>
     </div>
-    </div>
+    </div> 
 
     """, unsafe_allow_html=True)
     '''
 
-
+    
     
 
     # Mostrar la tabla de inventarios pendientes
@@ -237,7 +238,6 @@ with st.expander("Inventarios Pendientes",expanded=True):
         st.write("No hay inventarios pendientes.")
         st.write('')
 
-
 with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inventario_Realizado):
 
         
@@ -256,7 +256,19 @@ with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inven
     # Mostrar el total de inventarios pendientes
     
 
-        _ = ''' st.markdown(f"""
+        _ = '''
+        <style>
+body .stApp .fco,
+.stApp .fco, 
+html body div.fco,
+div.fco {
+  background-color: #999 !important;
+  display: flex !important;
+  align-items: center !important;
+}
+</style>
+        
+        <div class="fco"> st.markdown(f"""
         <div style="display: flex; align-items: center;">
         <div style="display:inline-block;background-color:orange;padding:10px;border-radius:10px;text-align:center;width:200px;margin-right:10px;">
             <h1>{len(datosJDE)}</h1>
@@ -278,8 +290,7 @@ with st.expander("Inventarios Realizados",expanded=st.session_state.expand_inven
         </div>
 
 
-        </div>
-
+        </div></div>
     """, unsafe_allow_html=True)
         '''
 
@@ -620,6 +631,7 @@ with st.expander("Resumen Inventario",expanded=st.session_state.expand_resumen_i
 
         # Mostrar detalles del inventario
         #st.write("OK")
+
 with st.expander("Plano Patio Mina 2",expanded=st.session_state.expand_plano):
 
     st.write('')

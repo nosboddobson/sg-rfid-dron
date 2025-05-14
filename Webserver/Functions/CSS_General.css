@@ -7,6 +7,16 @@
 }
 
 
+/* Estilos para la clase fco con alta especificidad */
+body .stApp .fco,
+.stApp .fco, 
+html body div.fco,
+div.fco {
+  background-color: #999 !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
 .stHorizontalBlock2  {
     border-bottom: 1px solid #ccc;
 }
@@ -46,4 +56,10 @@
   background-color: rgba(0, 0, 0, 0.3); /* Semi-transparent overlay */
   z-index: 9999; /* Ensure it's on top */
 }
- 
+
+
+div[data-testid="stExpander"] details summary {
+  background-color: rgb(129, 126, 126) !important;
+  /* If the summary itself doesn't take the background, try its parent <details> */
+  /* or the main expander div if necessary, but start with summary */
+}
