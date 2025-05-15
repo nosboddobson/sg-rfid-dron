@@ -63,3 +63,30 @@ div[data-testid="stExpander"] details summary {
   /* If the summary itself doesn't take the background, try its parent <details> */
   /* or the main expander div if necessary, but start with summary */
 }
+
+/* Styling for tables within a specific container */
+.custom-styled-table-container table.my-custom-df {
+  width: 100%;
+  border-collapse: collapse; /* Important for borders to look good */
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-size: 20px; /* Base font size for this table */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Optional: subtle shadow */
+}
+
+.custom-styled-table-container table.my-custom-df th {
+  background-color: #D3D3D3 !important; /* Header background - light gray */
+  color: #f89256 !important;             /* Header text - black */
+  font-weight: bold;
+  padding: 12px 15px; /* Padding for header cells */
+  text-align: left;   /* Align header text to the left */
+  border: 2px solid #cccccc;
+}
+
+.custom-styled-table-container table.my-custom-df td {
+  background-color: black !important;   /* Cell background - black */
+  color: #D3D3D3 !important;             /* Cell text - very light gray for readability */
+  padding: 10px 15px; /* Padding for data cells */
+  border: 2px solid #444444;
+  font-weight: normal; /* Ensure data cells are not bold by default */
+}

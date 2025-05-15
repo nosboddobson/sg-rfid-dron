@@ -497,17 +497,87 @@ with st.expander("Ver detalle",expanded=st.session_state.expand_resumen_inventar
   
             return styles
 
+        def style_dataframe_for_streamlit(df):
+            """
+            Styles a DataFrame for st.dataframe using Pandas Styler.
+            ALL styling for headers and cells is done here.
+            """
+            header_properties = [
+                ('background-color', '#D3D3D3'),
+                ('color', '#f89256'),
+                ('font-size', '22px'),
+                ('font-weight', 'bold'),
+                ('border', 'px solid #555')
+            ]
+            
+            cell_properties = [
+                ('background-color', 'black'),
+                ('color', '#D3D3D3'), 
+                ('font-size', '20px'),
+                ('border', '1px solid #444')
+            ]
+            # Create a Styler object from the DataFrame
+            styler = df.style
+            
+
+            # Apply styles to the data cells (td elements)
+            styler.set_table_styles([
+                {'selector': 'th', 'props': header_properties},
+                {'selector': 'td', 'props': cell_properties}
+            ], overwrite=False)
+
+            # --- Optional: Add your original 'highlight_resultado' logic conditionally ---
+            # If you need specific rows to have a different style based on their content,
+            # you would use .apply() here.
+            # For example, if you wanted to highlight rows based on the 'Estado' column:
+            def highlight_estado(row):
+                base_cell_style_str = "background-color: black; color: #D3D3D3; font-size: 16px; border: 2px solid #444;"
+                
+                estado = row['Resultado']
+                text_color_override = None
+                font_weight_override = None
+
+                if estado == 'Faltante':
+                    text_color_override = '#f89256'
+                    #font_weight_override = 'bold'
+                elif estado == 'Ok':
+                    text_color_override = '#2bb534'
+                    #font_weight_override = 'bold'
+                # 'Disponible' will use the default cell_properties text color
+
+                styles = []
+                for col_name, val in row.items():
+                    current_style = base_cell_style_str # Start with base
+                    if col_name == 'Resultado': # Or apply to whole row
+                        if text_color_override:
+                            current_style += f" color: {text_color_override};"
+                        if font_weight_override:
+                            current_style += f" font-weight: {font_weight_override};"
+                    styles.append(current_style)
+                return styles
+
+            # If you want to apply the conditional styling:
+            # Make sure your 'Estado' column exists or adjust the condition
+            if 'Resultado' in df.columns:
+                styler = styler.apply(highlight_estado, axis=1)
+                
+
+            return styler
+
         # Aplicar solo este método de estilo
         styled_df = resumen_inventario.style.apply(highlight_resultado, axis=1)
 
 
         styled_df = styled_df.apply(highlight_resultado, axis=1)
+        styled_df_output = style_dataframe_for_streamlit(resumen_inventario)
+        
 
         st.write('')
         st.markdown("**Detalle**")
         pagination = st.container()
-        pagination.dataframe(data=styled_df, use_container_width=True)      
-               
+        #pagination.dataframe(data=styled_df, use_container_width=True)      
+        pagination.dataframe(data=styled_df_output, use_container_width=True)
+        #pagination.write(styled_df_output.to_html(), unsafe_allow_html=True)      
         #st.video(data="videos/42_inventario_vuelo.mp4",format="video/mp4", autoplay=False)    
     else:
         st.write("Ningún Inventario selecionado")
