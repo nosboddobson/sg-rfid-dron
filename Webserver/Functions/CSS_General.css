@@ -59,7 +59,9 @@ div.fco {
 
 
 div[data-testid="stExpander"] details summary {
-  background-color: rgb(129, 126, 126) !important;
+  background-color: #ff5000 !important;
+  font-weight: bold;
+  color:white !important; /* Orange for missing items */
   /* If the summary itself doesn't take the background, try its parent <details> */
   /* or the main expander div if necessary, but start with summary */
 }
