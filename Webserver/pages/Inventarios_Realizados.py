@@ -459,7 +459,12 @@ with st.expander("Ver detalle",expanded=st.session_state.expand_resumen_inventar
         # Procesamiento de datos igual que antes
         resumen_inventario[['Fila', 'Rack']] = resumen_inventario['Ubicación'].apply(procesar_ubicacion)
         conteo = resumen_inventario.groupby(['Fila', 'Rack', 'Resultado']).size().unstack(fill_value=0)
-        conteo.columns = ['Faltantes', 'Correctos']
+        #conteo = conteo.reindex(columns=['Faltantes', 'Correctos'], fill_value=0)
+        try:
+            conteo.columns = ['Faltantes', 'Correctos']
+        except:
+            conteo = conteo.reindex(columns=['Faltantes', 'Correctos'], fill_value=0)
+            
         nuevo_df = conteo.reset_index()
 
         # Definir número de columnas por fila
