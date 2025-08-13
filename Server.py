@@ -332,6 +332,8 @@ def TestJDFolder():
     except Exception as e:
         print ({'Error': str(e)})
         return jsonify({'Error': str(e)}), 500
+    finally:
+        DronService.disconnect_from_share_folder(os.getenv('JD_REMOTE_FOLDER'))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5100)
