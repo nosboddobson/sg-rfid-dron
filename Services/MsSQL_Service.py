@@ -393,7 +393,7 @@ def obtener_nombre_archivo(ID):
 
 def Dron_GET_Boton_Envio_Datos():
     
-    time_to_wait=60
+    time_to_wait=20
 
     try:
         conn = get_db_connection()
