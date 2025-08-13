@@ -1,0 +1,94 @@
+
+.stApp {
+    background-color: #121620;
+}
+.stHeader {
+    background-color: #1E2338;
+}
+
+
+/* Estilos para la clase fco con alta especificidad */
+body .stApp .fco,
+.stApp .fco, 
+html body div.fco,
+div.fco {
+  background-color: #999 !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.stHorizontalBlock2  {
+    border-bottom: 1px solid #ccc;
+}
+
+.table-header{
+  color:#D3D3D3;
+  font-weight: bold;
+}
+.fly-data{
+  color:#D3D3D3;
+  font-weight: bold;
+}
+.fly-data-detail{
+  color:#A9A9A9;
+  font-weight: bold;
+}
+.data-ok {
+  color: #2bb534 !important; /* Green for correct items */
+  font-weight: bold;
+}
+.data-missing {
+  color: #f89256 !important; /* Orange for missing items */
+  font-weight: bold;
+}
+.data-excess {
+  color: #dfb52c !important; /* Yellow for excess items */
+  font-weight: bold;
+}
+/* Estilos para la tabla paginada */
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3); /* Semi-transparent overlay */
+  z-index: 9999; /* Ensure it's on top */
+}
+
+
+div[data-testid="stExpander"] details summary {
+  background-color: #ff5000 !important;
+  font-weight: bold;
+  color:white !important; /* Orange for missing items */
+  /* If the summary itself doesn't take the background, try its parent <details> */
+  /* or the main expander div if necessary, but start with summary */
+}
+
+/* Styling for tables within a specific container */
+.custom-styled-table-container table.my-custom-df {
+  width: 100%;
+  border-collapse: collapse; /* Important for borders to look good */
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-size: 20px; /* Base font size for this table */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Optional: subtle shadow */
+}
+
+.custom-styled-table-container table.my-custom-df th {
+  background-color: #D3D3D3 !important; /* Header background - light gray */
+  color: #f89256 !important;             /* Header text - black */
+  font-weight: bold;
+  padding: 12px 15px; /* Padding for header cells */
+  text-align: left;   /* Align header text to the left */
+  border: 2px solid #cccccc;
+}
+
+.custom-styled-table-container table.my-custom-df td {
+  background-color: black !important;   /* Cell background - black */
+  color: #D3D3D3 !important;             /* Cell text - very light gray for readability */
+  padding: 10px 15px; /* Padding for data cells */
+  border: 2px solid #444444;
+  font-weight: normal; /* Ensure data cells are not bold by default */
+}

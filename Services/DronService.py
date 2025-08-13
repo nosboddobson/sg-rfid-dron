@@ -179,6 +179,7 @@ def disconnect_from_share_folder(share_name):
         win32wnet.WNetCancelConnection2(share_name, 0,0)
     except Exception as e:
         print(f"Error disconnecting from share: {e}")
+        return None
 
     
 if __name__ == "__main__":

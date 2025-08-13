@@ -6,6 +6,7 @@ import jsonschema
 from Services import JDService, LogService as SaveExecutions
 from Services import DronService
 from Services import MsSQL_Service as dbService
+from Services import Video_Service 
 import os
 import json 
 import datetime
@@ -147,7 +148,7 @@ def actualizar_inventario():
             #obtenemos los valores retornados de Generar Conteo
            
             #Esperamos unos segundos para que el servidor genere el archivo con el inventario jsonout.txt
-            time.sleep(16)
+            time.sleep(40)
 
             print ("Conteo Solicitado OK")
             #Revisar si se la fecha del archivo disponoble es actual (> a la hora de inicio de ejecucion del codigo)
@@ -178,16 +179,37 @@ def actualizar_inventario():
                         #Actualizar DB
                         if (ID):
                            
+                            #Camiar estado de inventario en Inventario de Vuelos de Pendiente a OK
                             dbService.Actuaizar_Estado_inventario_vuelos(int(ID))
+
+                            #obtener array con resumen de inventario
                             resumen=dbService.Resumen_de_Conteo_desde_Json(inventario_json)
                             print (resumen)
 
                             ahora = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
                             #print (ahora)
-
+                            
+                            #Crear Registro en Inventario_JDE
                             Inventario_jed_id=dbService.insertar_inventario_jde(ID,ahora,resumen['OK Count'],resumen['FALTANTE Count'],resumen['Other Count'],resumen['Percentage OK'],NumeroConteo,Sucursal,Ubicacion,TransactionId)
+                            print ('Inventario JDE Insertado')
+                            #Insertar elementos en  Elementos JDE
                             print(dbService.insertar_elementos_jde(Inventario_jed_id,inventario_json))
+                            print ('Elementos JDE Insertados')
 
+                            #21/02/2025
+                            #agregar hora de lectura  a los elementos de JDE
+                            print (dbService.insertar_Fecha_Vuelo_Elementos_JED(ID,Inventario_jed_id))
+                            print ('Fecha de vuelo insertada en Elementos JDE')
+
+                            elementos_jed_df=dbService.Exportar_Elementos_JED_a_df(Inventario_jed_id)
+                            print ('Elementos de Inventario exportados a Dataframe para Generar Video')
+
+                            if elementos_jed_df is not None:
+                                print('Generando Video...')
+                                ruta_video=Video_Service.create_dron_video_3d(elementos_jed_df,Inventario_jed_id)
+                                if ruta_video is not None:
+                                    dbService.insertar_ruta_video_inventario_jde(Inventario_jed_id,ruta_video)
+                                    
                             print ("DB Actualizada con Exito")
                         return jsonify({'OK': 'Inventario en JD Actualizado con Éxito'}), 200 
                     
@@ -216,8 +238,8 @@ def actualizar_inventario():
     except Exception as e:
         end_time = time.time()
         SaveExecutions.Guardar_Ejecucion_a_csv(start_time,end_time,"actualizar-inventario",500)
-        print ({'Error': str(e)})
-        return jsonify({'Error': str(e)}), 500
+        print ({'Error General': str(e)})
+        return jsonify({'Error General': str(e)}), 500
     finally:
         DronService.disconnect_from_share_folder(os.getenv('JD_REMOTE_FOLDER'))
 
@@ -308,14 +330,23 @@ def upload_file():
 Funcion utilizada por  el Dron como Keep Alive, para determinar si hay conectividad al servidor
 Outputs
 On success: JSON response {'message': 'ok'} with a 200 status code.
+Si se presiona un boton en el sitio web para que el dron envie el los datos leidos, el json response es 201
 On failure: JSON response {'Error': <error_message>} with a 500 status code.
 
 '''
+
 @app.route('/printer/<msg>', methods=['POST'])
 def show_message(msg):
     try:
-        print(msg)
-        return jsonify({'message': 'ok'}), 200
+
+        client_ip = request.remote_addr
+        dbService.insert_client_ip_to_heartbeats(client_ip)
+        #now = datetime.datetime.now()
+        #print (now)
+        if  dbService.Dron_GET_Boton_Envio_Datos(): 
+            return jsonify({'message': 'ok'}), 201
+        else:
+            return jsonify({'message': 'ok'}), 200
     except Exception as e:
         return jsonify({'Error': str(e)}), 500
 
