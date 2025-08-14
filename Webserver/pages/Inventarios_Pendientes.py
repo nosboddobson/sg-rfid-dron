@@ -69,7 +69,7 @@ if Dron_Status:
             
             DB.Dron_SET_Boton_Envio_Datos_Hora(cookie_manager.get(cookie='username'))
    
-            for i in range(6):
+            for i in range(10):
                 st.toast("Esperando Inventario...")
                 time.sleep(5)
                 datos2 = DB.obtener_datos_inventarios_pendientes()
