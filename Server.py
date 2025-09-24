@@ -31,6 +31,7 @@ from Services import MsSQL_Service as dbService
 from Services import Video_Service 
 import os
 import datetime
+import logging
 
 # ------------------------------------------------------------------------------
 # Configuración de la Aplicación
@@ -41,7 +42,30 @@ app = Flask(__name__)
 # Cargar variables de entorno desde un archivo .env.
 # La opción `override=True` permite sobrescribir variables de entorno existentes.
 load_dotenv(override=True)
+# Configuración del logger
+log_file_path = os.getenv('DRON_API_LOG_PATH', 'd:/logs/Sierra_dron_api.txt')
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s %(message)s',
+    handlers=[
+        logging.FileHandler(log_file_path, encoding='utf-8'),
+        logging.StreamHandler()
+    ]
+)
 
+# Log al iniciar el servidor
+logging.info("Servidor Flask iniciado.")
+
+# Log para cada request
+@app.before_request
+def log_request_info():
+    logging.info(f"Ruta accedida: {request.path} | Método: {request.method} | IP: {request.remote_addr}")
+
+@app.after_request
+def log_response_info(response):
+    status = "Success" if response.status_code < 400 else "Error"
+    logging.info(f"Ruta accedida: {request.path} | Status: {response.status_code} ({status})")
+    return response
 # ------------------------------------------------------------------------------
 # Funciones Auxiliares
 # ------------------------------------------------------------------------------

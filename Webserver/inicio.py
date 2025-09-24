@@ -7,10 +7,29 @@ from Functions import AD_Service as AD
 import extra_streamlit_components as stx
 import os
 from PIL import Image
+from datetime import datetime
+
+LOG_FILE = "d:/logs/Sierra_dron_web.txt"
+
+def log_event(event):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    try:
+        with open(LOG_FILE, "a", encoding="utf-8") as f:
+            f.write(f"[{timestamp}] {event}\n")
+    except Exception as e:
+        pass  # Optionally handle logging errors
+
+# Log when the website starts
+#log_event("Website started")
+
 
 st.set_page_config(page_title="Inicio", layout="wide", initial_sidebar_state="collapsed")
 
 cookie_manager = stx.CookieManager()
+
+## Omitir Login - comentar para habilitar ---------------------------------------
+cookie_manager.set('logged_in', True,key='logged_in_cookie')
+cookie_manager.set('username', "Test",key='username_cookie')
 
 @st.cache_resource
 def set_bg_hack_url():
@@ -109,6 +128,7 @@ with col2_t:
                 cookie_manager.set('logged_in', True,key='logged_in_cookie')
                 cookie_manager.set('username', "Test",key='username_cookie')
                 st.success("Conectado correctamente!")
+                log_event("User 'Test' logged in using test credentials.")
                 sleep(0.5)
                 st.switch_page("pages/Inventarios_Pendientes.py")
 
@@ -121,6 +141,7 @@ with col2_t:
                     cookie_manager.set('logged_in', True,key='logged_in_cookie')
                     cookie_manager.set('username', username,key='username_cookie')
                     st.success("Conectado correctamente!")
+                    log_event(f"User '{username}' logged in successfully.")
                     sleep(0.5)
                     st.switch_page("pages/Inventarios_Pendientes.py")
                 else:
