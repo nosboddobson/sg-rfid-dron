@@ -1,4 +1,6 @@
 
+from time import sleep
+import requests
 import streamlit as st
 import plotly.express as px
 from menu import make_sidebar
@@ -85,19 +87,20 @@ with st.expander("Log de Vuelos",expanded=True):
     #selected_Limit=st.selectbox("Nº Elementos",["10","100","500","Todo"])
 
 
-    headers = st.columns([1, 2, 2, 2,2], gap="small", vertical_alignment="center")
+    headers = st.columns([1, 2, 2, 2,2,2], gap="small", vertical_alignment="center")
     headers[0].write("ID")
     headers[1].write("Fecha de Vuelo")
     headers[2].write("Elementos Detectados")
     headers[3].write("Tiempo de Vuelo[HH:MM:SS]")
     headers[4].write("Estado")
+    headers[5].write("Acción")
 
 
 
     if not datos.empty:
         for index, inventario in df_to_display.iterrows():
             # Each row of the table
-            col1, col2, col3, col4,col5  = st.columns([1, 2, 2, 2,2], gap="medium", vertical_alignment="center")
+            col1, col2, col3, col4,col5,col6  = st.columns([1, 2, 2, 2,2,2], gap="medium", vertical_alignment="center")
 
             # Column 1: ID Inventario
             col1.write(inventario["ID"])
@@ -119,6 +122,39 @@ with st.expander("Log de Vuelos",expanded=True):
             else:
                 col5.write("Pendiente")
 
+            with col6:
+                # Create a unique key for each button to avoid conflicts
+                button_key = f"cargar_nuevamente_{inventario['ID']}_{index}"
+                
+                if st.button("Subir Nuevamente", key=button_key):
+                    try:
+                            # Read the file from the path specified in Nombre_Archivo
+                            file_path = inventario["Nombre_Archivo"]
+                            
+                            # Check if file exists
+                            with open(file_path, 'rb') as file:
+                                files = {'file': (file_path.split('/')[-1], file, 'application/octet-stream')}
+                                
+                                
+                            # Make the API call
+                                response = requests.post(
+                                    "http://127.0.0.1:5100/upload",
+                                    files=files
+                                )
+                                
+                                if response.status_code == 200:
+                                    st.success(f"Archivo subido correctamente para ID {inventario['ID']}")
+                                    sleep(2)
+                                    st.rerun()
+                                else:
+                                    st.error(f"Error al subir archivo. Código: {response.status_code}")
+                            
+                    except FileNotFoundError:
+                        st.error(f"Archivo no encontrado: {file_path}")
+                    except Exception as e:
+                        st.error(f"Error al subir archivo: {str(e)}")
+
+             
             st.write('')    
                 #st.experimental_rerun(f"http://127.0.0.1:5100/actualizar-estado-inventario?sucursal={tipo_inventario}&Ubicacion={zona}&ID={inventario[0]}")
 

@@ -25,6 +25,7 @@ import uuid
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 import jsonschema
+import pandas as pd
 from Services import JDService, LogService as SaveExecutions
 from Services import DronService
 from Services import MsSQL_Service as dbService
@@ -340,14 +341,24 @@ def upload_file():
         SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "Upload_File", 500)
         return jsonify({'error': 'No selected file'}), 400
     
+
     if file:
-        unique_id = str(uuid.uuid4())
-        filename = utc_time() + "_" + unique_id + "_epc_records.csv"
-        file.save(os.path.join(os.getenv('DRON_FOLDER'), filename))
 
-        SaveExecutions.Guardar_Recepcion_Archivos_Dron_a_csv(filename)
-        dbService.insertar_datos_inventario_vuelos(filename)
+        df = pd.read_csv(file.stream, sep=',', dtype=str)
 
+        # Llamar a la función Limpiar_Archivos_Dron para obtener la lista de archivos
+        archivos_creados = DronService.Limpiar_Archivos_Dron(df,os.getenv('DRON_FOLDER'))
+    
+      
+        for filename in archivos_creados:
+            # --- Código original que se ejecutaba con 'file' ---
+            # unique_id = str(uuid.uuid4()) # Ya no es necesario generar un nuevo UUID
+            # filename = utc_time() + "_" + unique_id + "_epc_records.csv" # Ya no es necesario generar un nuevo nombre
+            # file.save(os.path.join(os.getenv('DRON_FOLDER'), filename)) # Ya no se guarda porque ya está guardado en Limpiar_Archivos_Dron
+
+            SaveExecutions.Guardar_Recepcion_Archivos_Dron_a_csv(filename)
+            dbService.insertar_datos_inventario_vuelos(filename)
+            
         end_time = time.time()
         SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "Upload_File", 200)
         return jsonify({'message': 'File successfully uploaded', 'filename': filename}), 200

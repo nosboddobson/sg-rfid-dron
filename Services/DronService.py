@@ -2,6 +2,7 @@ import datetime
 import glob
 import json
 import os
+import uuid
 import win32wnet
 from Services import MsSQL_Service
 #import MsSQL_Service
@@ -180,6 +181,74 @@ def disconnect_from_share_folder(share_name):
     except Exception as e:
         print(f"Error disconnecting from share: {e}")
         return None
+
+def Limpiar_Archivos_Dron(df,DRON_FOLDER):
+    """
+    Procesa un DataFrame, detecta si contiene datos de más de un día
+    basado en la columna 'Timestamp', y lo divide en DataFrames separados por día
+    si es necesario.
+
+    Args:
+        df (pandas.DataFrame): El DataFrame original con los datos.
+
+    Returns:
+        list: Lista de nombres de archivos (str) creados.
+    """
+    # Verificar si la columna 'Timestamp' existe
+    if 'Timestamp' not in df.columns:
+        raise ValueError("La columna 'Timestamp' no se encuentra en el archivo CSV.")
+
+    # Convertir la columna 'Timestamp' a datetime
+    # Asumiendo el formato: 'YYYY-MM-DD HH:MM:SS'
+    df['Timestamp_dt'] = pd.to_datetime(df['Timestamp'], format='%Y-%m-%d %H:%M:%S', errors='coerce')
+
+    # Verificar si hubo errores en la conversión
+    if df['Timestamp_dt'].isnull().any():
+        print("Advertencia: Algunas fechas en 'Timestamp' no pudieron ser parseadas y se han marcado como NaT.")
+
+    # Extraer la fecha (día) de la columna convertida
+    df['Fecha'] = df['Timestamp_dt'].dt.date
+
+    # Obtener las fechas únicas presentes
+    fechas_unicas = df['Fecha'].dropna().unique()
+
+    # Lista para almacenar los nombres de los archivos creados
+    filenames_creados = []
+
+    if len(fechas_unicas) > 1:
+        # Hay más de una fecha, dividir el archivo
+        print(f"Se encontraron {len(fechas_unicas)} fechas diferentes. Dividiendo el archivo...")
+        for fecha in fechas_unicas:
+            # Filtrar el DataFrame para la fecha actual
+            df_fecha = df[df['Fecha'] == fecha].copy()
+
+            # Opcional: Eliminar columnas auxiliares antes de guardar
+            df_fecha.drop(columns=['Fecha', 'Timestamp_dt'], inplace=True, errors='ignore')
+
+            # Generar un nuevo nombre de archivo basado en la fecha y un UUID
+            unique_id = str(uuid.uuid4())
+            # Formatear la fecha para incluirla en el nombre del archivo
+            fecha_str = fecha.strftime('%Y-%m-%d')
+            filename_fecha = f"{datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S')}_{fecha_str}_{unique_id}_epc_records.csv"
+
+            # Guardar el DataFrame filtrado en un nuevo archivo CSV
+            filepath_fecha = os.path.join(DRON_FOLDER, filename_fecha)
+            df_fecha.to_csv(filepath_fecha, index=False)
+            filenames_creados.append(filename_fecha)
+
+    else:
+        # Solo hay una fecha, procesar como antes
+        print(f"Solo se encontró una fecha: {fechas_unicas[0] if len(fechas_unicas) == 1 else 'N/A'}. Procesando como un solo archivo.")
+        # Opcional: Eliminar columnas auxiliares antes de guardar si se van a guardar tal cual
+        df_cleaned = df.drop(columns=['Fecha', 'Timestamp_dt'], inplace=False, errors='ignore')
+
+        unique_id = str(uuid.uuid4())
+        filename = f"{datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S')}_{unique_id}_epc_records.csv"
+        filepath_original = os.path.join(DRON_FOLDER, filename)
+        df_cleaned.to_csv(filepath_original, index=False)
+        filenames_creados.append(filename)
+
+    return filenames_creados
 
     
 if __name__ == "__main__":

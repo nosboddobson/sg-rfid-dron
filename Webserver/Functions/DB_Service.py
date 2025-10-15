@@ -17,6 +17,7 @@ DB_SERVER = os.getenv('DB_DRON_SERVER')
 DB_DATABASE = os.getenv('DB_DRON_DATABASE')
 DB_USERNAME = os.getenv('DB_DRON_USERNAME')
 DB_PASSWORD = os.getenv('DB_DRON_PASSWORD')
+DRON_FOLDER_PATH = os.getenv('DRON_FOLDER')
 
 # Function to establish a connection to the MS SQL Server
 def get_connection():
@@ -205,7 +206,7 @@ def obtener_datos_Log_Vuelos():
     
 
     cursor.execute('''
-        SELECT TOP 300 ID, Fecha_Vuelo, N_Elementos, Tiempo_Vuelo, Estado_Inventario 
+        SELECT TOP 300 ID,Nombre_Archivo, Fecha_Vuelo, N_Elementos, Tiempo_Vuelo, Estado_Inventario 
         FROM Inventario_Vuelos
         ORDER BY Fecha_Vuelo DESC
     ''')
@@ -218,6 +219,13 @@ def obtener_datos_Log_Vuelos():
     # Crear DataFrame solo si hay resultados
     df = pd.DataFrame([list(row) for row in results], columns=columns) if results else pd.DataFrame(columns=columns)
 
+    # Join DRON_FOLDER_PATH with Nombre_Archivo
+    if not df.empty:
+        df['Nombre_Archivo'] = df['Nombre_Archivo'].apply(
+            lambda x: os.path.join(DRON_FOLDER_PATH, x) if x else x
+        )
+
+    
     # Close the connection
     conn.close()
 
