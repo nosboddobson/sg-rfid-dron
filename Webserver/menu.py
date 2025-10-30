@@ -90,7 +90,7 @@ def make_navbar():
 
                
 
-                if st.button("🔴 Solicitar Inventario", help="Dron en línea, Solicitar inventario.", type="primary",use_container_width=True):
+                if st.button("🟢 Solicitar Inventario", help="Dron en línea, Solicitar inventario.", type="primary",use_container_width=True):
                     
                     #DB.Dron_SET_Boton_Envio_Datos_Hora(cookie_manager.get(cookie='username'))
         
