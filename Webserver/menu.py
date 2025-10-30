@@ -1,9 +1,10 @@
+import time
 import streamlit as st
 from time import sleep
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 from streamlit.source_util import get_pages
 import extra_streamlit_components as stx
-
+from Functions import DB_Service as DB
 cookie_manager = stx.CookieManager()
 
 
@@ -14,61 +15,109 @@ def get_current_page_name():
         raise RuntimeError("Couldn't get script context")
 
     pages = get_pages("")
-    #print(pages)
-
     return pages[ctx.page_script_hash]["page_name"]
 
-
-def make_sidebar():
+def make_navbar():
+    """Navbar con botones horizontales"""
     
-    no_sidebar_style = """
+    # Ocultar el sidebar predeterminado y la flecha
+    hide_sidebar_style = """
     <style>
+        [data-testid="stSidebar"] {display: none;}
         div[data-testid="stSidebarNav"] {display: none;}
         
-        /* Estilo responsive para la imagen del logo */
-        .sidebar-logo {
-            width: 100%;
-            max-width: 250px; 
-            height: auto;
-            margin-bottom: 20px;
+        /* Ocultar la flecha de colapsar sidebar */
+        button[kind="header"] {display: none;}
+        [data-testid="collapsedControl"] {display: none;}
+        /* Reducir el espacio superior */
+        .main .block-container {
+            padding-top: 1rem;
+            padding-bottom: 0rem;
+        }
+        /* Ocultar el iframe del CookieManager */
+        iframe[title="extra_streamlit_components.CookieManager.cookie_manager"] {
+            display: none;
         }
         
-        /* Ajustes para pantallas pequeñas */
-        @media screen and (max-width: 768px) {
-            .sidebar-logo {
-                max-width: 150px;
-            }
+        /* Ocultar todos los custom components con altura 0 */
+        .stCustomComponentV1[height="0"] {
+            display: none;
+        }
+        /* Reducir espacio del header */
+        header[data-testid="stHeader"] {
+            padding-top: 0rem;
+        }
+        
+        /* Ajustar el espacio de los botones */
+        div[data-testid="column"] {
+            padding: 0px 5px;
         }
     </style>
     """
-    st.markdown(no_sidebar_style, unsafe_allow_html=True)
-
-    with st.sidebar:
-
-        st.image('images/SG_Logo.png', use_container_width=True)
+    st.markdown(hide_sidebar_style, unsafe_allow_html=True)
+    
+    
+    
+    # Menú horizontal con botones
+    if st.session_state.get("logged_in", False):
+        col1, col2, col3, col4 = st.columns(4)
         
-        #st.page_link("inicio.py", label="Inicio")
-        st.write("")
-        st.write("")
-        if st.session_state.get("logged_in", False):
-            st.page_link("pages/Inventarios_Pendientes.py", label="Inventarios Pendientes" )
-            st.page_link("pages/Inventarios_Realizados.py", label="Inventarios Realizados")
-            st.page_link("pages/Inventarios_Log.py", label="Log de Vuelos")
-            st.page_link("pages/logout.py", label="Cerrar sesión")
-       
-        elif get_current_page_name() != "inicio":
+        with col1:
+            if st.button("📋 Pendientes", use_container_width=True):
+                st.switch_page("pages/Inventarios_Pendientes.py")
+        
+        with col2:
+            if st.button("✅ Realizados", use_container_width=True):
+                st.switch_page("pages/Inventarios_Realizados.py")
+        
+        with col3:
+            if st.button("📝 Log", use_container_width=True):
+                st.switch_page("pages/Inventarios_Log.py")
+        
+        with col4:
+            # if st.button("🚪 Cerrar", use_container_width=True):
+            #     st.switch_page("pages/logout.py")
+            ####Comunicacion y estado de Dron
+            Dron_Status = DB.get_last_heartbeat_and_compare()
+            if Dron_Status:
 
-            st.switch_page("inicio.py")
+                
 
-        print(str())
+                datos1 = DB.obtener_datos_inventarios_pendientes()
+
+            
+                if st.button("🚁 Solicitar Inventario", key='run_button',use_container_width=True):
+                    
+                    #DB.Dron_SET_Boton_Envio_Datos_Hora(cookie_manager.get(cookie='username'))
+        
+                    for i in range(10):
+                        st.toast("Esperando Inventario...")
+                        time.sleep(5)
+                        datos2 = DB.obtener_datos_inventarios_pendientes()
+                        if len(datos2)>len(datos1):
+                            st.toast("¡Inventario Recibido!", icon='🎉')
+                            #st.balloons()
+                            time.sleep(5)
+                            success=True
+                            break
+                        success=False   
+                    if not success:
+                            st.toast("¡Ningún Inventario Recibido!", icon='😞')
+                            time.sleep(5)
+
+
+                    st.rerun()
+
+            else:
+                    st.button("🚁 Fuera de Linea ",use_container_width=True, disabled=True)
+        
+         
+    
+    elif get_current_page_name() != "inicio":
+        st.switch_page("inicio.py")
+
 
 def main():
-    # Mostrar el logo de manera responsive
-    col1, col2, col3 = st.columns([1, 2, 1])
-    
-    with col2:
-        st.image('images/SG_Logo.png', use_column_width=True)
-    
     if "logged_in" in st.session_state:
         del st.session_state["logged_in"]
 
@@ -81,6 +130,7 @@ def main():
     st.info("Sesión Cerrada correctamente!")
     sleep(0.5)
     st.switch_page("inicio.py")
+
 
 if __name__ == "__main__":
     main()

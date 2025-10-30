@@ -3,7 +3,7 @@ from time import sleep
 import requests
 import streamlit as st
 import plotly.express as px
-from menu import make_sidebar
+from menu import make_navbar
 from Functions import DB_Service as DB
 from Functions import Reuse_Service as Reuse
 
@@ -15,7 +15,8 @@ from Functions import Reuse_Service as Reuse
 
 st.set_page_config(page_title="Log de Vuelos Sierra Gorda",layout="wide")
 
-make_sidebar()
+#make_sidebar()
+make_navbar()
 
 Reuse.Load_css('Functions/CSS_General.css')
 
@@ -24,7 +25,7 @@ Reuse.Load_css('Functions/CSS_General.css')
 
 with st.expander("Log de Vuelos",expanded=True):
 
-    st.title("Vuelos Realizados")
+    #st.title("Vuelos Realizados")
     
     #Obtener inventarios pendientes
     datos = DB.obtener_datos_Log_Vuelos()
@@ -35,23 +36,23 @@ with st.expander("Log de Vuelos",expanded=True):
 
     st.markdown(f"""
     <div style="display: flex; align-items: center;">
-    <div style="display:inline-block;background-color:orange;padding:10px;border-radius:10px;text-align:center;width:200px;margin-right:10px;">
+    <div style="display:inline-block;background-color:black;padding:10px;border-radius:10px;text-align:center;width:200px;margin-right:10px;">
         <h1>{len(datos)}</h1>
         <p>Nº de Vuelos</p>
     </div>
-    <div style="display:inline-block;background-color:orange;padding:10px;border-radius:10px;text-align:center;width:600px;margin-right:10px;">
+    <div style="display:inline-block;background-color:black;padding:10px;border-radius:10px;text-align:center;width:600px;margin-right:10px;">
         <h1>{DB.format_datetime(datos.iloc[0]["Fecha_Vuelo"])}</h1>
         <p>Último Vuelo</p>
     </div>
-    <div style="display:inline-block;background-color:orange;padding:10px;border-radius:10px;text-align:center;width:200px;margin-right:10px;">
+    <div style="display:inline-block;background-color:black;padding:10px;border-radius:10px;text-align:center;width:200px;margin-right:10px;">
         <h1>{datos[datos['Estado_Inventario'] == 'OK'].shape[0]}</h1>
         <p>Vuelos Procesados</p>
     </div>
-    <div style="display:inline-block;background-color:orange;padding:10px;border-radius:10px;text-align:center;width:200px;margin-right:10px;">
+    <div style="display:inline-block;background-color:black;padding:10px;border-radius:10px;text-align:center;width:200px;margin-right:10px;">
         <h1>{datos[datos['N_Elementos'] == 0].shape[0]}</h1>
         <p>Vuelos Descartados</p>
     </div>
-    <div style="display:inline-block;background-color:orange;padding:10px;border-radius:10px;text-align:center;width:200px;margin-right:10px;">
+    <div style="display:inline-block;background-color:black;padding:10px;border-radius:10px;text-align:center;width:200px;margin-right:10px;">
         <h1>{datos[datos['Estado_Inventario'] == 'Pendiente'].shape[0] }</h1>
         <p>Vuelos Pendientes</p>
     </div>

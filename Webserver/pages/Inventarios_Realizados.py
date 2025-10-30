@@ -8,7 +8,7 @@ import math
 #import matplotlib.pyplot as plt
 #from pywaffle import Waffle
 
-from menu import make_sidebar
+from menu import make_navbar
 
 from Functions import DB_Service as DB
 from Functions import Reuse_Service as Reuse
@@ -18,7 +18,7 @@ from Functions import Reuse_Service as Reuse
 
 st.set_page_config(page_title="Inventarios Sierra Gorda",layout="wide")
 
-make_sidebar()
+make_navbar()
 #_lock = RendererAgg.lock
 
 
@@ -31,7 +31,7 @@ make_sidebar()
 # Add title in the second column
 #with col2:
     #st.title("Inventarios Patio Mina 2")
-st.markdown("<h1 style='text-align: center;'>Inventarios Realizados Patio Mina 2</h1>", unsafe_allow_html=True)
+#st.markdown("<h1 style='text-align: center;'>Inventarios Realizados Patio Mina 2</h1>", unsafe_allow_html=True)
 
 Reuse.Load_css('Functions/CSS_General.css')
 
@@ -220,7 +220,43 @@ with st.expander("Inventarios",expanded=st.session_state.expand_inventario_Reali
         df_to_display = datosJDE.iloc[start_row:end_row]
 
         #st.subheader("Detalles de Inventarios Realizados")
-
+        # CSS para hacer el header responsive
+        st.markdown("""
+        <style>
+            /* Estilo base del header */
+            .table-header {
+                text-align: center;
+                font-weight: bold;
+                padding: 10px;
+                margin: 0;
+            }
+            
+            /* Responsive para tablets */
+            @media screen and (max-width: 1024px) {
+                .table-header {
+                    font-size: 13px;
+                    padding: 8px 4px;
+                }
+            }
+            
+            /* Responsive para móviles */
+            @media screen and (max-width: 768px) {
+                .table-header {
+                    font-size: 11px;
+                    padding: 6px 2px;
+                    word-wrap: break-word;
+                }
+            }
+            
+            /* Ajustar columnas en pantallas pequeñas */
+            @media screen and (max-width: 768px) {
+                div[data-testid="column"] {
+                    padding: 0px 2px !important;
+                    min-width: 60px;
+                }
+            }
+        </style>
+        """, unsafe_allow_html=True)
         headers_Procesado = st.columns([1, 2, 2, 2, 2, 2, 2, 2, 2,2,2], gap="medium", vertical_alignment="top")
     
         _= '''headers[0].write("Tipo Inventario")
@@ -236,42 +272,40 @@ with st.expander("Inventarios",expanded=st.session_state.expand_inventario_Reali
         headers[10].write("") '''
 
         header_texts = [
-            "Zona",
-            "Fecha",
-            "Inicio",
-            "Fecha Vuelo",
-            "Hora de Vuelo",
-            "Duración",
-            "Correctos",
-            "Faltantes",
-            "Sobrantes",
-            "Lectura",
+            "📍",
+            "📅",
+            "▶️",
+            "📆",
+            "🚁",
+            "⏱️",
+            "✅",
+            "❗❗",
+            "➖",
+            "%",
             ""  # Empty string for the last column
         ]        
 
         for i, header in enumerate(headers_Procesado):
             with header:
-                st.markdown(f"<p class='table-header' style='text-align: center;'>{header_texts[i]}</p>", unsafe_allow_html=True) 
-
-
+                st.markdown(f"<p class='table-header' style='text-align: center;'>{header_texts[i]}</p>", unsafe_allow_html=True)
         if not datosJDE.empty:  # Check if the DataFrame is not empty
             for index, inventario in df_to_display.iterrows():  # Iterate over rows using iterrows()
                 # Each row of the table
-                col2, col3, col4,colA,colB, col5, col6, col7, col8, col9,col11 = st.columns([1, 2, 2,2,2, 2, 2, 2, 2, 2,2], gap="medium", vertical_alignment="center")
+                col2, col3, col4,colA,colB, col5, col6, col7, col8, col9,col11 = st.columns([1, 2, 2,2,2, 2, 2, 2, 2, 2,2], gap="small", vertical_alignment="center")
 
                 # Determine Tipo_inventario based on Ubicacion
                 #Tipo_inventario = "Completo" if inventario["Ubicacion"] == "PT" else "Parcial"
 
 
                 #col1.write(Tipo_inventario)
-                col2.write(f"<p  style='text-align: center;'>{inventario['Ubicacion']}</p>", unsafe_allow_html=True) 
-                col3.write(f"<p style='text-align: center;'>{DB.format_date(inventario["Fecha_Inventario"])}</p>", unsafe_allow_html=True) 
-                col4.write(f"<p style='text-align: center;'>{DB.format_time(inventario["Fecha_Inventario"])}</p>", unsafe_allow_html=True) 
+                col2.write(f"<p  style='text-align: center;font-size: 12px;'>{inventario['Ubicacion']}</p>", unsafe_allow_html=True) 
+                col3.write(f"<p style='text-align: center;font-size: 12px;'>{DB.format_date(inventario["Fecha_Inventario"])}</p>", unsafe_allow_html=True) 
+                col4.write(f"<p style='text-align: center;font-size: 12px;'>{DB.format_time(inventario["Fecha_Inventario"])}</p>", unsafe_allow_html=True) 
 
-                colA.write(f"<p style='text-align: center;'>{DB.format_date(inventario["Fecha_Vuelo"])}</p>", unsafe_allow_html=True) 
-                colB.write(f"<p style='text-align: center;'>{DB.format_time(inventario["Fecha_Vuelo"])}</p>", unsafe_allow_html=True) 
+                colA.write(f"<p style='text-align: center;font-size: 12px;'>{DB.format_date(inventario["Fecha_Vuelo"])}</p>", unsafe_allow_html=True) 
+                colB.write(f"<p style='text-align: center;font-size: 12px;'>{DB.format_time(inventario["Fecha_Vuelo"])}</p>", unsafe_allow_html=True) 
 
-                col5.write(f"<p style='text-align: center;'>{DB.format_seconds_HHMMSS(inventario["Tiempo_Vuelo"])}</p>", unsafe_allow_html=True) 
+                col5.write(f"<p style='text-align: center;font-size: 12px;'>{DB.format_seconds_HHMMSS(inventario["Tiempo_Vuelo"])}</p>", unsafe_allow_html=True) 
             
         
 
@@ -284,12 +318,12 @@ with st.expander("Inventarios",expanded=st.session_state.expand_inventario_Reali
             
                 #col8.write(inventario["Elementos_Sobrantes"])
                 col8.write(f"<p class='data-excess' style='text-align: center;'>{inventario["Elementos_Sobrantes"]}</p>", unsafe_allow_html=True)
-                col9.write(f"<p style='text-align: center;'>{str(inventario["Porcentaje_Lectura"])}%</p>", unsafe_allow_html=True) 
+                col9.write(f"<p style='text-align: center;'>{str(inventario["Porcentaje_Lectura"])}</p>", unsafe_allow_html=True) 
                 #col10.write(f"<p style='text-align: center;'>{str(inventario["NumeroConteo"])}</p>", unsafe_allow_html=True) 
             
 
                 # Botón de "Resumen"
-                if col11.button("Ver", key=f"resumen_{inventario['ID']}"):
+                if col11.button("🔎", key=f"resumen_{inventario['ID']}"):
                     st.session_state.selected_inventory = inventario["ID"]
                     st.session_state.expand_resumen_inventario=True
                     st.session_state.expand_inventario_Realizado = False
@@ -302,7 +336,7 @@ with st.expander("Inventarios",expanded=st.session_state.expand_inventario_Reali
         col0,col1, col2, col3,col4 = st.columns([3,2, 2, 2,3],gap="small")  # Create three columns with different widths
 
         with col3:  # Next button column (left)
-            if st.button("Siguiente Página"):
+            if st.button("Siguiente"):
                
                 if st.session_state.page2 < total_pages -1 :
                     st.session_state.page2 = st.session_state.page2 + 1
@@ -314,7 +348,7 @@ with st.expander("Inventarios",expanded=st.session_state.expand_inventario_Reali
             st.markdown(f"<p style='text-align: center;'>Página {st.session_state.page2 + 1} de {total_pages}</p>", unsafe_allow_html=True)
 
         with col1:  # Previous button column (right)
-            if st.button("Página Anterior"):
+            if st.button("Anterior"):
                 if st.session_state.page2 > 0:
                     st.session_state.page2 = st.session_state.page2 - 1
                     st.rerun()

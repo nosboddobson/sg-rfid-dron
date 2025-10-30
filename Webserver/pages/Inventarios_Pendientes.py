@@ -12,14 +12,17 @@ from Functions import DB_Service as DB
 from Functions import Reuse_Service as Reuse
 
 
+
 #Inicio Creacion de la Pagina -----------------------------------------------------------------------------------------
 st.set_page_config(page_title="Inventario Sierra Gorda",layout="wide")
-from menu import make_sidebar
-make_sidebar()
+#from menu import make_sidebar
+#make_sidebar()
+from menu import make_navbar
+make_navbar()
 cookie_manager = stx.CookieManager()
 
 
-st.markdown("<h1 style='text-align: center;'>Inventarios Pendientes Patio Mina 2</h1>", unsafe_allow_html=True)
+#st.markdown("<h1 style='text-align: center;'>Inventarios Pendientes Patio Mina 2</h1>", unsafe_allow_html=True)
 
 Reuse.Load_css('Functions/CSS_General.css')
 
@@ -51,57 +54,56 @@ else:
 
 
 
-####Comunicacion y estado de Dron
-Dron_Status = DB.get_last_heartbeat_and_compare()
-cold1, cold2,cold3,cold4 = st.columns([1, 1,1,3],gap="small",vertical_alignment="center")  # Adjust column widths as needed
-st.write('') 
 
-cold1.write(f"<p style='text-align: right;'>Estado de Dron :</p>", unsafe_allow_html=True)
+#cold1, cold2,cold3,cold4 = st.columns([1, 1,1,3],gap="small",vertical_alignment="center")  # Adjust column widths as needed
+#st.write('') 
+
+#cold1.write(f"<p style='text-align: right;'>Estado de Dron :</p>", unsafe_allow_html=True)
      
-if Dron_Status:
+# if Dron_Status:
 
-    cold2.write(f"<p style='text-align: left;'>En Linea ✔️</p>", unsafe_allow_html=True)
+#     cold2.write(f"<p style='text-align: left;'>Online ✔️</p>", unsafe_allow_html=True)
 
-    datos1 = DB.obtener_datos_inventarios_pendientes()
+#     datos1 = DB.obtener_datos_inventarios_pendientes()
 
-    with cold3:
-        if st.button("Solicitar a Dron Enviar Inventario",disabled=st.session_state.running, key='run_button'):
+#     with cold3:
+#         if st.button("Solicitar a Dron Enviar Inventario",disabled=st.session_state.running, key='run_button'):
             
-            DB.Dron_SET_Boton_Envio_Datos_Hora(cookie_manager.get(cookie='username'))
+#             DB.Dron_SET_Boton_Envio_Datos_Hora(cookie_manager.get(cookie='username'))
    
-            for i in range(10):
-                st.toast("Esperando Inventario...")
-                time.sleep(5)
-                datos2 = DB.obtener_datos_inventarios_pendientes()
-                if len(datos2)>len(datos1):
-                    st.toast("¡Inventario Recibido!", icon='🎉')
-                    #st.balloons()
-                    time.sleep(5)
-                    success=True
-                    break
-                success=False   
-            if not success:
-                    st.toast("¡Ningún Inventario Recibido!", icon='😞')
-                    time.sleep(5)
+#             for i in range(10):
+#                 st.toast("Esperando Inventario...")
+#                 time.sleep(5)
+#                 datos2 = DB.obtener_datos_inventarios_pendientes()
+#                 if len(datos2)>len(datos1):
+#                     st.toast("¡Inventario Recibido!", icon='🎉')
+#                     #st.balloons()
+#                     time.sleep(5)
+#                     success=True
+#                     break
+#                 success=False   
+#             if not success:
+#                     st.toast("¡Ningún Inventario Recibido!", icon='😞')
+#                     time.sleep(5)
 
 
-            st.rerun()
+#             st.rerun()
 
-            # with cold4:
-            #     with st.spinner("Esperando Inventario...", show_time=True):
-            #         time.sleep(10)
-            #         datos2 = DB.obtener_datos_inventarios_pendientes()
-            #         message_placeholder = st.empty()
-            #         if len(datos2)>len(datos1):
-            #             message_placeholder.success("¡Inventario Recibido!")
-            #         else:
-            #             message_placeholder.error("¡Ningún Inventario Recibido!")
-            #     time.sleep(5)
-            #     message_placeholder.empty()
-            #     st.rerun()
+#             # with cold4:
+#             #     with st.spinner("Esperando Inventario...", show_time=True):
+#             #         time.sleep(10)
+#             #         datos2 = DB.obtener_datos_inventarios_pendientes()
+#             #         message_placeholder = st.empty()
+#             #         if len(datos2)>len(datos1):
+#             #             message_placeholder.success("¡Inventario Recibido!")
+#             #         else:
+#             #             message_placeholder.error("¡Ningún Inventario Recibido!")
+#             #     time.sleep(5)
+#             #     message_placeholder.empty()
+#             #     st.rerun()
 
-else:
-            cold2.write(f"<p style='text-align: left;'>Fuera de Linea ❌</p>", unsafe_allow_html=True)
+# else:
+#             cold2.write(f"<p style='text-align: left;'>Offline ❌</p>", unsafe_allow_html=True)
                 
 st.write('')                    
             
@@ -151,14 +153,14 @@ with st.expander("Inventarios Pendientes",expanded=True,):
     
 
     #st.subheader("Detalles de Inventarios Pendientes")
-    headers_Pendiente = st.columns([1, 2, 1, 1, 2, 1,1,1], gap="medium", vertical_alignment="center")
+    headers_Pendiente = st.columns([1, 2, 1, 1, 2, 2,1,1], gap="medium", vertical_alignment="center")
     header_texts = [
     "Nº",
-    "Fecha de Vuelo",
-    "Elementos Detectados",
-    "Tiempo de Vuelo",
-    "Tipo Inventario",
-    "Zona",
+    "🚁📅",
+    "📡",
+    "🕐",
+    "🔽Inventario",
+    "🔽Zona",
     "",
     "" # Empty string for the last column
     ]
@@ -181,7 +183,7 @@ with st.expander("Inventarios Pendientes",expanded=True,):
     if datos:
         for inventario in datos:
             # Each row of the table
-            col1, col2, col3, col4, col5, col6,col7,col8 = st.columns([1, 2, 1, 1, 2, 1,1,1], gap="medium", vertical_alignment="center")
+            col1, col2, col3, col4, col5, col6,col7,col8 = st.columns([1, 2, 1, 1, 2, 2,1,1], gap="small", vertical_alignment="center")
 
             # Column 1: ID Inventario
             col1.write(f"<p style='text-align: center;'>{fila}</p>", unsafe_allow_html=True)
@@ -206,7 +208,7 @@ with st.expander("Inventarios Pendientes",expanded=True,):
             zona = col6.selectbox("Zona", ["PF1", "PF2", "PF3","PF4","PF5"], key=f"zona_{inventario[0]}", help="S= Shelving, P= Pasillo y F=Fila",label_visibility="collapsed",disabled=zona_disabled)
 
             # Column 6: Acción button
-            if col7.button("Iniciar", key=f"iniciar_{inventario[0]}", help="Enviar Inventario a JD Edwards"): #Si el boton es presionado entonces:
+            if col7.button("▶️", key=f"iniciar_{inventario[0]}", help="Enviar Inventario a JD Edwards"): #Si el boton es presionado entonces:
                 # When the button is clicked, refer to the inventory update page
                 # Disable the button
                 st.session_state.button_disabled = True
@@ -223,7 +225,7 @@ with st.expander("Inventarios Pendientes",expanded=True,):
                         st.session_state.button_disabled = False
         
             
-            if col8.button("Eliminar", key=f"Eliminar_{inventario[0]}", help="Eliminar inventario"): #Si el boton es presionado entonces:
+            if col8.button("🗑️", key=f"Eliminar_{inventario[0]}", help="Eliminar inventario"): #Si el boton es presionado entonces:
                     
                     DB.eliminar_inventario_dialog(inventario[0])
 
