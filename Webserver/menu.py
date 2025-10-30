@@ -17,6 +17,7 @@ def get_current_page_name():
     pages = get_pages("")
     return pages[ctx.page_script_hash]["page_name"]
 
+
 def make_navbar():
     """Navbar con botones horizontales"""
     
@@ -52,6 +53,8 @@ def make_navbar():
         div[data-testid="column"] {
             padding: 0px 5px;
         }
+    
+    
     </style>
     """
     st.markdown(hide_sidebar_style, unsafe_allow_html=True)
@@ -79,14 +82,15 @@ def make_navbar():
             #     st.switch_page("pages/logout.py")
             ####Comunicacion y estado de Dron
             Dron_Status = DB.get_last_heartbeat_and_compare()
-            if Dron_Status:
+            if not Dron_Status:
 
                 
 
                 datos1 = DB.obtener_datos_inventarios_pendientes()
 
-            
-                if st.button("🚁 Solicitar Inventario", key='run_button',use_container_width=True):
+               
+
+                if st.button("🔴 Solicitar Inventario", help="Dron en línea, Solicitar inventario.", type="primary",use_container_width=True):
                     
                     #DB.Dron_SET_Boton_Envio_Datos_Hora(cookie_manager.get(cookie='username'))
         
@@ -109,7 +113,7 @@ def make_navbar():
                     st.rerun()
 
             else:
-                    st.button("🚁 Fuera de Linea ",use_container_width=True, disabled=True)
+                    st.button("🚁 Fuera de Linea ",help="Dron no conectado a la red",type="tertiary",use_container_width=True)
         
          
     
