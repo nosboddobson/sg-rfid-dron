@@ -82,7 +82,7 @@ def make_navbar():
             #     st.switch_page("pages/logout.py")
             ####Comunicacion y estado de Dron
             Dron_Status = DB.get_last_heartbeat_and_compare()
-            if not Dron_Status:
+            if Dron_Status:
 
                 
 
