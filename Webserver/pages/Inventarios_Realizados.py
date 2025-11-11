@@ -525,8 +525,8 @@ with st.expander("Ver detalle",expanded=st.session_state.expand_resumen_inventar
                         fig = create_waffle_chart(
                             correctos=row['Correctos'], 
                             faltantes=row['Faltantes'], 
-                            fila=int(row['Fila']), 
-                            seccion=int(row['Rack'])
+                            fila=row['Fila'], 
+                            seccion=row['Rack']
                         )
                         st.plotly_chart(fig)
 
