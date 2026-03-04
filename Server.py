@@ -23,7 +23,8 @@
 import time
 import uuid
 from dotenv import load_dotenv
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, redirect
+from flasgger import Flasgger
 import jsonschema
 import pandas as pd
 from Services import JDService, LogService as SaveExecutions
@@ -33,29 +34,76 @@ from Services import Video_Service
 import os
 import datetime
 import logging
-
-# ------------------------------------------------------------------------------
-# Configuración de la Aplicación
-# ------------------------------------------------------------------------------
-# Crear una instancia de la aplicación Flask.
-app = Flask(__name__)
+import json
+from logging.handlers import RotatingFileHandler
 
 # Cargar variables de entorno desde un archivo .env.
 # La opción `override=True` permite sobrescribir variables de entorno existentes.
 load_dotenv(override=True)
-# Configuración del logger
-log_file_path = os.getenv('DRON_API_LOG_PATH', 'd:/logs/Sierra_dron_api.txt')
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s %(levelname)s %(message)s',
-    handlers=[
-        logging.FileHandler(log_file_path, encoding='utf-8'),
-        logging.StreamHandler()
-    ]
+
+# Obtener configuración de la API desde variables de entorno
+API_HOST = os.getenv('API_HOST', '10.185.36.30')  # IP del servidor
+API_PORT = os.getenv('API_PORT', '5100')  # Puerto del servidor
+
+# Crear una instancia de la aplicación Flask.
+app = Flask(__name__)
+
+# Inicializar Flasgger para documentación Swagger
+swagger = Flasgger(app, template={
+    "swagger": "2.0",
+    "info": {
+        "title": "Sierra Dron API",
+        "description": "API para gestión de inventario de drones y sincronización con JD Edwards",
+        "contact": {
+            "email": "support@sierra.com",
+        },
+        "version": "1.0.0"
+    },
+    "host": f"{API_HOST}:{API_PORT}",
+    "basePath": "/",
+    "schemes": ["http", "https"]
+})
+
+# Configuración del logger con RotatingFileHandler
+# Crear directorio de logs si no existe
+logs_dir = 'logs'
+if not os.path.exists(logs_dir):
+    os.makedirs(logs_dir)
+
+# Configurar el archivo de log
+log_file_path = os.path.join(logs_dir, 'api.log')
+
+# Configurar logger con RotatingFileHandler
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+# Limpiar handlers existentes
+logger.handlers = []
+
+# RotatingFileHandler: máximo 5MB (5242880 bytes), mantiene 5 archivos de respaldo
+rotating_handler = RotatingFileHandler(
+    log_file_path,
+    maxBytes=5242880,  # 5 MB
+    backupCount=5,      # Mantiene 5 archivos de respaldo (api.log.1, api.log.2, etc.)
+    encoding='utf-8'
 )
 
+# Formato del log
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+rotating_handler.setFormatter(formatter)
+
+# Agregador a la consola también
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(formatter)
+
+logger.addHandler(rotating_handler)
+logger.addHandler(console_handler)
+
 # Log al iniciar el servidor
+logging.info("=" * 80)
 logging.info("Servidor Flask iniciado.")
+logging.info("Logs guardados en: " + os.path.abspath(log_file_path))
+logging.info("=" * 80)
 
 # Log para cada request
 @app.before_request
@@ -67,6 +115,19 @@ def log_response_info(response):
     status = "Success" if response.status_code < 400 else "Error"
     logging.info(f"Ruta accedida: {request.path} | Status: {response.status_code} ({status})")
     return response
+
+# Ruta de redirección para /docs → /apidocs
+@app.route('/docs')
+def docs_redirect():
+    """Redirecciona a /apidocs"""
+    return redirect('/apidocs', code=302)
+
+# Ruta de redirección para /docs/ → /apidocs
+@app.route('/docs/')
+def docs_slash_redirect():
+    """Redirecciona a /apidocs"""
+    return redirect('/apidocs', code=302)
+
 # ------------------------------------------------------------------------------
 # Funciones Auxiliares
 # ------------------------------------------------------------------------------
@@ -89,33 +150,341 @@ def utc_time():
 def hello_world():
     """
     Endpoint de prueba para verificar que la API está funcionando.
-    
-    Registra la ejecución en un archivo CSV.
-    
-    Returns:
-        str: Un mensaje de prueba.
+    ---
+    tags:
+      - Testing
+    responses:
+      200:
+        description: Prueba exitosa
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "¡Prueba de Api Exitosa!"
     """
     start_time = time.time()
     end_time = time.time()
     SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "test", 200)
     return '¡Prueba de Api Exitosa!'
 
+@app.route('/inventarios-pendientes', methods=['GET'])
+def obtener_datos_inventarios_pendientes():
+    """
+    Endpoint para obtener lista de inventarios pendientes con predicción de zona.
+    
+    ESTRATEGIA OPTIMIZADA:
+    1. Obtener IDs desde BD (muy rápido)
+    2. Cargar caché con predicciones previas
+    3. Comparar: detectar nuevos
+    4. Predecir solo los nuevos (no recalcular los existentes)
+    5. Combinar caché + nuevas predicciones
+    
+    Retorna todos los inventarios con estado 'Pendiente' junto con:
+    - Datos básicos (ID, Fecha, Elementos, Tiempo de vuelo)
+    - Predicción de zona automática (PF1, PF2, PF5, PT, o null)
+    - Confianza de la predicción
+    - Desglose de zonas detectadas
+    
+    ---
+    tags:
+      - Inventario - Listado
+    responses:
+      200:
+        description: Lista de inventarios pendientes con predicciones
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+              example: true
+            count:
+              type: integer
+              description: Total de inventarios pendientes
+              example: 5
+            inventarios:
+              type: array
+              items:
+                type: object
+                properties:
+                  ID:
+                    type: integer
+                    example: 46
+                  Fecha_Vuelo:
+                    type: string
+                    format: date-time
+                    example: "2026-01-31"
+                  N_Elementos:
+                    type: integer
+                    example: 300
+                  Tiempo_Vuelo:
+                    type: integer
+                    description: Segundos
+                    example: 1200
+                  predicted_zone:
+                    type: string
+                    description: "Zona predicha (PF1, PF2, PF5, PT, o null)"
+                    example: "PF2"
+                  zone_confidence:
+                    type: number
+                    description: Porcentaje de confianza (0-100)
+                    example: 83.5
+                  zone_breakdown:
+                    type: object
+                    description: Desglose de porcentajes por zona
+                    example: {"PF1": 5.0, "PF2": 83.5, "PF5": 11.5}
+      500:
+        description: Error al obtener datos
+    """
+    try:
+        start_time = time.time()
+        
+        # ===== PASO 1: OBTENER IDS DE BD (RÁPIDO) =====
+        time_p1_start = time.time()
+        conn = dbService.get_db_connection()
+        sql_query = '''
+            SELECT ID, Fecha_Vuelo, N_Elementos, Tiempo_Vuelo 
+            FROM Inventario_Vuelos
+            WHERE Estado_Inventario = 'Pendiente' AND N_Elementos > 0 
+            ORDER BY ID DESC
+        '''
+        df_pendientes = dbService.execute_sql_query(sql_query, conn, params=None)
+        dbService.close_connection(conn)
+        time_p1_end = time.time()
+        
+        # Si no hay inventarios pendientes
+        if df_pendientes is None or len(df_pendientes) == 0:
+            logging.info("GET /inventarios-pendientes: No pending inventories found")
+            return jsonify({
+                'success': True,
+                'count': 0,
+                'inventarios': []
+            }), 200
+        
+        bd_ids = set(df_pendientes['ID'].astype(int).tolist())
+        
+        # ===== PASO 2: CARGAR CACHÉ CON PREDICCIONES PREVIAS =====
+        time_p2_start = time.time()
+        cache_file = os.path.join('cache', 'inventarios_pendientes_cache.json')
+        cache_predicciones = {}  # {id: prediction_data}
+        cache_exists = False
+        
+        if os.path.exists(cache_file):
+            try:
+                with open(cache_file, 'r', encoding='utf-8') as f:
+                    cache_data = json.load(f)
+                
+                # Mapear predicciones en caché por ID para búsqueda rápida
+                for inv in cache_data.get('inventarios', []):
+                    cache_predicciones[inv['ID']] = {
+                        'predicted_zone': inv.get('predicted_zone'),
+                        'zone_confidence': inv.get('zone_confidence'),
+                        'zone_breakdown': inv.get('zone_breakdown', {})
+                    }
+                cache_exists = True
+                logging.info(f"GET /inventarios-pendientes: Loaded {len(cache_predicciones)} cached predictions")
+            except Exception as e:
+                logging.warning(f"GET /inventarios-pendientes: Error loading cache - {str(e)}")
+        time_p2_end = time.time()
+        
+        # ===== PASO 3: DETECTAR NUEVOS INVENTARIOS =====
+        time_p3_start = time.time()
+        cache_ids = set(cache_predicciones.keys())
+        nuevos_ids = bd_ids - cache_ids
+        desaparecidos_ids = cache_ids - bd_ids
+        time_p3_end = time.time()
+        
+        logging.info(f"GET /inventarios-pendientes: BD={len(bd_ids)} IDs, Caché={len(cache_ids)} IDs, Nuevos={len(nuevos_ids)}, Desaparecidos={len(desaparecidos_ids)}")
+        
+        # ===== PASO 4: PREDECIR SOLO LOS NUEVOS =====
+        time_p4_start = time.time()
+        nuevas_predicciones = {}
+        
+        if nuevos_ids:
+            logging.info(f"GET /inventarios-pendientes: Calculating predictions for {len(nuevos_ids)} new IDs: {nuevos_ids}")
+            for id_inventario in nuevos_ids:
+                try:
+                    # Predecir zona para este nuevo inventario
+                    prediction = dbService.predict_inventory_zone(id_inventario)
+                    nuevas_predicciones[id_inventario] = {
+                        'predicted_zone': prediction.get('zone'),
+                        'zone_confidence': prediction.get('confidence'),
+                        'zone_breakdown': prediction.get('breakdown', {})
+                    }
+                except Exception as e:
+                    logging.error(f"GET /inventarios-pendientes: Error predicting zone for ID {id_inventario} - {str(e)}")
+                    nuevas_predicciones[id_inventario] = {
+                        'predicted_zone': None,
+                        'zone_confidence': 0,
+                        'zone_breakdown': {}
+                    }
+        time_p4_end = time.time()
+        
+        # ===== PASO 5: COMBINAR CACHÉ + NUEVAS PREDICCIONES =====
+        predicciones_finales = {**cache_predicciones, **nuevas_predicciones}
+        
+        # Construir respuesta con todos los inventarios
+        inventarios_con_prediccion = []
+        
+        for idx, row in df_pendientes.iterrows():
+            id_inventario = int(row['ID'])
+            
+            # Obtener predicción del caché combinado
+            prediction = predicciones_finales.get(id_inventario, {
+                'predicted_zone': None,
+                'zone_confidence': 0,
+                'zone_breakdown': {}
+            })
+            
+            inventario_data = {
+                'ID': id_inventario,
+                'Fecha_Vuelo': str(row['Fecha_Vuelo']),
+                'N_Elementos': int(row['N_Elementos']),
+                'Tiempo_Vuelo': int(row['Tiempo_Vuelo']),
+                'predicted_zone': prediction.get('predicted_zone'),
+                'zone_confidence': prediction.get('zone_confidence'),
+                'zone_breakdown': prediction.get('zone_breakdown', {})
+            }
+            
+            inventarios_con_prediccion.append(inventario_data)
+        
+        end_time = time.time()
+        SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "obtener_inventarios_pendientes", 200)
+        
+        # Mostrar desglose de tiempos
+        total_time = end_time - start_time
+        logging.info(f"""GET /inventarios-pendientes: TIMING BREAKDOWN
+        └─ Paso 1 (BD query): {time_p1_end - time_p1_start:.2f}s
+        └─ Paso 2 (Load cache): {time_p2_end - time_p2_start:.2f}s
+        └─ Paso 3 (Detect new): {time_p3_end - time_p3_start:.2f}s
+        └─ Paso 4 (Predict {len(nuevos_ids)} new): {time_p4_end - time_p4_start:.2f}s (avg {(time_p4_end - time_p4_start) / max(1, len(nuevos_ids)):.2f}s per prediction)
+        └─ TOTAL REQUEST: {total_time:.2f}s
+        ✓ Returned {len(inventarios_con_prediccion)} inventories""")
+        
+        # ===== PASO 6: ACTUALIZAR CACHÉ CON NUEVAS PREDICCIONES =====
+        if nuevas_predicciones:
+            try:
+                cache_dir = 'cache'
+                if not os.path.exists(cache_dir):
+                    os.makedirs(cache_dir, exist_ok=True)
+                
+                cache_data = {
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'count': len(inventarios_con_prediccion),
+                    'inventarios': inventarios_con_prediccion
+                }
+                
+                with open(cache_file, 'w', encoding='utf-8') as f:
+                    json.dump(cache_data, f, indent=2, ensure_ascii=False)
+                
+                logging.info(f"GET /inventarios-pendientes: Cache updated with {len(nuevas_predicciones)} new predictions")
+            except Exception as cache_err:
+                logging.warning(f"GET /inventarios-pendientes: Could not update cache - {str(cache_err)}")
+        
+        return jsonify({
+            'success': True,
+            'count': len(inventarios_con_prediccion),
+            'inventarios': inventarios_con_prediccion
+        }), 200
+    
+    except Exception as e:
+        logging.error(f"GET /inventarios-pendientes: Error - {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'inventarios': []
+        }), 500
+
 @app.route('/dron/actualizar-estado-inventario', methods=['POST'])
 def actualizar_estado_inventario():
     """
     Endpoint para actualizar el estado del inventario basado en los datos del dron.
-    
-    Recibe un JSON con la estructura del inventario, lo valida contra un esquema
-    predefinido y luego llama a un servicio para procesar los datos.
-
-    JSON Schema:
-    - Espera un objeto con una clave "Inventario".
-    - "Inventario" debe ser un array de objetos.
-    - Cada objeto del array debe contener campos específicos como "BatchNumber",
-      "Sequence", "NumeroConteo", etc., todos de tipo string o integer.
-      
-    Returns:
-        tuple: Una tupla con un objeto JSON y un código de estado HTTP.
+    ---
+    tags:
+      - Dron - Inventario
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required:
+            - Inventario
+          properties:
+            Inventario:
+              type: array
+              items:
+                type: object
+                required:
+                  - BatchNumber
+                  - Sequence
+                  - NumeroConteo
+                  - Bodega
+                  - Ubicacion
+                  - NumeroEtiqueta
+                  - CodigoArticulo
+                  - CoordenadaX
+                  - CoordenadaY
+                  - TransactionId
+                  - TotalBatch
+                  - CoordenadaZ
+                properties:
+                  BatchNumber:
+                    type: string
+                    example: "BATCH001"
+                  Sequence:
+                    type: string
+                    example: "1"
+                  NumeroConteo:
+                    type: integer
+                    example: 1
+                  Bodega:
+                    type: string
+                    example: "WAREHOUSE_A"
+                  Ubicacion:
+                    type: string
+                    example: "PT"
+                  NumeroEtiqueta:
+                    type: string
+                    example: "TAG001"
+                  CodigoArticulo:
+                    type: string
+                    example: "ART001"
+                  CoordenadaX:
+                    type: string
+                    example: "10.5"
+                  CoordenadaY:
+                    type: string
+                    example: "20.3"
+                  TransactionId:
+                    type: string
+                    example: "TXN001"
+                  TotalBatch:
+                    type: string
+                    example: "100"
+                  CoordenadaZ:
+                    type: string
+                    example: "5.0"
+    responses:
+      200:
+        description: Inventario actualizado exitosamente
+        schema:
+          type: object
+      404:
+        description: Esquema de archivo no válido
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: "Esquema de Archivo no Valido!"
+      500:
+        description: Error general del servidor
+        schema:
+          type: object
+          properties:
+            Error:
+              type: string
     """
     # Esquema de validación JSON para los datos del inventario.
     json_schema = {
@@ -178,18 +547,54 @@ def actualizar_estado_inventario():
 def actualizar_inventario():
     """
     Endpoint para orquestar el proceso completo de actualización de inventario.
-    
-    - Recibe parámetros de sucursal, ubicación, ID y tipo de inventario.
-    - Conecta y limpia carpetas compartidas.
-    - Llama a la API de JD Edwards para generar un archivo de inventario.
-    - Compara el inventario del dron con el de JD Edwards.
-    - Guarda el resultado en un archivo CSV.
-    - Retorna los datos actualizados a JD Edwards.
-    - Genera un reporte y un video 3D del inventario.
-    - Actualiza el estado en la base de datos local.
-    
-    Returns:
-        tuple: Una tupla con un objeto JSON y un código de estado HTTP.
+    ---
+    tags:
+      - Dron - Inventario
+    parameters:
+      - in: query
+        name: Sucursal
+        type: string
+        default: "SGMINA"
+        description: Código de sucursal
+      - in: query
+        name: Ubicacion
+        type: string
+        default: "PT"
+        description: Código de ubicación
+      - in: query
+        name: ID
+        type: integer
+        required: true
+        description: ID del inventario de vuelo
+      - in: query
+        name: Tipo_Inventario
+        type: string
+        enum: ["Completo", "Parcial"]
+        required: true
+        description: Tipo de inventario a realizar
+    responses:
+      200:
+        description: Inventario actualizado exitosamente en JD
+        schema:
+          type: object
+          properties:
+            OK:
+              type: string
+              example: "Inventario en JD Actualizado con Éxito"
+      404:
+        description: Error en la actualización del inventario
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+      500:
+        description: Error general del servidor
+        schema:
+          type: object
+          properties:
+            Error General:
+              type: string
     """
     start_time = time.time()
     
@@ -273,11 +678,38 @@ def actualizar_inventario():
 def eliminar_inventario():
     """
     Endpoint para eliminar un registro de inventario de vuelo de la base de datos.
-
-    Recibe el ID del inventario como parámetro de la URL.
-    
-    Returns:
-        tuple: Una tupla con un objeto JSON y un código de estado HTTP.
+    ---
+    tags:
+      - Dron - Inventario
+    parameters:
+      - in: query
+        name: ID
+        type: integer
+        required: true
+        description: ID del inventario a eliminar
+    responses:
+      200:
+        description: Inventario eliminado exitosamente
+        schema:
+          type: object
+          properties:
+            OK:
+              type: string
+              example: "Inventario eliminado con Éxito"
+      404:
+        description: Error al eliminar inventario
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+      500:
+        description: Error general del servidor
+        schema:
+          type: object
+          properties:
+            Error:
+              type: string
     """
     start_time = time.time()
     
@@ -307,9 +739,20 @@ def eliminar_inventario():
 def post_data():
     """
     Endpoint genérico para recibir datos JSON.
-    
-    Returns:
-        tuple: Una tupla con un objeto JSON y un código de estado HTTP 201 (Created).
+    ---
+    tags:
+      - Data
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+    responses:
+      201:
+        description: Datos recibidos exitosamente
+        schema:
+          type: object
     """
     new_data = request.json
     return jsonify(new_data), 201
@@ -318,14 +761,42 @@ def post_data():
 def upload_file():
     """
     Endpoint para recibir y procesar archivos CSV del dron.
-    
-    - Valida que se haya subido un archivo.
-    - Genera un nombre de archivo único con un UUID y una marca de tiempo.
-    - Guarda el archivo en la carpeta de drones.
-    - Actualiza los registros de la base de datos y los logs.
-    
-    Returns:
-        tuple: Una tupla con un objeto JSON y un código de estado HTTP.
+    ---
+    tags:
+      - File Upload
+    consumes:
+      - multipart/form-data
+    parameters:
+      - in: formData
+        name: file
+        type: file
+        required: true
+        description: Archivo CSV con registros EPC
+    responses:
+      200:
+        description: Archivo cargado exitosamente
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "File successfully uploaded"
+            filename:
+              type: string
+      400:
+        description: Error de validación de archivo
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+      500:
+        description: Error en el procesamiento del archivo
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
     """
     start_time = time.time()
 
@@ -363,18 +834,152 @@ def upload_file():
         SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "Upload_File", 200)
         return jsonify({'message': 'File successfully uploaded', 'filename': filename}), 200
 
+@app.route('/predict-zone', methods=['POST'])
+def predict_zone():
+    """
+    Endpoint para predecir la zona (PF1, PF2, PF5, PT) de un inventario.
+    
+    Analiza la distribución de ubicaciones (zonas) de los EPCs en un inventario
+    y predice su zona basado en el porcentaje de ocurrencias.
+    
+    Reglas de predicción:
+    - Si una zona tiene >60% de EPCs → retorna esa zona
+    - Si múltiples zonas con distribución mixta → retorna 'PT' (todas)
+    - Si ninguna cumple criterios → retorna null (Unknown)
+    
+    ---
+    tags:
+      - Inventario - Análisis
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required:
+            - id_inventario
+          properties:
+            id_inventario:
+              type: integer
+              description: ID del inventario a analizar
+              example: 46
+    responses:
+      200:
+        description: Predicción de zona exitosa
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+              example: true
+            zone:
+              type: string
+              description: "Zona predicha (PF1, PF2, PF5, PT, o null)"
+              example: "PF2"
+            confidence:
+              type: number
+              description: "Porcentaje de confianza (0-100, null si es PT)"
+              example: 83.5
+            breakdown:
+              type: object
+              description: "Desglose de porcentajes por zona"
+              example: {"PF1": 5.0, "PF2": 83.5, "PF5": 11.5}
+            total_elements:
+              type: integer
+              description: "Total de EPCs analizados"
+              example: 200
+      400:
+        description: Parámetros inválidos o inventario no encontrado
+      500:
+        description: Error interno del servidor
+    """
+    try:
+        start_time = time.time()
+        
+        # Obtener ID del inventario desde el request
+        data = request.get_json()
+        
+        if not data:
+            logging.warning("POST /predict-zone: Request sin JSON")
+            return jsonify({'success': False, 'error': 'Request body must be JSON'}), 400
+        
+        id_inventario = data.get('id_inventario')
+        
+        if not id_inventario:
+            logging.warning("POST /predict-zone: Missing id_inventario parameter")
+            return jsonify({'success': False, 'error': 'id_inventario is required'}), 400
+        
+        # Validar que sea un entero
+        try:
+            id_inventario = int(id_inventario)
+        except (TypeError, ValueError):
+            logging.warning(f"POST /predict-zone: id_inventario no es entero: {id_inventario}")
+            return jsonify({'success': False, 'error': 'id_inventario must be an integer'}), 400
+        
+        # Llamar función de predicción
+        prediction = dbService.predict_inventory_zone(id_inventario)
+        
+        if prediction.get('error'):
+            logging.error(f"POST /predict-zone: Error en predicción - {prediction['error']}")
+            return jsonify({
+                'success': False,
+                'error': prediction['error']
+            }), 500
+        
+        end_time = time.time()
+        SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "predict_zone", 200)
+        
+        logging.info(f"POST /predict-zone: ID={id_inventario}, Zone={prediction['zone']}, Confidence={prediction['confidence']}%")
+        
+        return jsonify({
+            'success': True,
+            'zone': prediction['zone'],
+            'confidence': prediction['confidence'],
+            'breakdown': prediction['breakdown'],
+            'total_elements': prediction['total_elements']
+        }), 200
+    
+    except Exception as e:
+        logging.error(f"POST /predict-zone: Error general - {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/printer/<msg>', methods=['POST'])
 def show_message(msg):
     """
     Endpoint de 'Keep Alive' para que el dron verifique la conectividad con el servidor.
-    
-    También verifica si se ha presionado un botón en la interfaz web para
-    solicitar al dron que envíe los datos.
-    - Retorna 200 si solo es un 'keep alive'.
-    - Retorna 201 si el botón de 'envío de datos' ha sido presionado.
-    
-    Returns:
-        tuple: Una tupla con un objeto JSON y un código de estado HTTP.
+    ---
+    tags:
+      - Keep Alive
+    parameters:
+      - in: path
+        name: msg
+        type: string
+        required: true
+        description: Mensaje de keep alive
+    responses:
+      200:
+        description: Keep alive registrado (sin solicitud de envío)
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "ok"
+      201:
+        description: Keep alive registrado (solicitud de envío de datos activa)
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "ok"
+      500:
+        description: Error en el servidor
+        schema:
+          type: object
+          properties:
+            Error:
+              type: string
     """
     try:
         client_ip = request.remote_addr
@@ -392,13 +997,25 @@ def show_message(msg):
 def TestJDFolder():
     """
     Endpoint de prueba para verificar la conexión a la carpeta compartida de JD.
-    
-    Conecta a la carpeta compartida utilizando las credenciales de las
-    variables de entorno.
-    
-    Returns:
-        tuple: Una tupla con un mensaje de estado o un objeto JSON de error
-               y su código de estado HTTP.
+    ---
+    tags:
+      - Testing
+    responses:
+      200:
+        description: Conexión exitosa a la carpeta compartida
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "OK"
+      500:
+        description: Error de conexión
+        schema:
+          type: object
+          properties:
+            Error:
+              type: string
     """
     try:
         print("connecting to: " + os.getenv('JD_REMOTE_FOLDER') + " with user " + os.getenv('JD_REMOTE_FOLDER_USERNAME'))
@@ -416,6 +1033,9 @@ def TestJDFolder():
 if __name__ == '__main__':
     """
     El bloque principal del script que inicia el servidor Flask en el host
-    '0.0.0.0' y en el puerto 5100.
+    '0.0.0.0' (todas las interfaces) y en el puerto configurado en .env
     """
-    app.run(host='0.0.0.0', port=5100)
+    port = int(API_PORT)
+    logging.info(f"Iniciando servidor en http://{API_HOST}:{API_PORT}")
+    logging.info(f"Swagger UI disponible en http://{API_HOST}:{API_PORT}/apidocs")
+    app.run(host='0.0.0.0', port=port)

@@ -4,65 +4,124 @@ Este repositorio contiene la API Flask (backend) y la interfaz Streamlit (web) p
 
 ## Archivos principales
 - [Server.py](Server.py) — Servidor Flask que expone endpoints para orquestar la actualización de inventarios, recepción de archivos y keep-alive del dron. Referencias a funciones clave:
-  - [`Server.actualizar_inventario`](Server.py) — Orquesta generación/recepción/comparación de inventario con JD Edwards, persistencia y creación de video.
-  - [`Server.actualizar_estado_inventario`](Server.py) — Endpoint que valida y procesa el JSON de estado de inventario.
-  - [`Server.upload_file`](Server.py) — Endpoint `/upload` que recibe CSVs desde el dron y los guarda/registrar en DB.
-  - [`Server.show_message`](Server.py) — Endpoint `/printer/<msg>` usado como keep-alive y para detectar petición web de envío desde la UI.
-- [Webserver/inicio.py](Webserver/inicio.py) — Aplicación Streamlit que implementa la UI de inicio/login y puntos de entrada a las páginas. Función relevante:
-  - [`inicio.log_event`](Webserver/inicio.py) — Helper para escribir eventos en LOG_FILE.
-
-También útil:
+  - `actualizar_inventario` — Orquesta generación/recepción/comparación de inventario con JD Edwards, persistencia y creación de video.
+  - `actualizar_estado_inventario` — Endpoint que valida y procesa el JSON de estado de inventario.
+  - `upload_file` — Endpoint `/upload` que recibe CSVs desde el dron y los guarda/registra en BD.
+  - `show_message` — Endpoint `/printer/<msg>` usado como keep-alive y para detectar petición web de envío desde la UI.
+- [Webserver/inicio.py](Webserver/inicio.py) — Aplicación Streamlit que implementa la UI de inicio/login y puntos de entrada a las páginas.
 - [Webserver/Webserver_as_a_service.bat](Webserver/Webserver_as_a_service.bat) — Script de Windows para iniciar la UI Streamlit en modo headless.
 
+## 📚 Documentación API (Swagger/OpenAPI)
+
+La API incluye documentación interactiva generada automáticamente con **Swagger UI** usando **Flasgger**.
+
+### Acceso a Swagger UI
+Una vez que el servidor Flask esté ejecutándose, accede a la documentación interactiva:
+
+```
+http://localhost:5100/apidocs
+```
+
+**Alternativas:**
+- ReDoc (documentación alternativa): `http://localhost:5100/redoc`
+- Especificación JSON: `http://localhost:5100/swagger.json`
+
+### Características de la documentación
+- ✅ Descripción detallada de cada endpoint
+- ✅ Parámetros de entrada y validaciones
+- ✅ Esquemas de respuesta para cada código de estado HTTP
+- ✅ Interfaz interactiva para probar endpoints
+- ✅ Ejemplos de uso y respuestas
+
+Para más detalles, ver [SWAGGER.md](SWAGGER.md).
+
 ## Flujo rápido (alto nivel)
-1. El dron o cliente sube CSVs a `POST /upload` (`Server.upload_file`) → Server guarda archivos y actualiza DB.
-2. Desde la UI Streamlit se invocan acciones que llaman endpoints como `/dron/actualizar-inventario` (`Server.actualizar_inventario`) o `/dron/actualizar-estado-inventario` (`Server.actualizar_estado_inventario`) para orquestar la generación de conteos en JD, comparar y persistir resultados.
-3. El endpoint `/printer/<msg>` (`Server.show_message`) sirve como heartbeat/keep-alive y detecta si la UI solicitó al dron enviar datos (devuelve 201 si se presionó el botón).
-4. Logs y auditoría: el servidor escribe en el fichero configurado por `DRON_API_LOG_PATH` (ver `.env`) y en CSVs mediante `Services/LogService.py`.
+1. El dron o cliente sube CSVs a `POST /upload` → Server guarda archivos y actualiza BD.
+2. Desde la UI Streamlit se invocan acciones llamando endpoints como `POST /dron/actualizar-inventario` o `POST /dron/actualizar-estado-inventario` para orquestar la generación de conteos en JD, comparar y persistir resultados.
+3. El endpoint `POST /printer/<msg>` sirve como heartbeat/keep-alive y detecta si la UI solicitó al dron enviar datos (devuelve 201 si se presionó el botón).
+4. **Logs y auditoría:** El servidor escribe en el fichero configurado por `DRON_API_LOG_PATH` y en CSVs mediante `Services/LogService.py`.
 
 ## Variables de entorno (usadas con dotenv)
-- DRON_API_LOG_PATH — ruta por defecto del log del servidor (p. ej. `D:/logs/Sierra_dron_api.txt`).
-- JD_REMOTE_FOLDER, JD_REMOTE_FOLDER_USERNAME, JD_REMOTE_FOLDER_PASSWORD — usadas por `Services.DronService`.
-- DB_DRON_* — credenciales de la BD usadas por `Webserver/Functions/DB_Service.py`.
-- DRON_FOLDER — carpeta donde se almacenan archivos recibidos del dron.
+- `DRON_API_LOG_PATH` — Ruta por defecto del log del servidor (p. ej. `D:/logs/Sierra_dron_api.txt`).
+- `JD_REMOTE_FOLDER`, `JD_REMOTE_FOLDER_USERNAME`, `JD_REMOTE_FOLDER_PASSWORD` — Usadas por `Services.DronService` para conectar a carpeta compartida de JD Edwards.
+- `DB_DRON_*` — Credenciales de la BD usadas por `Webserver/Functions/DB_Service.py`.
+- `DRON_FOLDER` — Carpeta donde se almacenan archivos recibidos del dron.
 
 (Revisa el `.env` en la raíz para valores actuales.)
 
 ## Cómo ejecutar (desarrollo)
-- Iniciar la API Flask:
-  - Desde la raíz del repo:
-    ```sh
-    python Server.py
-    ```
-  - El servidor escucha por defecto en `0.0.0.0:5100`.
 
-- Iniciar la UI Streamlit:
-  - Manual:
-    ```sh
-    streamlit run Webserver/inicio.py --server.headless true
-    ```
-  - En Windows como servicio (usa el .bat):
-    - Ejecutar: 
+### Iniciar la API Flask
+Desde la raíz del repo:
+```bash
+python Server.py
+```
+- El servidor escucha por defecto en `0.0.0.0:5100`
+- Accede a Swagger en: `http://localhost:5100/apidocs`
 
-## Rutas importantes (ejemplos)
-- GET /test — endpoint de prueba.
-- POST /upload — subir archivo CSV ().
-- POST /dron/actualizar-inventario — proceso principal ().
-- POST /dron/actualizar-estado-inventario — valida y actualiza estado ().
-- POST /printer/<msg> — heartbeat / comprobar botón de envío ().
+### Iniciar la UI Streamlit
+**Manual:**
+```bash
+streamlit run Webserver/inicio.py --server.headless true
+```
+
+**En Windows como servicio (usa el script .bat):**
+```bash
+Webserver_as_a_service.bat
+```
+
+## Endpoints principales
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| GET | `/test` | Endpoint de prueba de conectividad |
+| POST | `/upload` | Subir archivo CSV desde el dron |
+| POST | `/dron/actualizar-inventario` | Proceso principal de actualización de inventario |
+| POST | `/dron/actualizar-estado-inventario` | Valida y actualiza estado del inventario |
+| POST | `/printer/<msg>` | Heartbeat / comprobar solicitud de envío |
+| POST | `/dron/eliminar-inventario` | Eliminar registro de inventario |
+| POST | `/dron/TestJDFolder` | Verificar conexión a carpeta compartida de JD |
+| POST | `/api/data` | Endpoint genérico para recibir datos JSON |
 
 ## Logs y trazabilidad
-- El logger del servidor se configura en  y escribe en la ruta indicada por `DRON_API_LOG_PATH`.
-- Las ejecuciones y recepciones de archivos se registran con .
+- **Logger del servidor:** Se configura en `Server.py` y escribe en la ruta indicada por `DRON_API_LOG_PATH`
+- **Auditoría:** Las ejecuciones y recepciones de archivos se registran con `Services/LogService.py`
+- **Histórico de ejecuciones:** Ver `Api_Executions.csv`
 
 ## Dónde mirar para entender la lógica completa
-- Lógica de integración con JD: 
-- Persistencia y consultas:  y 
-- Procesamiento de CSVs recibidos:  y 
+- **Integración con JD Edwards:** [Services/JDService.py](Services/JDService.py)
+- **Persistencia de datos:** [Services/MsSQL_Service.py](Services/MsSQL_Service.py), [Services/SQLite_Service.py](Services/SQLite_Service.py)
+- **Procesamiento de CSVs:** [DRON/Suscriber_Reader.py](DRON/Suscriber_Reader.py), [DRON/EpcTranslator.py](DRON/EpcTranslator.py)
+- **Generación de videos 3D:** [Services/Video_Service.py](Services/Video_Service.py)
+
+## Instalación de dependencias
+
+```bash
+pip install -r requirements.txt
+```
+
+Este proyecto requiere:
+- Python 3.8+
+- Flask 3.0.3
+- Flasgger 0.9.7.1 (para documentación Swagger)
+- Streamlit (para UI)
+- pandas, pyodbc, python-dotenv, y más (ver requirements.txt)
+
+## Remote de respaldo en Azure DevOps
+
+El repositorio está configurado con un remote de respaldo en Azure DevOps:
+
+```bash
+# Ver remotes
+git remote -v
+
+# Hacer push a respaldo
+git push backup main
+
+# Push forzado (reemplaza contenido)
+git push backup main --force
+```
 
 ---
 
-Para cambios puntuales en comportamiento del endpoint o flujos, abrir los archivos:
-- 
-- 
-- 
+Para cambios puntuales en comportamiento del endpoint o flujos, abrir los archivos relevantes en `Server.py`, `Services/`, o `DRON/`.

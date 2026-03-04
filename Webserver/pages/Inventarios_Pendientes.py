@@ -5,6 +5,8 @@ import time
 import pandas as pd
 import streamlit as st
 import plotly.express as px
+import requests
+import json
 
 import extra_streamlit_components as stx
 
@@ -50,7 +52,74 @@ if 'run_button' in st.session_state and st.session_state.run_button == True:
     st.session_state.running = True
 else:
     st.session_state.running = False
-    # Crear la página "Inventarios Pendientes"
+
+# Función para obtener datos desde la API /inventarios-pendientes
+# El servidor maneja caché inteligentemente: carga datos BD + caché + solo predice nuevos
+def obtener_inventarios_con_predicciones(force_refresh=False):
+    """
+    Obtiene inventarios pendientes desde la API /inventarios-pendientes.
+    
+    El SERVIDOR maneja la optimización:
+    1. Obtiene IDs de BD (rápido)
+    2. Carga caché de predicciones (instantáneo)
+    3. Detecta nuevos IDs
+    4. Predice SOLO los nuevos (no recalcula existentes)
+    5. Combina caché + nuevas predicciones
+    6. Actualiza caché
+    
+    Streamlit solo necesita llamar a la API y mostrar resultados.
+    """
+    try:
+        api_url = "http://10.185.36.30:5100/inventarios-pendientes"
+        response = requests.get(api_url, timeout=30)
+        
+        if response.status_code == 200:
+            datos_api_response = response.json()
+            if isinstance(datos_api_response, dict) and "inventarios" in datos_api_response:
+                inventarios_list = datos_api_response["inventarios"]
+                
+                if isinstance(inventarios_list, list) and len(inventarios_list) > 0:
+                    # Mapear campos de API a formato estandarizado
+                    datos_mapeados = []
+                    for inv in inventarios_list:
+                        datos_mapeados.append({
+                            'id': inv.get('ID'),
+                            'fecha_vuelo': inv.get('Fecha_Vuelo'),
+                            'elementos': inv.get('N_Elementos'),
+                            'tiempo_vuelo': inv.get('Tiempo_Vuelo'),
+                            'predicted_zone': inv.get('predicted_zone'),
+                            'confidence': inv.get('zone_confidence', 0),
+                            'breakdown': inv.get('zone_breakdown', {})
+                        })
+                    st.session_state.api_success = True
+                    print(f"[STREAMLIT] API returned {len(datos_mapeados)} inventories")
+                    return datos_mapeados
+    except Exception as e:
+        print(f"[STREAMLIT] Error calling API: {str(e)}")
+        st.session_state.api_success = False
+    
+    # FALLBACK: Usar DB si API falla
+    try:
+        datos_db = DB.obtener_datos_inventarios_pendientes()
+        datos_convertidos = []
+        for inv in datos_db:
+            datos_convertidos.append({
+                'id': inv[0],
+                'fecha_vuelo': inv[1],
+                'elementos': inv[2],
+                'tiempo_vuelo': inv[3],
+                'predicted_zone': None,
+                'confidence': 0,
+                'breakdown': {}
+            })
+        st.session_state.api_success = False
+        print(f"[STREAMLIT] Fallback to DB with {len(datos_convertidos)} inventories")
+        return datos_convertidos
+    except Exception as e:
+        print(f"[STREAMLIT] Error getting data: {str(e)}")
+        return []
+
+# Crear la página "Inventarios Pendientes"
 
 
 
@@ -112,8 +181,18 @@ with st.expander("Inventarios Pendientes",expanded=True,):
 
 # st.title("Inventarios Pendientes")
 
-    #Obtener inventarios pendientes
-    datos = DB.obtener_datos_inventarios_pendientes()
+    # ===== OBTENER INVENTARIOS DESDE API =====
+    # Obtener inventarios pendientes con predicciones desde API /inventarios-pendientes
+    datos = obtener_inventarios_con_predicciones()
+    
+    # Si usamos la API, mostrar un indicador
+    #if st.session_state.get('api_success', False):
+    #    st.success("✅ Datos cargados desde API con predicciones de zona")
+    #elif len(datos) > 0:
+    #    st.info("ℹ️ Datos cargados desde Base de Datos (API no disponible)", icon="ℹ️")
+    
+    # CÓDIGO ANTIGUO COMENTADO POR SI HAY ERRORES:
+    # datos = DB.obtener_datos_inventarios_pendientes()
     #if len(datos) >0:
     #    total_seconds =sum(row[3] for row in datos)/len(datos)
     #else:
@@ -182,59 +261,102 @@ with st.expander("Inventarios Pendientes",expanded=True,):
     fila = len(datos)
     if datos:
         for inventario in datos:
+            # ===== MANEJAR DATOS DE API O DB =====
+            # Si viene de la API, es un dict; si viene de DB, es una tupla
+            if isinstance(inventario, dict):
+                inv_id = inventario.get('id')
+                inv_fecha = inventario.get('fecha_vuelo')
+                inv_elementos = inventario.get('elementos')
+                inv_tiempo = inventario.get('tiempo_vuelo')
+                predicted_zone = inventario.get('predicted_zone')  # Predicción de zona
+                confidence = inventario.get('confidence', 0)  # Confianza de la predicción
+            else:
+                # Fallback para datos de DB (tupla)
+                inv_id = inventario[0]
+                inv_fecha = inventario[1]
+                inv_elementos = inventario[2]
+                inv_tiempo = inventario[3]
+                predicted_zone = None
+                confidence = 0
+            
             # Each row of the table
-            col1, col2, col3, col4, col5, col6,col7,col8 = st.columns([1, 2, 1, 1, 2, 2,1,1], gap="small", vertical_alignment="center")
+            col1, col2, col3, col4, col5, col6, col7, col8 = st.columns([1, 2, 1, 1, 2, 2, 1, 1], gap="small", vertical_alignment="center")
 
             # Column 1: ID Inventario
             col1.write(f"<p style='text-align: center;'>{fila}</p>", unsafe_allow_html=True)
-            fila -=1
+            fila -= 1
 
             # Column 2: Fecha de Vuelo
-            col2.write(f"<p style='text-align: center;'>{DB.format_datetime(inventario[1])}</p>", unsafe_allow_html=True)
+            col2.write(f"<p style='text-align: center;'>{DB.format_datetime(inv_fecha)}</p>", unsafe_allow_html=True)
 
-            # Column 3: Elementos Detectador
-            col3.write(f"<p style='text-align: center;'>{inventario[2]}</p>", unsafe_allow_html=True)
-            # Column 3: Elementos Detectador
-            #minutes = str(inventario[3] // 60).zfill(2)
-            #seconds = str(inventario[3] % 60).zfill(2)
-            #col4.write(minutes+":"+seconds)
-            #col4.write(DB.seconds_to_hhmmss(inventario[3]))
-            col4.write(f"<p style='text-align: center;'>{DB.format_seconds_HHMMSS(inventario[3])}</p>", unsafe_allow_html=True)
-            # Column 4: Tipo Inventario dropdown
-            tipo_inventario = col5.selectbox("Tipo Inventario", ["Parcial", "Completo"], key=f"tipo_{inventario[0]}",label_visibility="collapsed")
+            # Column 3: Elementos Detectados
+            col3.write(f"<p style='text-align: center;'>{inv_elementos}</p>", unsafe_allow_html=True)
 
+            # Column 4: Tiempo de Vuelo
+            col4.write(f"<p style='text-align: center;'>{DB.format_seconds_HHMMSS(inv_tiempo)}</p>", unsafe_allow_html=True)
+            
+            # ===== LÓGICA DE PRESELECCIÓN BASADA EN PREDICCIÓN =====
+            # Determinar valores por defecto basados en predicted_zone
+            default_tipo = "Completo" if predicted_zone == "PT" else "Parcial"
+            # Si hay predicción y es una zona válida, úsala; si no, PF1 como default
+            default_zona = predicted_zone if (predicted_zone and predicted_zone in ["PF1", "PF2", "PF3", "PF4", "PF5"]) else " "
+            
+            # Column 5: Tipo Inventario dropdown con PRESELECCIÓN
+            # Si predicted_zone es "PT", preselecciona "Completo"
+            tipo_inventario = col5.selectbox(
+                "Tipo Inventario", 
+                ["Parcial", "Completo"], 
+                index=0 if default_tipo == "Parcial" else 1,  # Índice basado en predicción
+                key=f"tipo_{inv_id}",
+                label_visibility="collapsed",
+                help=f"Predicción: {predicted_zone} (Confianza: {confidence:.0%})" if predicted_zone else "Sin predicción disponible"
+            )
+
+            # Deshabilitar zona si se selecciona "Completo" (PT)
             zona_disabled = True if tipo_inventario == "Completo" else False
-            # Column 5: Zona dropdown
-            zona = col6.selectbox("Zona", ["PF1", "PF2", "PF3","PF4","PF5"], key=f"zona_{inventario[0]}", help="S= Shelving, P= Pasillo y F=Fila",label_visibility="collapsed",disabled=zona_disabled)
+            
+            # Column 6: Zona dropdown con PRESELECCIÓN
+            # Si predicted_zone es una zona válida (PF1-PF5), preselecciona esa zona
+            zona_options = [" ","PF1", "PF2", "PF3", "PF4", "PF5"]
+            try:
+                default_index = zona_options.index(default_zona)
+            except ValueError:
+                default_index = 0  # Si no encontramos la zona, usa PF1 (índice 0)
+            
+            modo_prediccion = "🤖 Predicción automática" if (predicted_zone and predicted_zone in zona_options) else "Manual"
+            confidence_text = f"(Confianza: {confidence:.0%})" if confidence > 0 else ""
+            
+            zona = col6.selectbox(
+                "Zona", 
+                zona_options, 
+                index=default_index,  # Índice basado en predicción
+                key=f"zona_{inv_id}", 
+                help=f"{modo_prediccion} {confidence_text}" if confidence > 0 else "Selección manual",
+                label_visibility="collapsed",
+                disabled=zona_disabled
+            )
 
-            # Column 6: Acción button
-            if col7.button("▶️", key=f"iniciar_{inventario[0]}", help="Enviar Inventario a JD Edwards"): #Si el boton es presionado entonces:
-                # When the button is clicked, refer to the inventory update page
-                # Disable the button
+            # Column 7: Botón de acción (Enviar a JD Edwards)
+            if col7.button("▶️", key=f"iniciar_{inv_id}", help="Enviar Inventario a JD Edwards"):
                 st.session_state.button_disabled = True
                 with st.spinner("Procesando..."):
                     try:
-                        result = DB.Generar_Inventario(f"http://127.0.0.1:5100/dron/actualizar-inventario?Tipo_Inventario={tipo_inventario}&Ubicacion={zona}&ID={inventario[0]}")
+                        # CÓDIGO ANTIGUO (comentado por si hay errores):
+                        # result = DB.Generar_Inventario(f"http://127.0.0.1:5100/dron/actualizar-inventario?Tipo_Inventario={tipo_inventario}&Ubicacion={zona}&ID={inv_id}")
+                        result = DB.Generar_Inventario(f"http://10.185.36.30:5100/dron/actualizar-inventario?Tipo_Inventario={tipo_inventario}&Ubicacion={zona}&ID={inv_id}")
                         DB.show_popup(result)
-                        datos =DB.obtener_datos_inventarios_pendientes() #Actualizar Tabla
+                        # Actualizar tabla
+                        datos = obtener_inventarios_con_predicciones()  # Usar función con API
                         st.rerun()
-                        # Disable the button
-                        
                     except Exception as e:
-                        st.error(f"invp Error Conectado a Servidor, por favor, intenta mas tarde!" + str(e))
+                        st.error(f"Error conectando a Servidor, por favor intenta más tarde: {str(e)}")
                         st.session_state.button_disabled = False
-        
             
-            if col8.button("🗑️", key=f"Eliminar_{inventario[0]}", help="Eliminar inventario"): #Si el boton es presionado entonces:
-                    
-                    DB.eliminar_inventario_dialog(inventario[0])
+            # Column 8: Botón de eliminar
+            if col8.button("🗑️", key=f"Eliminar_{inv_id}", help="Eliminar inventario"):
+                DB.eliminar_inventario_dialog(inv_id)
 
-                    
-                        
-                
-
-            st.write('')    
-                #st.experimental_rerun(f"http://127.0.0.1:5100/actualizar-estado-inventario?sucursal={tipo_inventario}&Ubicacion={zona}&ID={inventario[0]}")
+            st.write('')
 
     else:
         st.write("No hay inventarios pendientes.")

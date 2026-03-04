@@ -190,13 +190,16 @@ def Limpiar_Archivos_Dron(df,DRON_FOLDER):
 
     Args:
         df (pandas.DataFrame): El DataFrame original con los datos.
+        DRON_FOLDER (str): Carpeta donde guardar los archivos limpios.
 
     Returns:
         list: Lista de nombres de archivos (str) creados.
     """
     # Verificar si la columna 'Timestamp' existe
     if 'Timestamp' not in df.columns:
-        raise ValueError("La columna 'Timestamp' no se encuentra en el archivo CSV.")
+        # Si no existe, crear una columna 'Timestamp' con la fecha y hora actual
+        print("Advertencia: La columna 'Timestamp' no se encuentra en el archivo CSV. Se creará con la hora actual.")
+        df['Timestamp'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     # Convertir la columna 'Timestamp' a datetime
     # Asumiendo el formato: 'YYYY-MM-DD HH:MM:SS'

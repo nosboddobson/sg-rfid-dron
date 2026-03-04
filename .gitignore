@@ -12,6 +12,8 @@ Api_Executions.csv
 # C extensions
 *.so
 .venv
+output_Inventario.json
+
 
 # Distribution / packaging
 .Python

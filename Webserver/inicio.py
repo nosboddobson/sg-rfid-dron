@@ -8,19 +8,69 @@ import extra_streamlit_components as stx
 import os
 from PIL import Image
 from datetime import datetime
+import logging
+from logging.handlers import RotatingFileHandler
 
-LOG_FILE = "d:/logs/Sierra_dron_web.txt"
+# ============================================================================
+# Configuración de Logging
+# ============================================================================
+# Cargar variables de entorno
+load_dotenv(override=True)
 
-def log_event(event):
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+# Crear directorio de logs si no existe (en la raíz del proyecto)
+logs_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logs')
+if not os.path.exists(logs_dir):
+    os.makedirs(logs_dir)
+
+# Configurar el archivo de log para Streamlit
+log_file_path = os.path.join(logs_dir, 'streamlit.log')
+
+# Configurar logger con RotatingFileHandler
+logger = logging.getLogger('streamlit_app')
+logger.setLevel(logging.INFO)
+
+# Limpiar handlers existentes
+logger.handlers = []
+
+# RotatingFileHandler: máximo 5MB (5242880 bytes), mantiene 5 archivos de respaldo
+rotating_handler = RotatingFileHandler(
+    log_file_path,
+    maxBytes=5242880,  # 5 MB
+    backupCount=5,      # Mantiene 5 archivos de respaldo (streamlit.log.1, streamlit.log.2, etc.)
+    encoding='utf-8'
+)
+
+# Formato del log
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+rotating_handler.setFormatter(formatter)
+logger.addHandler(rotating_handler)
+
+# Función mejorada para registrar eventos
+def log_event(event, level="info"):
+    """
+    Registra un evento en el archivo de log.
+    
+    Args:
+        event (str): El mensaje a registrar
+        level (str): Nivel de log ('info', 'warning', 'error', 'debug')
+    """
     try:
-        with open(LOG_FILE, "a", encoding="utf-8") as f:
-            f.write(f"[{timestamp}] {event}\n")
+        if level.lower() == "error":
+            logger.error(event)
+        elif level.lower() == "warning":
+            logger.warning(event)
+        elif level.lower() == "debug":
+            logger.debug(event)
+        else:
+            logger.info(event)
     except Exception as e:
         pass  # Optionally handle logging errors
 
-# Log when the website starts
-#log_event("Website started")
+# Log cuando el sitio Streamlit inicia
+logger.info("=" * 80)
+logger.info("Sitio web Streamlit iniciado.")
+logger.info("Logs guardados en: " + os.path.abspath(log_file_path))
+logger.info("=" * 80)
 
 
 st.set_page_config(page_title="Inicio", layout="wide", initial_sidebar_state="collapsed")
