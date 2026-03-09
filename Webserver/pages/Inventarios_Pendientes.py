@@ -263,21 +263,23 @@ with st.expander("Inventarios Pendientes",expanded=True,):
         for inventario in datos:
             # ===== MANEJAR DATOS DE API O DB =====
             # Si viene de la API, es un dict; si viene de DB, es una tupla
+            # Inicializar variables por defecto
+            predicted_zone = " "
+            confidence = 0
+            
             if isinstance(inventario, dict):
                 inv_id = inventario.get('id')
                 inv_fecha = inventario.get('fecha_vuelo')
                 inv_elementos = inventario.get('elementos')
                 inv_tiempo = inventario.get('tiempo_vuelo')
                 predicted_zone = inventario.get('predicted_zone')  # Predicción de zona
-                confidence = inventario.get('confidence', 0)  # Confianza de la predicción
+                confidence = inventario.get('confidence') or 0  # Confianza de la predicción
             else:
                 # Fallback para datos de DB (tupla)
                 inv_id = inventario[0]
                 inv_fecha = inventario[1]
                 inv_elementos = inventario[2]
                 inv_tiempo = inventario[3]
-                predicted_zone = None
-                confidence = 0
             
             # Each row of the table
             col1, col2, col3, col4, col5, col6, col7, col8 = st.columns([1, 2, 1, 1, 2, 2, 1, 1], gap="small", vertical_alignment="center")

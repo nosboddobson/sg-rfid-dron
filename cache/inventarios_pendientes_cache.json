@@ -1,22 +1,152 @@
 {
-  "timestamp": "2026-03-04T14:47:59.261856",
-  "count": 30,
+  "timestamp": "2026-03-09T10:25:45.406144",
+  "count": 40,
   "inventarios": [
     {
-      "ID": 1582,
-      "Fecha_Vuelo": "2026-03-04 11:59:59",
-      "N_Elementos": 204,
-      "Tiempo_Vuelo": 973,
-      "predicted_zone": "PF5",
-      "zone_confidence": 72.09,
+      "ID": 1599,
+      "Fecha_Vuelo": "2026-03-09 10:10:05",
+      "N_Elementos": 247,
+      "Tiempo_Vuelo": 705,
+      "predicted_zone": "PF3",
+      "zone_confidence": 73.66,
       "zone_breakdown": {
-        "PF5": 72.09,
-        "PT": 18.29,
-        "PF1": 5.63,
-        "PF4": 3.1,
-        "PF3": 0.83,
+        "PF3": 73.66,
+        "PT": 22.1,
+        "PF1": 3.58,
+        "PF2": 0.51,
+        "PF5": 0.1,
+        "PF4": 0.05
+      }
+    },
+    {
+      "ID": 1598,
+      "Fecha_Vuelo": "2026-03-08 17:21:54",
+      "N_Elementos": 2,
+      "Tiempo_Vuelo": 0,
+      "predicted_zone": null,
+      "zone_confidence": 0,
+      "zone_breakdown": {}
+    },
+    {
+      "ID": 1596,
+      "Fecha_Vuelo": "2026-03-08 16:57:14",
+      "N_Elementos": 229,
+      "Tiempo_Vuelo": 603,
+      "predicted_zone": "PF5",
+      "zone_confidence": 74.36,
+      "zone_breakdown": {
+        "PF5": 74.36,
+        "PT": 17.19,
+        "PF1": 5.4,
+        "PF4": 2.38,
+        "PF3": 0.6,
         "PF2": 0.06
       }
+    },
+    {
+      "ID": 1592,
+      "Fecha_Vuelo": "2026-03-06 09:30:00",
+      "N_Elementos": 162,
+      "Tiempo_Vuelo": 521,
+      "predicted_zone": "PF5",
+      "zone_confidence": 77.51,
+      "zone_breakdown": {
+        "PF5": 77.51,
+        "PT": 15.47,
+        "PF1": 5.84,
+        "PF4": 1.11,
+        "PF2": 0.07
+      }
+    },
+    {
+      "ID": 1591,
+      "Fecha_Vuelo": "2026-03-06 02:27:24",
+      "N_Elementos": 13,
+      "Tiempo_Vuelo": 545,
+      "predicted_zone": null,
+      "zone_confidence": 0,
+      "zone_breakdown": {}
+    },
+    {
+      "ID": 1589,
+      "Fecha_Vuelo": "2026-03-05 20:59:26",
+      "N_Elementos": 3,
+      "Tiempo_Vuelo": 0,
+      "predicted_zone": "PT",
+      "zone_confidence": null,
+      "zone_breakdown": {
+        "PT": 50.0,
+        "PF5": 46.55,
+        "PF1": 3.45
+      }
+    },
+    {
+      "ID": 1588,
+      "Fecha_Vuelo": "2026-03-05 20:57:12",
+      "N_Elementos": 3,
+      "Tiempo_Vuelo": 0,
+      "predicted_zone": "PT",
+      "zone_confidence": null,
+      "zone_breakdown": {
+        "PT": 50.0,
+        "PF5": 46.55,
+        "PF1": 3.45
+      }
+    },
+    {
+      "ID": 1587,
+      "Fecha_Vuelo": "2026-03-05 10:45:35",
+      "N_Elementos": 144,
+      "Tiempo_Vuelo": 36497,
+      "predicted_zone": "PF5",
+      "zone_confidence": 79.59,
+      "zone_breakdown": {
+        "PF5": 79.59,
+        "PT": 13.41,
+        "PF1": 6.03,
+        "PF4": 0.89,
+        "PF2": 0.08
+      }
+    },
+    {
+      "ID": 1585,
+      "Fecha_Vuelo": "2026-03-05 10:11:37",
+      "N_Elementos": 438,
+      "Tiempo_Vuelo": 1267,
+      "predicted_zone": "PF4",
+      "zone_confidence": 86.41,
+      "zone_breakdown": {
+        "PF4": 86.41,
+        "PT": 10.08,
+        "PF5": 2.8,
+        "PF3": 0.54,
+        "PF1": 0.1,
+        "PF2": 0.07
+      }
+    },
+    {
+      "ID": 1584,
+      "Fecha_Vuelo": "2026-03-04 12:22:24",
+      "N_Elementos": 171,
+      "Tiempo_Vuelo": 630,
+      "predicted_zone": "PF5",
+      "zone_confidence": 76.9,
+      "zone_breakdown": {
+        "PF5": 76.9,
+        "PT": 15.46,
+        "PF1": 5.79,
+        "PF4": 1.79,
+        "PF2": 0.07
+      }
+    },
+    {
+      "ID": 1583,
+      "Fecha_Vuelo": "2026-03-04 12:17:33",
+      "N_Elementos": 4,
+      "Tiempo_Vuelo": 222,
+      "predicted_zone": null,
+      "zone_confidence": 0,
+      "zone_breakdown": {}
     },
     {
       "ID": 1576,
