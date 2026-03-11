@@ -1,7 +1,25 @@
 {
-  "timestamp": "2026-03-09T10:25:45.406144",
-  "count": 40,
+  "timestamp": "2026-03-09T15:10:26.900595",
+  "count": 42,
   "inventarios": [
+    {
+      "ID": 1602,
+      "Fecha_Vuelo": "2026-03-09 13:49:13",
+      "N_Elementos": 83,
+      "Tiempo_Vuelo": 189,
+      "predicted_zone": null,
+      "zone_confidence": 0,
+      "zone_breakdown": {}
+    },
+    {
+      "ID": 1601,
+      "Fecha_Vuelo": "2026-03-09 10:30:42",
+      "N_Elementos": 128,
+      "Tiempo_Vuelo": 11916,
+      "predicted_zone": null,
+      "zone_confidence": 0,
+      "zone_breakdown": {}
+    },
     {
       "ID": 1599,
       "Fecha_Vuelo": "2026-03-09 10:10:05",

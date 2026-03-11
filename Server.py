@@ -21,7 +21,6 @@
 # Importaciones de Módulos
 # ------------------------------------------------------------------------------
 import time
-import uuid
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request, redirect
 from flasgger import Flasgger
@@ -35,6 +34,10 @@ import os
 import datetime
 import logging
 import json
+import atexit
+import signal
+import sys
+import traceback
 from logging.handlers import RotatingFileHandler
 
 # Cargar variables de entorno desde un archivo .env.
@@ -103,6 +106,44 @@ logger.addHandler(console_handler)
 logging.info("=" * 80)
 logging.info("Servidor Flask iniciado.")
 logging.info("Logs guardados en: " + os.path.abspath(log_file_path))
+logging.info("=" * 80)
+
+# ===============================================================================
+# MANEJADOR GLOBAL DE EXCEPCIONES Y SEÑALES
+# ===============================================================================
+def log_exit_event(signal_num=None, frame=None):
+    """Registra cuándo el servidor está siendo terminado"""
+    if signal_num:
+        logging.warning(f"SIGNAL RECEIVED: {signal_num} - Ignoring this signal, server continues running")
+        # NO hacer nada - ignorar la señal para que Streamlit no pueda matar el servidor
+    else:
+        logging.error("Server is exiting (atexit called)")
+
+def excepthook(exc_type, exc_value, exc_traceback):
+    """Manejador global de excepciones no capturadas"""
+    if issubclass(exc_type, KeyboardInterrupt):
+        logging.info("KeyboardInterrupt received - ignoring to keep server alive")
+        # NO salir - ignorar Ctrl+C para que Streamlit no pueda matar el servidor
+    else:
+        logging.critical(
+            f"UNCAUGHT EXCEPTION! Type: {exc_type.__name__}\n"
+            f"Message: {str(exc_value)}\n"
+            f"Traceback:\n{''.join(traceback.format_exception(exc_type, exc_value, exc_traceback))}"
+        )
+
+# Registrar manejadores
+sys.excepthook = excepthook
+atexit.register(log_exit_event)
+
+# Capturar y IGNORAR señales de terminación (prevent interruption from Streamlit)
+try:
+    # Ignorar SIGTERM y SIGINT completamente
+    signal.signal(signal.SIGTERM, signal.SIG_IGN)
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
+except Exception as e:
+    logging.warning(f"Could not register signal handlers: {str(e)}")
+
+# Log al iniciar el servidor
 logging.info("=" * 80)
 
 # Log para cada request
@@ -306,13 +347,14 @@ def obtener_datos_inventarios_pendientes():
                 try:
                     # Predecir zona para este nuevo inventario
                     prediction = dbService.predict_inventory_zone(id_inventario)
+                    logging.debug(f"GET /inventarios-pendientes: ID {id_inventario} - Prediction: {prediction.get('zone')} (confidence: {prediction.get('confidence')})")
                     nuevas_predicciones[id_inventario] = {
                         'predicted_zone': prediction.get('zone'),
                         'zone_confidence': prediction.get('confidence'),
                         'zone_breakdown': prediction.get('breakdown', {})
                     }
                 except Exception as e:
-                    logging.error(f"GET /inventarios-pendientes: Error predicting zone for ID {id_inventario} - {str(e)}")
+                    logging.error(f"GET /inventarios-pendientes: Error predicting zone for ID {id_inventario} - {str(e)}", exc_info=True)
                     nuevas_predicciones[id_inventario] = {
                         'predicted_zone': None,
                         'zone_confidence': 0,
@@ -818,7 +860,7 @@ def upload_file():
         df = pd.read_csv(file.stream, sep=',', dtype=str)
 
         # Llamar a la función Limpiar_Archivos_Dron para obtener la lista de archivos
-        archivos_creados = DronService.Limpiar_Archivos_Dron(df,os.getenv('DRON_FOLDER'))
+        archivos_creados = DronService.Limpiar_Archivos_Dron(df,os.getenv('Dron_Folder'))
     
       
         for filename in archivos_creados:
@@ -1038,4 +1080,4 @@ if __name__ == '__main__':
     port = int(API_PORT)
     logging.info(f"Iniciando servidor en http://{API_HOST}:{API_PORT}")
     logging.info(f"Swagger UI disponible en http://{API_HOST}:{API_PORT}/apidocs")
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False, use_debugger=False, threaded=True)

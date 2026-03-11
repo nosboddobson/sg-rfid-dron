@@ -52,8 +52,7 @@ def get_db_connection():
             print("[INFO] Usando SQLAlchemy para conexión a base de datos")
             
         except Exception as e:
-            print(f"[WARNING] No se pudo usar SQLAlchemy: {e}")
-            print("[INFO] Fallback a pyodbc")
+            logging.warning(f"[DB_CONN] SQLAlchemy no disponible: {str(e)} - Usando pyodbc", exc_info=False)
             _use_sqlalchemy = False
             _db_engine = None
     
@@ -64,7 +63,7 @@ def get_db_connection():
             raw_conn = _db_engine.raw_connection()
             return raw_conn
         except Exception as e:
-            print(f"[WARNING] Error obteniendo conexión de SQLAlchemy Engine: {e}")
+            logging.warning(f"[DB_CONN] Error en pool SQLAlchemy: {str(e)} - Fallback a pyodbc", exc_info=False)
             _use_sqlalchemy = False
     
     # Usar pyodbc como fallback
@@ -72,7 +71,7 @@ def get_db_connection():
         conn = pyodbc.connect(f'DRIVER={{SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}')
         return conn
     except Exception as e:
-        print(f"[ERROR] Error al conectar con pyodbc: {e}")
+        logging.error(f"[DB_CONN] ✗ Error crítico conectando a BD {server}/{database}: {str(e)}", exc_info=True)
         raise
 
 def execute_sql_query(sql_query, conn, params=None):
@@ -94,7 +93,7 @@ def execute_sql_query(sql_query, conn, params=None):
         else:
             return pd.read_sql_query(sql_query, conn)
     except Exception as e:
-        print(f"[ERROR] Error ejecutando query: {e}")
+        logging.error(f"[SQL] Error ejecutando query: {str(e)}", exc_info=True)
         raise
 
 def get_cursor_from_connection(conn):
@@ -144,7 +143,7 @@ def execute_update_query(sql_query, conn, params=None):
         return True
             
     except Exception as e:
-        print(f"[ERROR] Error ejecutando update query: {e}")
+        logging.error(f"[SQL] Error en UPDATE: {str(e)}", exc_info=True)
         try:
             conn.rollback()
         except:
@@ -152,37 +151,47 @@ def execute_update_query(sql_query, conn, params=None):
         raise
 
 def Contar_Numero_de_Elementos(filename):
-    Ultimo_Archivo_Dron = os.path.join(os.getenv('DRON_FOLDER'), filename)
-    
-    if Ultimo_Archivo_Dron:
-        Ultimo_Archivo_Dron_data = pd.read_csv(Ultimo_Archivo_Dron)
-        if 'EPC' in Ultimo_Archivo_Dron_data.columns:
-            Ultimo_Archivo_Dron_data['EPC'] = Ultimo_Archivo_Dron_data['EPC'].str.replace(' ', '').str.lower()  # Normalize EPC
-            Ultimo_Archivo_Dron_data = Ultimo_Archivo_Dron_data[Ultimo_Archivo_Dron_data['EPC'] != '00 00 00']  # Filter out rows without a valid tag
-            Ultimo_Archivo_Dron_data = Ultimo_Archivo_Dron_data.drop_duplicates(subset=['EPC'])  # Remove duplicates
-            
-
-            numero_de_epc = Ultimo_Archivo_Dron_data['EPC'].count()
-            return numero_de_epc
-        return 0
-    else:
+    try:
+        file_path = os.path.join(os.getenv('Dron_Folder'), filename)
+        
+        if not os.path.exists(file_path):
+            logging.warning(f"[COUNT] Archivo no encontrado: {file_path}")
+            return 0
+        
+        df_data = pd.read_csv(file_path)
+        
+        if 'EPC' not in df_data.columns:
+            logging.warning(f"[COUNT] Columna EPC no encontrada en {filename}")
+            return 0
+        
+        df_data['EPC'] = df_data['EPC'].astype(str).str.replace(' ', '').str.lower()
+        df_data = df_data[df_data['EPC'] != '00 00 00']
+        df_data = df_data.drop_duplicates(subset=['EPC'])
+        
+        return df_data['EPC'].count()
+        
+    except Exception as e:
+        logging.error(f"[COUNT] Error contando EPCs en {filename}: {str(e)}", exc_info=True)
         return 0
 
 def Obtener_duracion_Vuelo(filename):
-    Ultimo_Archivo_Dron = os.path.join(os.getenv('DRON_FOLDER'), filename)
-
-    
-    if Ultimo_Archivo_Dron:
-        try:
-            df = pd.read_csv(Ultimo_Archivo_Dron)
-            if len(df) >2:
-                df['Localtime'] = pd.to_datetime(df['Localtime'])
-                time_diff = df['Localtime'].max() - df['Localtime'].min()
-                return int(time_diff.total_seconds())
-        except Exception as e:
-            print(f"Error Obtener_duracion_Vuelo: {e}")
+    try:
+        file_path = os.path.join(os.getenv('Dron_Folder'), filename)
+        
+        if not os.path.exists(file_path):
             return 0
-    else:
+        
+        df = pd.read_csv(file_path)
+        
+        if len(df) > 2 and 'Localtime' in df.columns:
+            df['Localtime'] = pd.to_datetime(df['Localtime'])
+            time_diff = df['Localtime'].max() - df['Localtime'].min()
+            return int(time_diff.total_seconds())
+        
+        return 0
+        
+    except Exception as e:
+        logging.error(f"[FLIGHT] Error calculando duración vuelo {filename}: {str(e)}", exc_info=True)
         return 0
 
 def insertar_datos_inventario_vuelos(filename):
@@ -702,7 +711,7 @@ def predict_inventory_zone(id_inventario):
                 'confidence': 0,
                 'breakdown': {},
                 'total_elements': 0,
-                'error': f'Inventory ID {id_inventario} not found in Inventario_Vuelos'
+                'error': f'Inventory ID {id_inventario} not found'
             }
         
         filename = df_filename.iloc[0]['Nombre_Archivo']
@@ -710,18 +719,20 @@ def predict_inventory_zone(id_inventario):
         # Paso 2: Construir ruta del archivo y abrirlo
         dron_folder = os.getenv('Dron_Folder')
         if not dron_folder:
+            logging.error(f"[PREDICT] ID {id_inventario}: Dron_Folder no configurado")
             close_connection(conn)
             return {
                 'zone': None,
                 'confidence': 0,
                 'breakdown': {},
                 'total_elements': 0,
-                'error': 'Dron_Folder not configured in .env'
+                'error': 'Dron_Folder not configured'
             }
         
         file_path = os.path.join(dron_folder, filename)
         
         if not os.path.exists(file_path):
+            logging.error(f"[PREDICT] ID {id_inventario}: Archivo no encontrado {file_path}")
             close_connection(conn)
             return {
                 'zone': None,
@@ -735,13 +746,14 @@ def predict_inventory_zone(id_inventario):
         try:
             df_file = pd.read_csv(file_path)
         except Exception as e:
+            logging.error(f"[PREDICT] ID {id_inventario}: Error leyendo CSV {filename}: {str(e)}", exc_info=True)
             close_connection(conn)
             return {
                 'zone': None,
                 'confidence': 0,
                 'breakdown': {},
                 'total_elements': 0,
-                'error': f'Error reading CSV file: {str(e)}'
+                'error': f'Error reading CSV: {str(e)}'
             }
         
         # Verificar que existe la columna EPC
@@ -800,13 +812,12 @@ def predict_inventory_zone(id_inventario):
             df_epc_locations = execute_sql_query(sql_find_all_epcs, conn, params=tuple(epcs_from_file))
             
             if df_epc_locations is not None and len(df_epc_locations) > 0:
-                # Procesar resultados
                 for idx, row in df_epc_locations.iterrows():
                     ubicacion = row['Ubicacion']
                     zone_counts[ubicacion] = zone_counts.get(ubicacion, 0) + 1
                     found_count += 1
         except Exception as e:
-            logging.error(f"[PREDICT] Error in SQL query: {str(e)}")
+            logging.error(f"[PREDICT] ID {id_inventario}: Error en query de EPCs: {str(e)}", exc_info=True)
             close_connection(conn)
             return {
                 'zone': None,
@@ -869,7 +880,7 @@ def predict_inventory_zone(id_inventario):
         }
         
     except Exception as e:
-        print(f"[ERROR] Error prediciendo zona de inventario: {e}")
+        logging.error(f"[PREDICT] Unexpected error predicting zone for ID {id_inventario}: {str(e)}", exc_info=True)
         return {
             'zone': None,
             'confidence': 0,

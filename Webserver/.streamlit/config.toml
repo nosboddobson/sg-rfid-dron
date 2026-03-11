@@ -1,6 +1,0 @@
-[theme]
-base="dark"
-primaryColor="#f89256"
-
-[global]
-showWarningOnDirectExecution = false

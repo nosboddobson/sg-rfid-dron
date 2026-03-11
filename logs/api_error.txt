@@ -1,0 +1,683 @@
+2026-03-09 15:34:05,730 - INFO - ================================================================================
+2026-03-09 15:34:05,731 - INFO - Servidor Flask iniciado.
+2026-03-09 15:34:05,731 - INFO - Logs guardados en: D:\dev\sg-rfid-dron\logs\api.log
+2026-03-09 15:34:05,732 - INFO - ================================================================================
+2026-03-09 15:34:05,736 - INFO - Iniciando servidor en http://10.185.36.30:5100
+2026-03-09 15:34:05,737 - INFO - Swagger UI disponible en http://10.185.36.30:5100/apidocs
+2026-03-09 15:34:05,764 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5100
+ * Running on http://10.185.36.30:5100
+2026-03-09 15:34:05,766 - INFO - [33mPress CTRL+C to quit[0m
+2026-03-09 15:34:09,525 - INFO - Ruta accedida: /inventarios-pendientes | Método: GET | IP: 10.185.36.30
+2026-03-09 15:34:09,957 - INFO - GET /inventarios-pendientes: Loaded 42 cached predictions
+2026-03-09 15:34:09,958 - INFO - GET /inventarios-pendientes: BD=28 IDs, Caché=42 IDs, Nuevos=0, Desaparecidos=14
+2026-03-09 15:34:09,966 - INFO - GET /inventarios-pendientes: TIMING BREAKDOWN
+        \u2514\u2500 Paso 1 (BD query): 0.43s
+        \u2514\u2500 Paso 2 (Load cache): 0.00s
+        \u2514\u2500 Paso 3 (Detect new): 0.00s
+        \u2514\u2500 Paso 4 (Predict 0 new): 0.00s (avg 0.00s per prediction)
+        \u2514\u2500 TOTAL REQUEST: 0.43s
+        \u2713 Returned 28 inventories
+2026-03-09 15:34:09,967 - INFO - Ruta accedida: /inventarios-pendientes | Status: 200 (Success)
+2026-03-09 15:34:09,967 - INFO - 10.185.36.30 - - [09/Mar/2026 15:34:09] "GET /inventarios-pendientes HTTP/1.1" 200 -
+2026-03-09 15:34:15,405 - INFO - ================================================================================
+2026-03-09 15:34:15,405 - INFO - Servidor Flask iniciado.
+2026-03-09 15:34:15,406 - INFO - Logs guardados en: D:\dev\sg-rfid-dron\logs\api.log
+2026-03-09 15:34:15,406 - INFO - ================================================================================
+2026-03-09 15:34:15,411 - INFO - Iniciando servidor en http://10.185.36.30:5100
+2026-03-09 15:34:15,412 - INFO - Swagger UI disponible en http://10.185.36.30:5100/apidocs
+2026-03-09 15:34:15,440 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5100
+ * Running on http://10.185.36.30:5100
+2026-03-09 15:34:15,440 - INFO - [33mPress CTRL+C to quit[0m
+2026-03-09 15:34:15,597 - INFO - Ruta accedida: /inventarios-pendientes | Método: GET | IP: 10.185.36.30
+2026-03-09 15:34:16,005 - INFO - GET /inventarios-pendientes: Loaded 42 cached predictions
+2026-03-09 15:34:16,006 - INFO - GET /inventarios-pendientes: BD=28 IDs, Caché=42 IDs, Nuevos=0, Desaparecidos=14
+2026-03-09 15:34:16,014 - INFO - GET /inventarios-pendientes: TIMING BREAKDOWN
+        \u2514\u2500 Paso 1 (BD query): 0.41s
+        \u2514\u2500 Paso 2 (Load cache): 0.00s
+        \u2514\u2500 Paso 3 (Detect new): 0.00s
+        \u2514\u2500 Paso 4 (Predict 0 new): 0.00s (avg 0.00s per prediction)
+        \u2514\u2500 TOTAL REQUEST: 0.41s
+        \u2713 Returned 28 inventories
+2026-03-09 15:34:16,015 - INFO - Ruta accedida: /inventarios-pendientes | Status: 200 (Success)
+2026-03-09 15:34:16,016 - INFO - 10.185.36.30 - - [09/Mar/2026 15:34:16] "GET /inventarios-pendientes HTTP/1.1" 200 -
+2026-03-09 15:34:21,401 - INFO - ================================================================================
+2026-03-09 15:34:21,402 - INFO - Servidor Flask iniciado.
+2026-03-09 15:34:21,402 - INFO - Logs guardados en: D:\dev\sg-rfid-dron\logs\api.log
+2026-03-09 15:34:21,403 - INFO - ================================================================================
+2026-03-09 15:34:21,407 - INFO - Iniciando servidor en http://10.185.36.30:5100
+2026-03-09 15:34:21,408 - INFO - Swagger UI disponible en http://10.185.36.30:5100/apidocs
+2026-03-09 15:34:21,434 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5100
+ * Running on http://10.185.36.30:5100
+2026-03-09 15:34:21,435 - INFO - [33mPress CTRL+C to quit[0m
+2026-03-09 15:34:22,122 - INFO - Ruta accedida: /printer/hb_sierra_dron | Método: POST | IP: 10.185.89.102
+2026-03-09 15:34:22,537 - INFO - Ruta accedida: /printer/hb_sierra_dron | Status: 200 (Success)
+2026-03-09 15:34:22,537 - INFO - 10.185.89.102 - - [09/Mar/2026 15:34:22] "POST /printer/hb_sierra_dron HTTP/1.1" 200 -
+2026-03-09 15:34:28,040 - INFO - ================================================================================
+2026-03-09 15:34:28,041 - INFO - Servidor Flask iniciado.
+2026-03-09 15:34:28,042 - INFO - Logs guardados en: D:\dev\sg-rfid-dron\logs\api.log
+2026-03-09 15:34:28,042 - INFO - ================================================================================
+2026-03-09 15:34:28,047 - INFO - Iniciando servidor en http://10.185.36.30:5100
+2026-03-09 15:34:28,048 - INFO - Swagger UI disponible en http://10.185.36.30:5100/apidocs
+2026-03-09 15:34:28,074 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5100
+ * Running on http://10.185.36.30:5100
+2026-03-09 15:34:28,075 - INFO - [33mPress CTRL+C to quit[0m
+2026-03-09 15:34:31,497 - INFO - Ruta accedida: /inventarios-pendientes | Método: GET | IP: 10.185.36.30
+2026-03-09 15:34:31,920 - INFO - GET /inventarios-pendientes: Loaded 42 cached predictions
+2026-03-09 15:34:31,921 - INFO - GET /inventarios-pendientes: BD=28 IDs, Caché=42 IDs, Nuevos=0, Desaparecidos=14
+2026-03-09 15:34:31,929 - INFO - GET /inventarios-pendientes: TIMING BREAKDOWN
+        \u2514\u2500 Paso 1 (BD query): 0.42s
+        \u2514\u2500 Paso 2 (Load cache): 0.00s
+        \u2514\u2500 Paso 3 (Detect new): 0.00s
+        \u2514\u2500 Paso 4 (Predict 0 new): 0.00s (avg 0.00s per prediction)
+        \u2514\u2500 TOTAL REQUEST: 0.43s
+        \u2713 Returned 28 inventories
+2026-03-09 15:34:31,930 - INFO - Ruta accedida: /inventarios-pendientes | Status: 200 (Success)
+2026-03-09 15:34:31,931 - INFO - 10.185.36.30 - - [09/Mar/2026 15:34:31] "GET /inventarios-pendientes HTTP/1.1" 200 -
+2026-03-09 15:34:37,429 - INFO - ================================================================================
+2026-03-09 15:34:37,429 - INFO - Servidor Flask iniciado.
+2026-03-09 15:34:37,430 - INFO - Logs guardados en: D:\dev\sg-rfid-dron\logs\api.log
+2026-03-09 15:34:37,431 - INFO - ================================================================================
+2026-03-09 15:34:37,436 - INFO - Iniciando servidor en http://10.185.36.30:5100
+2026-03-09 15:34:37,436 - INFO - Swagger UI disponible en http://10.185.36.30:5100/apidocs
+2026-03-09 15:34:37,464 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5100
+ * Running on http://10.185.36.30:5100
+2026-03-09 15:34:37,465 - INFO - [33mPress CTRL+C to quit[0m
+2026-03-09 15:39:23,079 - INFO - ================================================================================
+2026-03-09 15:39:23,080 - INFO - Servidor Flask iniciado.
+2026-03-09 15:39:23,080 - INFO - Logs guardados en: D:\dev\sg-rfid-dron\logs\api.log
+2026-03-09 15:39:23,081 - INFO - ================================================================================
+2026-03-09 15:39:23,085 - INFO - Iniciando servidor en http://10.185.36.30:5100
+2026-03-09 15:39:23,086 - INFO - Swagger UI disponible en http://10.185.36.30:5100/apidocs
+2026-03-09 15:39:23,113 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5100
+ * Running on http://10.185.36.30:5100
+2026-03-09 15:39:23,113 - INFO - [33mPress CTRL+C to quit[0m
+2026-03-09 15:39:51,398 - INFO - Ruta accedida: /inventarios-pendientes | Método: GET | IP: 10.185.36.30
+2026-03-09 15:39:51,810 - INFO - GET /inventarios-pendientes: Loaded 42 cached predictions
+2026-03-09 15:39:51,810 - INFO - GET /inventarios-pendientes: BD=28 IDs, Caché=42 IDs, Nuevos=0, Desaparecidos=14
+2026-03-09 15:39:51,819 - INFO - GET /inventarios-pendientes: TIMING BREAKDOWN
+        \u2514\u2500 Paso 1 (BD query): 0.41s
+        \u2514\u2500 Paso 2 (Load cache): 0.00s
+        \u2514\u2500 Paso 3 (Detect new): 0.00s
+        \u2514\u2500 Paso 4 (Predict 0 new): 0.00s (avg 0.00s per prediction)
+        \u2514\u2500 TOTAL REQUEST: 0.41s
+        \u2713 Returned 28 inventories
+2026-03-09 15:39:51,820 - INFO - Ruta accedida: /inventarios-pendientes | Status: 200 (Success)
+2026-03-09 15:39:51,820 - INFO - 10.185.36.30 - - [09/Mar/2026 15:39:51] "GET /inventarios-pendientes HTTP/1.1" 200 -
+2026-03-09 15:42:49,695 - INFO - ================================================================================
+2026-03-09 15:42:49,696 - INFO - Servidor Flask iniciado.
+2026-03-09 15:42:49,696 - INFO - Logs guardados en: D:\dev\sg-rfid-dron\logs\api.log
+2026-03-09 15:42:49,697 - INFO - ================================================================================
+2026-03-09 15:42:49,701 - INFO - Iniciando servidor en http://10.185.36.30:5100
+2026-03-09 15:42:49,702 - INFO - Swagger UI disponible en http://10.185.36.30:5100/apidocs
+2026-03-09 15:42:49,728 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5100
+ * Running on http://10.185.36.30:5100
+2026-03-09 15:42:49,728 - INFO - [33mPress CTRL+C to quit[0m
+2026-03-09 15:43:29,381 - INFO - Ruta accedida: /inventarios-pendientes | Método: GET | IP: 10.185.36.30
+2026-03-09 15:43:29,870 - INFO - Ruta accedida: /inventarios-pendientes | Método: GET | IP: 10.185.36.30
+2026-03-09 15:43:29,881 - INFO - GET /inventarios-pendientes: Loaded 42 cached predictions
+2026-03-09 15:43:29,881 - INFO - GET /inventarios-pendientes: BD=28 IDs, Caché=42 IDs, Nuevos=0, Desaparecidos=14
+2026-03-09 15:43:29,894 - INFO - GET /inventarios-pendientes: Loaded 42 cached predictions
+2026-03-09 15:43:29,895 - INFO - GET /inventarios-pendientes: BD=28 IDs, Caché=42 IDs, Nuevos=0, Desaparecidos=14
+2026-03-09 15:43:29,898 - INFO - GET /inventarios-pendientes: TIMING BREAKDOWN
+        \u2514\u2500 Paso 1 (BD query): 0.50s
+        \u2514\u2500 Paso 2 (Load cache): 0.00s
+        \u2514\u2500 Paso 3 (Detect new): 0.00s
+        \u2514\u2500 Paso 4 (Predict 0 new): 0.00s (avg 0.00s per prediction)
+        \u2514\u2500 TOTAL REQUEST: 0.50s
+        \u2713 Returned 28 inventories
+2026-03-09 15:43:29,899 - INFO - Ruta accedida: /inventarios-pendientes | Status: 200 (Success)
+2026-03-09 15:43:29,899 - INFO - GET /inventarios-pendientes: TIMING BREAKDOWN
+        \u2514\u2500 Paso 1 (BD query): 0.02s
+        \u2514\u2500 Paso 2 (Load cache): 0.00s
+        \u2514\u2500 Paso 3 (Detect new): 0.00s
+        \u2514\u2500 Paso 4 (Predict 0 new): 0.00s (avg 0.00s per prediction)
+        \u2514\u2500 TOTAL REQUEST: 0.03s
+        \u2713 Returned 28 inventories
+2026-03-09 15:43:29,900 - INFO - 10.185.36.30 - - [09/Mar/2026 15:43:29] "GET /inventarios-pendientes HTTP/1.1" 200 -
+2026-03-09 15:43:29,901 - INFO - Ruta accedida: /inventarios-pendientes | Status: 200 (Success)
+2026-03-09 15:43:29,902 - INFO - 10.185.36.30 - - [09/Mar/2026 15:43:29] "GET /inventarios-pendientes HTTP/1.1" 200 -
+2026-03-09 16:00:29,366 - INFO - ================================================================================
+2026-03-09 16:00:29,367 - INFO - Servidor Flask iniciado.
+2026-03-09 16:00:29,367 - INFO - Logs guardados en: D:\dev\sg-rfid-dron\logs\api.log
+2026-03-09 16:00:29,368 - INFO - ================================================================================
+2026-03-09 16:00:29,373 - INFO - Iniciando servidor en http://10.185.36.30:5100
+2026-03-09 16:00:29,373 - INFO - Swagger UI disponible en http://10.185.36.30:5100/apidocs
+2026-03-09 16:00:29,400 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5100
+ * Running on http://10.185.36.30:5100
+2026-03-09 16:00:29,401 - INFO - [33mPress CTRL+C to quit[0m
+2026-03-09 16:00:29,491 - INFO - Ruta accedida: /apidocs/ | Método: GET | IP: 10.214.3.174
+2026-03-09 16:00:29,524 - INFO - Ruta accedida: /apidocs/ | Status: 200 (Success)
+2026-03-09 16:00:29,524 - INFO - 10.214.3.174 - - [09/Mar/2026 16:00:29] "GET /apidocs/ HTTP/1.1" 200 -
+2026-03-09 16:00:29,569 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Método: GET | IP: 10.214.3.174
+2026-03-09 16:00:29,597 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:00:29,599 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:00:29,644 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Status: 304 (Success)
+2026-03-09 16:00:29,644 - INFO - 10.214.3.174 - - [09/Mar/2026 16:00:29] "[36mGET /flasgger_static/swagger-ui.css HTTP/1.1[0m" 304 -
+2026-03-09 16:00:29,753 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:00:29,851 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Status: 304 (Success)
+2026-03-09 16:00:29,852 - INFO - 10.214.3.174 - - [09/Mar/2026 16:00:29] "[36mGET /flasgger_static/lib/jquery.min.js HTTP/1.1[0m" 304 -
+2026-03-09 16:00:29,997 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Status: 304 (Success)
+2026-03-09 16:00:29,999 - INFO - 10.214.3.174 - - [09/Mar/2026 16:00:29] "[36mGET /flasgger_static/swagger-ui-bundle.js HTTP/1.1[0m" 304 -
+2026-03-09 16:00:30,546 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Status: 304 (Success)
+2026-03-09 16:00:30,546 - INFO - 10.214.3.174 - - [09/Mar/2026 16:00:30] "[36mGET /flasgger_static/swagger-ui-standalone-preset.js HTTP/1.1[0m" 304 -
+2026-03-09 16:00:30,664 - INFO - Ruta accedida: /apispec_1.json | Método: GET | IP: 10.214.3.174
+2026-03-09 16:00:30,675 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Método: GET | IP: 10.214.3.174
+2026-03-09 16:00:30,700 - INFO - Ruta accedida: /apispec_1.json | Status: 200 (Success)
+2026-03-09 16:00:30,701 - INFO - 10.214.3.174 - - [09/Mar/2026 16:00:30] "GET /apispec_1.json HTTP/1.1" 200 -
+2026-03-09 16:00:30,703 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Status: 304 (Success)
+2026-03-09 16:00:30,704 - INFO - 10.214.3.174 - - [09/Mar/2026 16:00:30] "[36mGET /flasgger_static/favicon-32x32.png HTTP/1.1[0m" 304 -
+2026-03-09 16:00:49,699 - INFO - Ruta accedida: /apidocs/ | Método: GET | IP: 10.214.3.174
+2026-03-09 16:00:49,700 - INFO - Ruta accedida: /apidocs/ | Status: 200 (Success)
+2026-03-09 16:00:49,701 - INFO - 10.214.3.174 - - [09/Mar/2026 16:00:49] "GET /apidocs/ HTTP/1.1" 200 -
+2026-03-09 16:00:49,744 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Método: GET | IP: 10.214.3.174
+2026-03-09 16:00:49,746 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Status: 304 (Success)
+2026-03-09 16:00:49,747 - INFO - 10.214.3.174 - - [09/Mar/2026 16:00:49] "[36mGET /flasgger_static/swagger-ui.css HTTP/1.1[0m" 304 -
+2026-03-09 16:00:49,776 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:00:49,777 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:00:49,778 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:00:49,779 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Status: 304 (Success)
+2026-03-09 16:00:49,779 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Status: 304 (Success)
+2026-03-09 16:00:49,780 - INFO - 10.214.3.174 - - [09/Mar/2026 16:00:49] "[36mGET /flasgger_static/swagger-ui-standalone-preset.js HTTP/1.1[0m" 304 -
+2026-03-09 16:00:49,780 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Status: 304 (Success)
+2026-03-09 16:00:49,781 - INFO - 10.214.3.174 - - [09/Mar/2026 16:00:49] "[36mGET /flasgger_static/swagger-ui-bundle.js HTTP/1.1[0m" 304 -
+2026-03-09 16:00:49,782 - INFO - 10.214.3.174 - - [09/Mar/2026 16:00:49] "[36mGET /flasgger_static/lib/jquery.min.js HTTP/1.1[0m" 304 -
+2026-03-09 16:00:49,867 - INFO - Ruta accedida: /apispec_1.json | Método: GET | IP: 10.214.3.174
+2026-03-09 16:00:49,868 - INFO - Ruta accedida: /apispec_1.json | Status: 200 (Success)
+2026-03-09 16:00:49,869 - INFO - 10.214.3.174 - - [09/Mar/2026 16:00:49] "GET /apispec_1.json HTTP/1.1" 200 -
+2026-03-09 16:00:49,874 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Método: GET | IP: 10.214.3.174
+2026-03-09 16:00:49,875 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Status: 304 (Success)
+2026-03-09 16:00:49,876 - INFO - 10.214.3.174 - - [09/Mar/2026 16:00:49] "[36mGET /flasgger_static/favicon-32x32.png HTTP/1.1[0m" 304 -
+2026-03-09 16:00:53,357 - INFO - Ruta accedida: /inventarios-pendientes | Método: GET | IP: 10.185.36.30
+2026-03-09 16:00:53,881 - INFO - GET /inventarios-pendientes: Loaded 42 cached predictions
+2026-03-09 16:00:53,881 - INFO - GET /inventarios-pendientes: BD=28 IDs, Caché=42 IDs, Nuevos=0, Desaparecidos=14
+2026-03-09 16:00:53,890 - INFO - GET /inventarios-pendientes: TIMING BREAKDOWN
+        \u2514\u2500 Paso 1 (BD query): 0.52s
+        \u2514\u2500 Paso 2 (Load cache): 0.00s
+        \u2514\u2500 Paso 3 (Detect new): 0.00s
+        \u2514\u2500 Paso 4 (Predict 0 new): 0.00s (avg 0.00s per prediction)
+        \u2514\u2500 TOTAL REQUEST: 0.53s
+        \u2713 Returned 28 inventories
+2026-03-09 16:00:53,891 - INFO - Ruta accedida: /inventarios-pendientes | Status: 200 (Success)
+2026-03-09 16:00:53,892 - INFO - 10.185.36.30 - - [09/Mar/2026 16:00:53] "GET /inventarios-pendientes HTTP/1.1" 200 -
+2026-03-09 16:05:29,053 - INFO - ================================================================================
+2026-03-09 16:05:29,053 - INFO - Servidor Flask iniciado.
+2026-03-09 16:05:29,054 - INFO - Logs guardados en: D:\dev\sg-rfid-dron\logs\api.log
+2026-03-09 16:05:29,055 - INFO - ================================================================================
+2026-03-09 16:05:29,059 - INFO - Iniciando servidor en http://10.185.36.30:5100
+2026-03-09 16:05:29,060 - INFO - Swagger UI disponible en http://10.185.36.30:5100/apidocs
+2026-03-09 16:05:29,086 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5100
+ * Running on http://10.185.36.30:5100
+2026-03-09 16:05:29,087 - INFO - [33mPress CTRL+C to quit[0m
+2026-03-09 16:05:30,607 - INFO - Ruta accedida: /apidocs/ | Método: GET | IP: 10.214.3.174
+2026-03-09 16:05:30,627 - INFO - Ruta accedida: /apidocs/ | Status: 200 (Success)
+2026-03-09 16:05:30,628 - INFO - 10.214.3.174 - - [09/Mar/2026 16:05:30] "GET /apidocs/ HTTP/1.1" 200 -
+2026-03-09 16:05:30,679 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Método: GET | IP: 10.214.3.174
+2026-03-09 16:05:30,710 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:05:30,711 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:05:30,713 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:05:30,720 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Status: 304 (Success)
+2026-03-09 16:05:30,721 - INFO - 10.214.3.174 - - [09/Mar/2026 16:05:30] "[36mGET /flasgger_static/swagger-ui.css HTTP/1.1[0m" 304 -
+2026-03-09 16:05:30,762 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Status: 304 (Success)
+2026-03-09 16:05:30,763 - INFO - 10.214.3.174 - - [09/Mar/2026 16:05:30] "[36mGET /flasgger_static/swagger-ui-standalone-preset.js HTTP/1.1[0m" 304 -
+2026-03-09 16:05:30,771 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Status: 304 (Success)
+2026-03-09 16:05:30,771 - INFO - 10.214.3.174 - - [09/Mar/2026 16:05:30] "[36mGET /flasgger_static/swagger-ui-bundle.js HTTP/1.1[0m" 304 -
+2026-03-09 16:05:30,776 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Status: 304 (Success)
+2026-03-09 16:05:30,777 - INFO - 10.214.3.174 - - [09/Mar/2026 16:05:30] "[36mGET /flasgger_static/lib/jquery.min.js HTTP/1.1[0m" 304 -
+2026-03-09 16:05:30,939 - INFO - Ruta accedida: /apispec_1.json | Método: GET | IP: 10.214.3.174
+2026-03-09 16:05:30,984 - INFO - Ruta accedida: /apispec_1.json | Status: 200 (Success)
+2026-03-09 16:05:30,985 - INFO - 10.214.3.174 - - [09/Mar/2026 16:05:30] "GET /apispec_1.json HTTP/1.1" 200 -
+2026-03-09 16:05:30,987 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Método: GET | IP: 10.214.3.174
+2026-03-09 16:05:30,989 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Status: 304 (Success)
+2026-03-09 16:05:30,990 - INFO - 10.214.3.174 - - [09/Mar/2026 16:05:30] "[36mGET /flasgger_static/favicon-32x32.png HTTP/1.1[0m" 304 -
+2026-03-09 16:05:35,306 - INFO - Ruta accedida: /inventarios-pendientes | Método: GET | IP: 10.185.36.30
+2026-03-09 16:05:35,722 - INFO - GET /inventarios-pendientes: Loaded 42 cached predictions
+2026-03-09 16:05:35,722 - INFO - GET /inventarios-pendientes: BD=28 IDs, Caché=42 IDs, Nuevos=0, Desaparecidos=14
+2026-03-09 16:05:35,732 - INFO - GET /inventarios-pendientes: TIMING BREAKDOWN
+        \u2514\u2500 Paso 1 (BD query): 0.41s
+        \u2514\u2500 Paso 2 (Load cache): 0.00s
+        \u2514\u2500 Paso 3 (Detect new): 0.00s
+        \u2514\u2500 Paso 4 (Predict 0 new): 0.00s (avg 0.00s per prediction)
+        \u2514\u2500 TOTAL REQUEST: 0.42s
+        \u2713 Returned 28 inventories
+2026-03-09 16:05:35,733 - INFO - Ruta accedida: /inventarios-pendientes | Status: 200 (Success)
+2026-03-09 16:05:35,733 - INFO - 10.185.36.30 - - [09/Mar/2026 16:05:35] "GET /inventarios-pendientes HTTP/1.1" 200 -
+2026-03-09 16:10:19,088 - INFO - ================================================================================
+2026-03-09 16:10:19,088 - INFO - Servidor Flask iniciado.
+2026-03-09 16:10:19,089 - INFO - Logs guardados en: D:\dev\sg-rfid-dron\logs\api.log
+2026-03-09 16:10:19,089 - INFO - ================================================================================
+2026-03-09 16:10:19,094 - INFO - Iniciando servidor en http://10.185.36.30:5100
+2026-03-09 16:10:19,095 - INFO - Swagger UI disponible en http://10.185.36.30:5100/apidocs
+2026-03-09 16:10:19,122 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5100
+ * Running on http://10.185.36.30:5100
+2026-03-09 16:10:19,122 - INFO - [33mPress CTRL+C to quit[0m
+2026-03-09 16:10:50,688 - INFO - Ruta accedida: /inventarios-pendientes | Método: GET | IP: 10.185.36.30
+2026-03-09 16:10:50,855 - INFO - Ruta accedida: /inventarios-pendientes | Método: GET | IP: 10.185.36.30
+2026-03-09 16:10:51,125 - INFO - GET /inventarios-pendientes: Loaded 42 cached predictions
+2026-03-09 16:10:51,125 - INFO - GET /inventarios-pendientes: BD=28 IDs, Caché=42 IDs, Nuevos=0, Desaparecidos=14
+2026-03-09 16:10:51,130 - INFO - GET /inventarios-pendientes: Loaded 42 cached predictions
+2026-03-09 16:10:51,132 - INFO - GET /inventarios-pendientes: BD=28 IDs, Caché=42 IDs, Nuevos=0, Desaparecidos=14
+2026-03-09 16:10:51,140 - INFO - GET /inventarios-pendientes: TIMING BREAKDOWN
+        \u2514\u2500 Paso 1 (BD query): 0.27s
+        \u2514\u2500 Paso 2 (Load cache): 0.00s
+        \u2514\u2500 Paso 3 (Detect new): 0.00s
+        \u2514\u2500 Paso 4 (Predict 0 new): 0.00s (avg 0.00s per prediction)
+        \u2514\u2500 TOTAL REQUEST: 0.28s
+        \u2713 Returned 28 inventories
+2026-03-09 16:10:51,140 - INFO - GET /inventarios-pendientes: TIMING BREAKDOWN
+        \u2514\u2500 Paso 1 (BD query): 0.44s
+        \u2514\u2500 Paso 2 (Load cache): 0.00s
+        \u2514\u2500 Paso 3 (Detect new): 0.00s
+        \u2514\u2500 Paso 4 (Predict 0 new): 0.00s (avg 0.00s per prediction)
+        \u2514\u2500 TOTAL REQUEST: 0.44s
+        \u2713 Returned 28 inventories
+2026-03-09 16:10:51,141 - INFO - Ruta accedida: /inventarios-pendientes | Status: 200 (Success)
+2026-03-09 16:10:51,142 - INFO - Ruta accedida: /inventarios-pendientes | Status: 200 (Success)
+2026-03-09 16:10:51,142 - INFO - 10.185.36.30 - - [09/Mar/2026 16:10:51] "GET /inventarios-pendientes HTTP/1.1" 200 -
+2026-03-09 16:10:51,143 - INFO - 10.185.36.30 - - [09/Mar/2026 16:10:51] "GET /inventarios-pendientes HTTP/1.1" 200 -
+2026-03-09 16:14:51,453 - INFO - ================================================================================
+2026-03-09 16:14:51,454 - INFO - Servidor Flask iniciado.
+2026-03-09 16:14:51,454 - INFO - Logs guardados en: D:\dev\sg-rfid-dron\logs\api.log
+2026-03-09 16:14:51,455 - INFO - ================================================================================
+2026-03-09 16:14:51,460 - INFO - Iniciando servidor en http://10.185.36.30:5100
+2026-03-09 16:14:51,460 - INFO - Swagger UI disponible en http://10.185.36.30:5100/apidocs
+2026-03-09 16:14:51,489 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5100
+ * Running on http://10.185.36.30:5100
+2026-03-09 16:14:51,490 - INFO - [33mPress CTRL+C to quit[0m
+2026-03-09 16:14:54,844 - INFO - Ruta accedida: /apidocs/ | Método: GET | IP: 10.214.3.174
+2026-03-09 16:14:54,870 - INFO - Ruta accedida: /apidocs/ | Status: 200 (Success)
+2026-03-09 16:14:54,871 - INFO - 10.214.3.174 - - [09/Mar/2026 16:14:54] "GET /apidocs/ HTTP/1.1" 200 -
+2026-03-09 16:14:54,922 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Método: GET | IP: 10.214.3.174
+2026-03-09 16:14:54,950 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:14:54,951 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:14:54,952 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:14:54,962 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Status: 304 (Success)
+2026-03-09 16:14:54,962 - INFO - 10.214.3.174 - - [09/Mar/2026 16:14:54] "[36mGET /flasgger_static/swagger-ui.css HTTP/1.1[0m" 304 -
+2026-03-09 16:14:55,002 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Status: 304 (Success)
+2026-03-09 16:14:55,003 - INFO - 10.214.3.174 - - [09/Mar/2026 16:14:55] "[36mGET /flasgger_static/lib/jquery.min.js HTTP/1.1[0m" 304 -
+2026-03-09 16:14:55,007 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Status: 304 (Success)
+2026-03-09 16:14:55,008 - INFO - 10.214.3.174 - - [09/Mar/2026 16:14:55] "[36mGET /flasgger_static/swagger-ui-bundle.js HTTP/1.1[0m" 304 -
+2026-03-09 16:14:55,015 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Status: 304 (Success)
+2026-03-09 16:14:55,015 - INFO - 10.214.3.174 - - [09/Mar/2026 16:14:55] "[36mGET /flasgger_static/swagger-ui-standalone-preset.js HTTP/1.1[0m" 304 -
+2026-03-09 16:14:55,189 - INFO - Ruta accedida: /apispec_1.json | Método: GET | IP: 10.214.3.174
+2026-03-09 16:14:55,215 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Método: GET | IP: 10.214.3.174
+2026-03-09 16:14:55,221 - INFO - Ruta accedida: /apispec_1.json | Status: 200 (Success)
+2026-03-09 16:14:55,223 - INFO - 10.214.3.174 - - [09/Mar/2026 16:14:55] "GET /apispec_1.json HTTP/1.1" 200 -
+2026-03-09 16:14:55,223 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Status: 304 (Success)
+2026-03-09 16:14:55,224 - INFO - 10.214.3.174 - - [09/Mar/2026 16:14:55] "[36mGET /flasgger_static/favicon-32x32.png HTTP/1.1[0m" 304 -
+2026-03-09 16:14:59,456 - INFO - Ruta accedida: /inventarios-pendientes | Método: GET | IP: 10.185.36.30
+2026-03-09 16:14:59,871 - INFO - GET /inventarios-pendientes: Loaded 42 cached predictions
+2026-03-09 16:14:59,872 - INFO - GET /inventarios-pendientes: BD=28 IDs, Caché=42 IDs, Nuevos=0, Desaparecidos=14
+2026-03-09 16:14:59,881 - INFO - GET /inventarios-pendientes: TIMING BREAKDOWN
+        \u2514\u2500 Paso 1 (BD query): 0.41s
+        \u2514\u2500 Paso 2 (Load cache): 0.00s
+        \u2514\u2500 Paso 3 (Detect new): 0.00s
+        \u2514\u2500 Paso 4 (Predict 0 new): 0.00s (avg 0.00s per prediction)
+        \u2514\u2500 TOTAL REQUEST: 0.42s
+        \u2713 Returned 28 inventories
+2026-03-09 16:14:59,882 - INFO - Ruta accedida: /inventarios-pendientes | Status: 200 (Success)
+2026-03-09 16:14:59,883 - INFO - 10.185.36.30 - - [09/Mar/2026 16:14:59] "GET /inventarios-pendientes HTTP/1.1" 200 -
+2026-03-09 16:21:48,788 - INFO - ================================================================================
+2026-03-09 16:21:48,788 - INFO - Servidor Flask iniciado.
+2026-03-09 16:21:48,789 - INFO - Logs guardados en: D:\dev\sg-rfid-dron\logs\api.log
+2026-03-09 16:21:48,790 - INFO - ================================================================================
+2026-03-09 16:21:48,795 - INFO - Iniciando servidor en http://10.185.36.30:5100
+2026-03-09 16:21:48,796 - INFO - Swagger UI disponible en http://10.185.36.30:5100/apidocs
+2026-03-09 16:21:48,827 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5100
+ * Running on http://10.185.36.30:5100
+2026-03-09 16:21:48,828 - INFO - [33mPress CTRL+C to quit[0m
+2026-03-09 16:22:50,798 - INFO - Ruta accedida: /inventarios-pendientes | Método: GET | IP: 10.185.36.30
+2026-03-09 16:22:51,223 - INFO - GET /inventarios-pendientes: Loaded 42 cached predictions
+2026-03-09 16:22:51,224 - INFO - GET /inventarios-pendientes: BD=28 IDs, Caché=42 IDs, Nuevos=0, Desaparecidos=14
+2026-03-09 16:22:51,233 - INFO - GET /inventarios-pendientes: TIMING BREAKDOWN
+        \u2514\u2500 Paso 1 (BD query): 0.42s
+        \u2514\u2500 Paso 2 (Load cache): 0.00s
+        \u2514\u2500 Paso 3 (Detect new): 0.00s
+        \u2514\u2500 Paso 4 (Predict 0 new): 0.00s (avg 0.00s per prediction)
+        \u2514\u2500 TOTAL REQUEST: 0.43s
+        \u2713 Returned 28 inventories
+2026-03-09 16:22:51,234 - INFO - Ruta accedida: /inventarios-pendientes | Status: 200 (Success)
+2026-03-09 16:22:51,235 - INFO - 10.185.36.30 - - [09/Mar/2026 16:22:51] "GET /inventarios-pendientes HTTP/1.1" 200 -
+2026-03-09 16:26:27,566 - INFO - ================================================================================
+2026-03-09 16:26:27,566 - INFO - Servidor Flask iniciado.
+2026-03-09 16:26:27,567 - INFO - Logs guardados en: D:\dev\sg-rfid-dron\logs\api.log
+2026-03-09 16:26:27,568 - INFO - ================================================================================
+2026-03-09 16:26:27,568 - INFO - ================================================================================
+2026-03-09 16:26:27,573 - INFO - Iniciando servidor en http://10.185.36.30:5100
+2026-03-09 16:26:27,574 - INFO - Swagger UI disponible en http://10.185.36.30:5100/apidocs
+2026-03-09 16:26:27,601 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5100
+ * Running on http://10.185.36.30:5100
+2026-03-09 16:26:27,602 - INFO - [33mPress CTRL+C to quit[0m
+2026-03-09 16:27:23,660 - ERROR - SIGNAL RECEIVED: 2 - Server is being terminated!
+2026-03-09 16:27:28,363 - INFO - ================================================================================
+2026-03-09 16:27:28,364 - INFO - Servidor Flask iniciado.
+2026-03-09 16:27:28,364 - INFO - Logs guardados en: D:\dev\sg-rfid-dron\logs\api.log
+2026-03-09 16:27:28,365 - INFO - ================================================================================
+2026-03-09 16:27:28,365 - INFO - ================================================================================
+2026-03-09 16:27:28,369 - INFO - Iniciando servidor en http://10.185.36.30:5100
+2026-03-09 16:27:28,370 - INFO - Swagger UI disponible en http://10.185.36.30:5100/apidocs
+2026-03-09 16:27:28,395 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5100
+ * Running on http://10.185.36.30:5100
+2026-03-09 16:27:28,395 - INFO - [33mPress CTRL+C to quit[0m
+2026-03-09 16:28:10,354 - INFO - Ruta accedida: /apidocs/ | Método: GET | IP: 10.214.3.174
+2026-03-09 16:28:10,378 - INFO - Ruta accedida: /apidocs/ | Status: 200 (Success)
+2026-03-09 16:28:10,378 - INFO - 10.214.3.174 - - [09/Mar/2026 16:28:10] "GET /apidocs/ HTTP/1.1" 200 -
+2026-03-09 16:28:10,425 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Método: GET | IP: 10.214.3.174
+2026-03-09 16:28:10,454 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:28:10,456 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:28:10,457 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:28:10,481 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Status: 304 (Success)
+2026-03-09 16:28:10,481 - INFO - 10.214.3.174 - - [09/Mar/2026 16:28:10] "[36mGET /flasgger_static/swagger-ui.css HTTP/1.1[0m" 304 -
+2026-03-09 16:28:10,509 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Status: 304 (Success)
+2026-03-09 16:28:10,510 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Status: 304 (Success)
+2026-03-09 16:28:10,511 - INFO - 10.214.3.174 - - [09/Mar/2026 16:28:10] "[36mGET /flasgger_static/swagger-ui-standalone-preset.js HTTP/1.1[0m" 304 -
+2026-03-09 16:28:10,511 - INFO - 10.214.3.174 - - [09/Mar/2026 16:28:10] "[36mGET /flasgger_static/swagger-ui-bundle.js HTTP/1.1[0m" 304 -
+2026-03-09 16:28:10,513 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Status: 304 (Success)
+2026-03-09 16:28:10,513 - INFO - 10.214.3.174 - - [09/Mar/2026 16:28:10] "[36mGET /flasgger_static/lib/jquery.min.js HTTP/1.1[0m" 304 -
+2026-03-09 16:28:10,635 - INFO - Ruta accedida: /apispec_1.json | Método: GET | IP: 10.214.3.174
+2026-03-09 16:28:10,642 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Método: GET | IP: 10.214.3.174
+2026-03-09 16:28:10,669 - INFO - Ruta accedida: /apispec_1.json | Status: 200 (Success)
+2026-03-09 16:28:10,670 - INFO - 10.214.3.174 - - [09/Mar/2026 16:28:10] "GET /apispec_1.json HTTP/1.1" 200 -
+2026-03-09 16:28:10,670 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Status: 304 (Success)
+2026-03-09 16:28:10,671 - INFO - 10.214.3.174 - - [09/Mar/2026 16:28:10] "[36mGET /flasgger_static/favicon-32x32.png HTTP/1.1[0m" 304 -
+2026-03-09 16:28:41,462 - INFO - Ruta accedida: /apidocs/ | Método: GET | IP: 10.214.3.174
+2026-03-09 16:28:41,463 - INFO - Ruta accedida: /apidocs/ | Status: 200 (Success)
+2026-03-09 16:28:41,464 - INFO - 10.214.3.174 - - [09/Mar/2026 16:28:41] "GET /apidocs/ HTTP/1.1" 200 -
+2026-03-09 16:28:41,508 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Método: GET | IP: 10.214.3.174
+2026-03-09 16:28:41,509 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Status: 304 (Success)
+2026-03-09 16:28:41,510 - INFO - 10.214.3.174 - - [09/Mar/2026 16:28:41] "[36mGET /flasgger_static/swagger-ui.css HTTP/1.1[0m" 304 -
+2026-03-09 16:28:41,537 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:28:41,538 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:28:41,540 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:28:41,540 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Status: 304 (Success)
+2026-03-09 16:28:41,541 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Status: 304 (Success)
+2026-03-09 16:28:41,542 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Status: 304 (Success)
+2026-03-09 16:28:41,542 - INFO - 10.214.3.174 - - [09/Mar/2026 16:28:41] "[36mGET /flasgger_static/lib/jquery.min.js HTTP/1.1[0m" 304 -
+2026-03-09 16:28:41,543 - INFO - 10.214.3.174 - - [09/Mar/2026 16:28:41] "[36mGET /flasgger_static/swagger-ui-bundle.js HTTP/1.1[0m" 304 -
+2026-03-09 16:28:41,543 - INFO - 10.214.3.174 - - [09/Mar/2026 16:28:41] "[36mGET /flasgger_static/swagger-ui-standalone-preset.js HTTP/1.1[0m" 304 -
+2026-03-09 16:28:41,634 - INFO - Ruta accedida: /apispec_1.json | Método: GET | IP: 10.214.3.174
+2026-03-09 16:28:41,635 - INFO - Ruta accedida: /apispec_1.json | Status: 200 (Success)
+2026-03-09 16:28:41,635 - INFO - 10.214.3.174 - - [09/Mar/2026 16:28:41] "GET /apispec_1.json HTTP/1.1" 200 -
+2026-03-09 16:28:41,638 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Método: GET | IP: 10.214.3.174
+2026-03-09 16:28:41,640 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Status: 304 (Success)
+2026-03-09 16:28:41,640 - INFO - 10.214.3.174 - - [09/Mar/2026 16:28:41] "[36mGET /flasgger_static/favicon-32x32.png HTTP/1.1[0m" 304 -
+2026-03-09 16:29:26,057 - INFO - Ruta accedida: /apidocs/ | Método: GET | IP: 10.214.3.174
+2026-03-09 16:29:26,059 - INFO - Ruta accedida: /apidocs/ | Status: 200 (Success)
+2026-03-09 16:29:26,059 - INFO - 10.214.3.174 - - [09/Mar/2026 16:29:26] "GET /apidocs/ HTTP/1.1" 200 -
+2026-03-09 16:29:26,101 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Método: GET | IP: 10.214.3.174
+2026-03-09 16:29:26,103 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Status: 304 (Success)
+2026-03-09 16:29:26,104 - INFO - 10.214.3.174 - - [09/Mar/2026 16:29:26] "[36mGET /flasgger_static/swagger-ui.css HTTP/1.1[0m" 304 -
+2026-03-09 16:29:26,138 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:29:26,139 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:29:26,140 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:29:26,141 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Status: 304 (Success)
+2026-03-09 16:29:26,142 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Status: 304 (Success)
+2026-03-09 16:29:26,142 - INFO - 10.214.3.174 - - [09/Mar/2026 16:29:26] "[36mGET /flasgger_static/swagger-ui-standalone-preset.js HTTP/1.1[0m" 304 -
+2026-03-09 16:29:26,143 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Status: 304 (Success)
+2026-03-09 16:29:26,143 - INFO - 10.214.3.174 - - [09/Mar/2026 16:29:26] "[36mGET /flasgger_static/lib/jquery.min.js HTTP/1.1[0m" 304 -
+2026-03-09 16:29:26,144 - INFO - 10.214.3.174 - - [09/Mar/2026 16:29:26] "[36mGET /flasgger_static/swagger-ui-bundle.js HTTP/1.1[0m" 304 -
+2026-03-09 16:29:26,228 - INFO - Ruta accedida: /apispec_1.json | Método: GET | IP: 10.214.3.174
+2026-03-09 16:29:26,229 - INFO - Ruta accedida: /apispec_1.json | Status: 200 (Success)
+2026-03-09 16:29:26,230 - INFO - 10.214.3.174 - - [09/Mar/2026 16:29:26] "GET /apispec_1.json HTTP/1.1" 200 -
+2026-03-09 16:29:26,237 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Método: GET | IP: 10.214.3.174
+2026-03-09 16:29:26,239 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Status: 304 (Success)
+2026-03-09 16:29:26,239 - INFO - 10.214.3.174 - - [09/Mar/2026 16:29:26] "[36mGET /flasgger_static/favicon-32x32.png HTTP/1.1[0m" 304 -
+2026-03-09 16:32:24,923 - ERROR - SIGNAL RECEIVED: 2 - Server is being terminated!
+2026-03-09 16:32:29,892 - INFO - ================================================================================
+2026-03-09 16:32:29,893 - INFO - Servidor Flask iniciado.
+2026-03-09 16:32:29,893 - INFO - Logs guardados en: D:\dev\sg-rfid-dron\logs\api.log
+2026-03-09 16:32:29,894 - INFO - ================================================================================
+2026-03-09 16:32:29,894 - INFO - ================================================================================
+2026-03-09 16:32:29,900 - INFO - Iniciando servidor en http://10.185.36.30:5100
+2026-03-09 16:32:29,902 - INFO - Swagger UI disponible en http://10.185.36.30:5100/apidocs
+2026-03-09 16:32:29,927 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5100
+ * Running on http://10.185.36.30:5100
+2026-03-09 16:32:29,928 - INFO - [33mPress CTRL+C to quit[0m
+2026-03-09 16:32:30,393 - INFO - Ruta accedida: /apidocs/ | Método: GET | IP: 10.214.3.174
+2026-03-09 16:32:30,412 - INFO - Ruta accedida: /apidocs/ | Status: 200 (Success)
+2026-03-09 16:32:30,413 - INFO - 10.214.3.174 - - [09/Mar/2026 16:32:30] "GET /apidocs/ HTTP/1.1" 200 -
+2026-03-09 16:32:30,458 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Método: GET | IP: 10.214.3.174
+2026-03-09 16:32:30,486 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:32:30,488 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:32:30,489 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:32:30,510 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Status: 304 (Success)
+2026-03-09 16:32:30,511 - INFO - 10.214.3.174 - - [09/Mar/2026 16:32:30] "[36mGET /flasgger_static/swagger-ui.css HTTP/1.1[0m" 304 -
+2026-03-09 16:32:30,545 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Status: 304 (Success)
+2026-03-09 16:32:30,546 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Status: 304 (Success)
+2026-03-09 16:32:30,546 - INFO - 10.214.3.174 - - [09/Mar/2026 16:32:30] "[36mGET /flasgger_static/swagger-ui-bundle.js HTTP/1.1[0m" 304 -
+2026-03-09 16:32:30,547 - INFO - 10.214.3.174 - - [09/Mar/2026 16:32:30] "[36mGET /flasgger_static/lib/jquery.min.js HTTP/1.1[0m" 304 -
+2026-03-09 16:32:30,548 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Status: 304 (Success)
+2026-03-09 16:32:30,549 - INFO - 10.214.3.174 - - [09/Mar/2026 16:32:30] "[36mGET /flasgger_static/swagger-ui-standalone-preset.js HTTP/1.1[0m" 304 -
+2026-03-09 16:32:30,636 - INFO - Ruta accedida: /apispec_1.json | Método: GET | IP: 10.214.3.174
+2026-03-09 16:32:30,637 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Método: GET | IP: 10.214.3.174
+2026-03-09 16:32:30,675 - INFO - Ruta accedida: /apispec_1.json | Status: 200 (Success)
+2026-03-09 16:32:30,675 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Status: 304 (Success)
+2026-03-09 16:32:30,676 - INFO - 10.214.3.174 - - [09/Mar/2026 16:32:30] "GET /apispec_1.json HTTP/1.1" 200 -
+2026-03-09 16:32:30,677 - INFO - 10.214.3.174 - - [09/Mar/2026 16:32:30] "[36mGET /flasgger_static/favicon-32x32.png HTTP/1.1[0m" 304 -
+2026-03-09 16:32:31,432 - INFO - Ruta accedida: /apidocs/ | Método: GET | IP: 10.214.3.174
+2026-03-09 16:32:31,432 - INFO - Ruta accedida: /apidocs/ | Status: 200 (Success)
+2026-03-09 16:32:31,433 - INFO - 10.214.3.174 - - [09/Mar/2026 16:32:31] "GET /apidocs/ HTTP/1.1" 200 -
+2026-03-09 16:32:31,478 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Método: GET | IP: 10.214.3.174
+2026-03-09 16:32:31,480 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Status: 304 (Success)
+2026-03-09 16:32:31,481 - INFO - 10.214.3.174 - - [09/Mar/2026 16:32:31] "[36mGET /flasgger_static/swagger-ui.css HTTP/1.1[0m" 304 -
+2026-03-09 16:32:31,507 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:32:31,508 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:32:31,509 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Método: GET | IP: 10.214.3.174
+2026-03-09 16:32:31,510 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Status: 304 (Success)
+2026-03-09 16:32:31,511 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Status: 304 (Success)
+2026-03-09 16:32:31,512 - INFO - 10.214.3.174 - - [09/Mar/2026 16:32:31] "[36mGET /flasgger_static/swagger-ui-standalone-preset.js HTTP/1.1[0m" 304 -
+2026-03-09 16:32:31,512 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Status: 304 (Success)
+2026-03-09 16:32:31,512 - INFO - 10.214.3.174 - - [09/Mar/2026 16:32:31] "[36mGET /flasgger_static/swagger-ui-bundle.js HTTP/1.1[0m" 304 -
+2026-03-09 16:32:31,513 - INFO - 10.214.3.174 - - [09/Mar/2026 16:32:31] "[36mGET /flasgger_static/lib/jquery.min.js HTTP/1.1[0m" 304 -
+2026-03-09 16:32:31,596 - INFO - Ruta accedida: /apispec_1.json | Método: GET | IP: 10.214.3.174
+2026-03-09 16:32:31,597 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Método: GET | IP: 10.214.3.174
+2026-03-09 16:32:31,598 - INFO - Ruta accedida: /apispec_1.json | Status: 200 (Success)
+2026-03-09 16:32:31,599 - INFO - 10.214.3.174 - - [09/Mar/2026 16:32:31] "GET /apispec_1.json HTTP/1.1" 200 -
+2026-03-09 16:32:31,599 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Status: 304 (Success)
+2026-03-09 16:32:31,600 - INFO - 10.214.3.174 - - [09/Mar/2026 16:32:31] "[36mGET /flasgger_static/favicon-32x32.png HTTP/1.1[0m" 304 -
+2026-03-09 16:32:38,112 - INFO - Ruta accedida: /inventarios-pendientes | Método: GET | IP: 10.185.36.30
+2026-03-09 16:32:38,517 - INFO - GET /inventarios-pendientes: Loaded 42 cached predictions
+2026-03-09 16:32:38,518 - INFO - GET /inventarios-pendientes: BD=28 IDs, Caché=42 IDs, Nuevos=0, Desaparecidos=14
+2026-03-09 16:32:38,525 - INFO - GET /inventarios-pendientes: TIMING BREAKDOWN
+        \u2514\u2500 Paso 1 (BD query): 0.40s
+        \u2514\u2500 Paso 2 (Load cache): 0.00s
+        \u2514\u2500 Paso 3 (Detect new): 0.00s
+        \u2514\u2500 Paso 4 (Predict 0 new): 0.00s (avg 0.00s per prediction)
+        \u2514\u2500 TOTAL REQUEST: 0.41s
+        \u2713 Returned 28 inventories
+2026-03-09 16:32:38,526 - INFO - Ruta accedida: /inventarios-pendientes | Status: 200 (Success)
+2026-03-09 16:32:38,527 - INFO - 10.185.36.30 - - [09/Mar/2026 16:32:38] "GET /inventarios-pendientes HTTP/1.1" 200 -
+2026-03-11 11:25:02,337 - INFO - ================================================================================
+2026-03-11 11:25:02,338 - INFO - Servidor Flask iniciado.
+2026-03-11 11:25:02,338 - INFO - Logs guardados en: D:\dev\sg-rfid-dron\logs\api.log
+2026-03-11 11:25:02,338 - INFO - ================================================================================
+2026-03-11 11:25:02,339 - INFO - ================================================================================
+2026-03-11 11:25:02,343 - INFO - Iniciando servidor en http://10.185.36.30:5100
+2026-03-11 11:25:02,343 - INFO - Swagger UI disponible en http://10.185.36.30:5100/apidocs
+2026-03-11 11:25:02,371 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5100
+ * Running on http://10.185.36.30:5100
+2026-03-11 11:25:02,371 - INFO - [33mPress CTRL+C to quit[0m
+2026-03-11 11:25:03,956 - INFO - Ruta accedida: /apidocs/ | Método: GET | IP: 10.214.3.183
+2026-03-11 11:25:04,093 - INFO - Ruta accedida: /apidocs/ | Status: 200 (Success)
+2026-03-11 11:25:04,094 - INFO - 10.214.3.183 - - [11/Mar/2026 11:25:04] "GET /apidocs/ HTTP/1.1" 200 -
+2026-03-11 11:25:04,137 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Método: GET | IP: 10.214.3.183
+2026-03-11 11:25:04,166 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Método: GET | IP: 10.214.3.183
+2026-03-11 11:25:04,167 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Método: GET | IP: 10.214.3.183
+2026-03-11 11:25:04,168 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Método: GET | IP: 10.214.3.183
+2026-03-11 11:25:04,201 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Status: 304 (Success)
+2026-03-11 11:25:04,202 - INFO - 10.214.3.183 - - [11/Mar/2026 11:25:04] "[36mGET /flasgger_static/swagger-ui.css HTTP/1.1[0m" 304 -
+2026-03-11 11:25:04,298 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Status: 304 (Success)
+2026-03-11 11:25:04,299 - INFO - 10.214.3.183 - - [11/Mar/2026 11:25:04] "[36mGET /flasgger_static/lib/jquery.min.js HTTP/1.1[0m" 304 -
+2026-03-11 11:25:04,507 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Status: 304 (Success)
+2026-03-11 11:25:04,508 - INFO - 10.214.3.183 - - [11/Mar/2026 11:25:04] "[36mGET /flasgger_static/swagger-ui-bundle.js HTTP/1.1[0m" 304 -
+2026-03-11 11:25:05,028 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Status: 304 (Success)
+2026-03-11 11:25:05,028 - INFO - 10.214.3.183 - - [11/Mar/2026 11:25:05] "[36mGET /flasgger_static/swagger-ui-standalone-preset.js HTTP/1.1[0m" 304 -
+2026-03-11 11:25:05,153 - INFO - Ruta accedida: /apispec_1.json | Método: GET | IP: 10.214.3.183
+2026-03-11 11:25:05,179 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Método: GET | IP: 10.214.3.183
+2026-03-11 11:25:05,183 - INFO - Ruta accedida: /apispec_1.json | Status: 200 (Success)
+2026-03-11 11:25:05,184 - INFO - 10.214.3.183 - - [11/Mar/2026 11:25:05] "GET /apispec_1.json HTTP/1.1" 200 -
+2026-03-11 11:25:05,193 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Status: 304 (Success)
+2026-03-11 11:25:05,194 - INFO - 10.214.3.183 - - [11/Mar/2026 11:25:05] "[36mGET /flasgger_static/favicon-32x32.png HTTP/1.1[0m" 304 -
+2026-03-11 11:25:12,741 - INFO - Ruta accedida: /apidocs/ | Método: GET | IP: 10.214.3.183
+2026-03-11 11:25:12,742 - INFO - Ruta accedida: /apidocs/ | Status: 200 (Success)
+2026-03-11 11:25:12,743 - INFO - 10.214.3.183 - - [11/Mar/2026 11:25:12] "GET /apidocs/ HTTP/1.1" 200 -
+2026-03-11 11:25:12,783 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Método: GET | IP: 10.214.3.183
+2026-03-11 11:25:12,785 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Status: 304 (Success)
+2026-03-11 11:25:12,785 - INFO - 10.214.3.183 - - [11/Mar/2026 11:25:12] "[36mGET /flasgger_static/swagger-ui.css HTTP/1.1[0m" 304 -
+2026-03-11 11:25:12,813 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Método: GET | IP: 10.214.3.183
+2026-03-11 11:25:12,814 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Método: GET | IP: 10.214.3.183
+2026-03-11 11:25:12,815 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Método: GET | IP: 10.214.3.183
+2026-03-11 11:25:12,816 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Status: 304 (Success)
+2026-03-11 11:25:12,817 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Status: 304 (Success)
+2026-03-11 11:25:12,817 - INFO - 10.214.3.183 - - [11/Mar/2026 11:25:12] "[36mGET /flasgger_static/swagger-ui-bundle.js HTTP/1.1[0m" 304 -
+2026-03-11 11:25:12,818 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Status: 304 (Success)
+2026-03-11 11:25:12,818 - INFO - 10.214.3.183 - - [11/Mar/2026 11:25:12] "[36mGET /flasgger_static/swagger-ui-standalone-preset.js HTTP/1.1[0m" 304 -
+2026-03-11 11:25:12,819 - INFO - 10.214.3.183 - - [11/Mar/2026 11:25:12] "[36mGET /flasgger_static/lib/jquery.min.js HTTP/1.1[0m" 304 -
+2026-03-11 11:25:12,901 - INFO - Ruta accedida: /apispec_1.json | Método: GET | IP: 10.214.3.183
+2026-03-11 11:25:12,902 - INFO - Ruta accedida: /apispec_1.json | Status: 200 (Success)
+2026-03-11 11:25:12,903 - INFO - 10.214.3.183 - - [11/Mar/2026 11:25:12] "GET /apispec_1.json HTTP/1.1" 200 -
+2026-03-11 11:25:12,906 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Método: GET | IP: 10.214.3.183
+2026-03-11 11:25:12,907 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Status: 304 (Success)
+2026-03-11 11:25:12,908 - INFO - 10.214.3.183 - - [11/Mar/2026 11:25:12] "[36mGET /flasgger_static/favicon-32x32.png HTTP/1.1[0m" 304 -
+2026-03-11 11:25:30,629 - INFO - Ruta accedida: /inventarios-pendientes | Método: GET | IP: 10.185.36.30
+2026-03-11 11:25:31,347 - INFO - GET /inventarios-pendientes: Loaded 42 cached predictions
+2026-03-11 11:25:31,348 - INFO - GET /inventarios-pendientes: BD=28 IDs, Caché=42 IDs, Nuevos=0, Desaparecidos=14
+2026-03-11 11:25:31,358 - INFO - GET /inventarios-pendientes: TIMING BREAKDOWN
+        \u2514\u2500 Paso 1 (BD query): 0.72s
+        \u2514\u2500 Paso 2 (Load cache): 0.00s
+        \u2514\u2500 Paso 3 (Detect new): 0.00s
+        \u2514\u2500 Paso 4 (Predict 0 new): 0.00s (avg 0.00s per prediction)
+        \u2514\u2500 TOTAL REQUEST: 0.72s
+        \u2713 Returned 28 inventories
+2026-03-11 11:25:31,359 - INFO - Ruta accedida: /inventarios-pendientes | Status: 200 (Success)
+2026-03-11 11:25:31,360 - INFO - 10.185.36.30 - - [11/Mar/2026 11:25:31] "GET /inventarios-pendientes HTTP/1.1" 200 -
+2026-03-11 11:27:55,623 - INFO - ================================================================================
+2026-03-11 11:27:55,623 - INFO - Servidor Flask iniciado.
+2026-03-11 11:27:55,624 - INFO - Logs guardados en: D:\dev\sg-rfid-dron\logs\api.log
+2026-03-11 11:27:55,625 - INFO - ================================================================================
+2026-03-11 11:27:55,625 - INFO - ================================================================================
+2026-03-11 11:27:55,630 - INFO - Iniciando servidor en http://10.185.36.30:5100
+2026-03-11 11:27:55,630 - INFO - Swagger UI disponible en http://10.185.36.30:5100/apidocs
+2026-03-11 11:27:55,657 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5100
+ * Running on http://10.185.36.30:5100
+2026-03-11 11:27:55,657 - INFO - [33mPress CTRL+C to quit[0m
+2026-03-11 11:27:57,736 - INFO - Ruta accedida: /apidocs/ | Método: GET | IP: 10.214.3.183
+2026-03-11 11:27:57,757 - INFO - Ruta accedida: /apidocs/ | Status: 200 (Success)
+2026-03-11 11:27:57,758 - INFO - 10.214.3.183 - - [11/Mar/2026 11:27:57] "GET /apidocs/ HTTP/1.1" 200 -
+2026-03-11 11:27:57,860 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Método: GET | IP: 10.214.3.183
+2026-03-11 11:27:57,889 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Método: GET | IP: 10.214.3.183
+2026-03-11 11:27:57,889 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Método: GET | IP: 10.214.3.183
+2026-03-11 11:27:57,890 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Método: GET | IP: 10.214.3.183
+2026-03-11 11:27:57,905 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Status: 304 (Success)
+2026-03-11 11:27:57,905 - INFO - 10.214.3.183 - - [11/Mar/2026 11:27:57] "[36mGET /flasgger_static/swagger-ui.css HTTP/1.1[0m" 304 -
+2026-03-11 11:27:57,944 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Status: 304 (Success)
+2026-03-11 11:27:57,945 - INFO - 10.214.3.183 - - [11/Mar/2026 11:27:57] "[36mGET /flasgger_static/lib/jquery.min.js HTTP/1.1[0m" 304 -
+2026-03-11 11:27:57,947 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Status: 304 (Success)
+2026-03-11 11:27:57,947 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Status: 304 (Success)
+2026-03-11 11:27:57,948 - INFO - 10.214.3.183 - - [11/Mar/2026 11:27:57] "[36mGET /flasgger_static/swagger-ui-bundle.js HTTP/1.1[0m" 304 -
+2026-03-11 11:27:57,948 - INFO - 10.214.3.183 - - [11/Mar/2026 11:27:57] "[36mGET /flasgger_static/swagger-ui-standalone-preset.js HTTP/1.1[0m" 304 -
+2026-03-11 11:27:58,131 - INFO - Ruta accedida: /apispec_1.json | Método: GET | IP: 10.214.3.183
+2026-03-11 11:27:58,161 - INFO - Ruta accedida: /apispec_1.json | Status: 200 (Success)
+2026-03-11 11:27:58,161 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Método: GET | IP: 10.214.3.183
+2026-03-11 11:27:58,162 - INFO - 10.214.3.183 - - [11/Mar/2026 11:27:58] "GET /apispec_1.json HTTP/1.1" 200 -
+2026-03-11 11:27:58,163 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Status: 304 (Success)
+2026-03-11 11:27:58,164 - INFO - 10.214.3.183 - - [11/Mar/2026 11:27:58] "[36mGET /flasgger_static/favicon-32x32.png HTTP/1.1[0m" 304 -
+2026-03-11 11:28:43,360 - INFO - Ruta accedida: /apidocs/ | Método: GET | IP: 10.214.3.183
+2026-03-11 11:28:43,361 - INFO - Ruta accedida: /apidocs/ | Status: 200 (Success)
+2026-03-11 11:28:43,363 - INFO - 10.214.3.183 - - [11/Mar/2026 11:28:43] "GET /apidocs/ HTTP/1.1" 200 -
+2026-03-11 11:28:43,404 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Método: GET | IP: 10.214.3.183
+2026-03-11 11:28:43,406 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Status: 304 (Success)
+2026-03-11 11:28:43,407 - INFO - 10.214.3.183 - - [11/Mar/2026 11:28:43] "[36mGET /flasgger_static/swagger-ui.css HTTP/1.1[0m" 304 -
+2026-03-11 11:28:43,434 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Método: GET | IP: 10.214.3.183
+2026-03-11 11:28:43,435 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Método: GET | IP: 10.214.3.183
+2026-03-11 11:28:43,436 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Método: GET | IP: 10.214.3.183
+2026-03-11 11:28:43,437 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Status: 304 (Success)
+2026-03-11 11:28:43,438 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Status: 304 (Success)
+2026-03-11 11:28:43,438 - INFO - 10.214.3.183 - - [11/Mar/2026 11:28:43] "[36mGET /flasgger_static/swagger-ui-standalone-preset.js HTTP/1.1[0m" 304 -
+2026-03-11 11:28:43,439 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Status: 304 (Success)
+2026-03-11 11:28:43,439 - INFO - 10.214.3.183 - - [11/Mar/2026 11:28:43] "[36mGET /flasgger_static/swagger-ui-bundle.js HTTP/1.1[0m" 304 -
+2026-03-11 11:28:43,440 - INFO - 10.214.3.183 - - [11/Mar/2026 11:28:43] "[36mGET /flasgger_static/lib/jquery.min.js HTTP/1.1[0m" 304 -
+2026-03-11 11:28:43,559 - INFO - Ruta accedida: /apispec_1.json | Método: GET | IP: 10.214.3.183
+2026-03-11 11:28:43,561 - INFO - Ruta accedida: /apispec_1.json | Status: 200 (Success)
+2026-03-11 11:28:43,561 - INFO - 10.214.3.183 - - [11/Mar/2026 11:28:43] "GET /apispec_1.json HTTP/1.1" 200 -
+2026-03-11 11:28:43,562 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Método: GET | IP: 10.214.3.183
+2026-03-11 11:28:43,564 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Status: 304 (Success)
+2026-03-11 11:28:43,564 - INFO - 10.214.3.183 - - [11/Mar/2026 11:28:43] "[36mGET /flasgger_static/favicon-32x32.png HTTP/1.1[0m" 304 -
+2026-03-11 11:28:48,577 - INFO - Ruta accedida: /inventarios-pendientes | Método: GET | IP: 10.185.36.30
+2026-03-11 11:28:49,015 - INFO - GET /inventarios-pendientes: Loaded 42 cached predictions
+2026-03-11 11:28:49,016 - INFO - GET /inventarios-pendientes: BD=28 IDs, Caché=42 IDs, Nuevos=0, Desaparecidos=14
+2026-03-11 11:28:49,031 - INFO - GET /inventarios-pendientes: TIMING BREAKDOWN
+        \u2514\u2500 Paso 1 (BD query): 0.44s
+        \u2514\u2500 Paso 2 (Load cache): 0.00s
+        \u2514\u2500 Paso 3 (Detect new): 0.00s
+        \u2514\u2500 Paso 4 (Predict 0 new): 0.00s (avg 0.00s per prediction)
+        \u2514\u2500 TOTAL REQUEST: 0.44s
+        \u2713 Returned 28 inventories
+2026-03-11 11:28:49,032 - INFO - Ruta accedida: /inventarios-pendientes | Status: 200 (Success)
+2026-03-11 11:28:49,033 - INFO - 10.185.36.30 - - [11/Mar/2026 11:28:49] "GET /inventarios-pendientes HTTP/1.1" 200 -
+2026-03-11 11:28:54,886 - INFO - ================================================================================
+2026-03-11 11:28:54,886 - INFO - Servidor Flask iniciado.
+2026-03-11 11:28:54,887 - INFO - Logs guardados en: D:\dev\sg-rfid-dron\logs\api.log
+2026-03-11 11:28:54,888 - INFO - ================================================================================
+2026-03-11 11:28:54,888 - INFO - ================================================================================
+2026-03-11 11:28:54,892 - INFO - Iniciando servidor en http://10.185.36.30:5100
+2026-03-11 11:28:54,893 - INFO - Swagger UI disponible en http://10.185.36.30:5100/apidocs
+2026-03-11 11:28:54,919 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5100
+ * Running on http://10.185.36.30:5100
+2026-03-11 11:28:54,919 - INFO - [33mPress CTRL+C to quit[0m
+2026-03-11 11:30:53,924 - INFO - Ruta accedida: /apidocs/ | Método: GET | IP: 10.214.3.183
+2026-03-11 11:30:53,946 - INFO - Ruta accedida: /apidocs/ | Status: 200 (Success)
+2026-03-11 11:30:53,947 - INFO - 10.214.3.183 - - [11/Mar/2026 11:30:53] "GET /apidocs/ HTTP/1.1" 200 -
+2026-03-11 11:30:53,988 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Método: GET | IP: 10.214.3.183
+2026-03-11 11:30:54,024 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Método: GET | IP: 10.214.3.183
+2026-03-11 11:30:54,025 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Método: GET | IP: 10.214.3.183
+2026-03-11 11:30:54,034 - INFO - Ruta accedida: /flasgger_static/swagger-ui.css | Status: 304 (Success)
+2026-03-11 11:30:54,035 - INFO - 10.214.3.183 - - [11/Mar/2026 11:30:54] "[36mGET /flasgger_static/swagger-ui.css HTTP/1.1[0m" 304 -
+2026-03-11 11:30:54,075 - INFO - Ruta accedida: /flasgger_static/swagger-ui-standalone-preset.js | Status: 304 (Success)
+2026-03-11 11:30:54,076 - INFO - 10.214.3.183 - - [11/Mar/2026 11:30:54] "[36mGET /flasgger_static/swagger-ui-standalone-preset.js HTTP/1.1[0m" 304 -
+2026-03-11 11:30:54,089 - INFO - Ruta accedida: /flasgger_static/swagger-ui-bundle.js | Status: 304 (Success)
+2026-03-11 11:30:54,092 - INFO - 10.214.3.183 - - [11/Mar/2026 11:30:54] "[36mGET /flasgger_static/swagger-ui-bundle.js HTTP/1.1[0m" 304 -
+2026-03-11 11:30:54,095 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Método: GET | IP: 10.214.3.183
+2026-03-11 11:30:54,097 - INFO - Ruta accedida: /flasgger_static/lib/jquery.min.js | Status: 304 (Success)
+2026-03-11 11:30:54,111 - INFO - 10.214.3.183 - - [11/Mar/2026 11:30:54] "[36mGET /flasgger_static/lib/jquery.min.js HTTP/1.1[0m" 304 -
+2026-03-11 11:30:54,193 - INFO - Ruta accedida: /apispec_1.json | Método: GET | IP: 10.214.3.183
+2026-03-11 11:30:54,194 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Método: GET | IP: 10.214.3.183
+2026-03-11 11:30:54,233 - INFO - Ruta accedida: /apispec_1.json | Status: 200 (Success)
+2026-03-11 11:30:54,234 - INFO - 10.214.3.183 - - [11/Mar/2026 11:30:54] "GET /apispec_1.json HTTP/1.1" 200 -
+2026-03-11 11:30:54,236 - INFO - Ruta accedida: /flasgger_static/favicon-32x32.png | Status: 304 (Success)
+2026-03-11 11:30:54,236 - INFO - 10.214.3.183 - - [11/Mar/2026 11:30:54] "[36mGET /flasgger_static/favicon-32x32.png HTTP/1.1[0m" 304 -
