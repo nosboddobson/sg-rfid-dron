@@ -14,65 +14,127 @@ warnings.filterwarnings('ignore', message='.*pandas only supports SQLAlchemy con
 # Load environment variables from .env
 load_dotenv(override=True)
 
-# Variables globales para almacenar la conexión y el engine
-_db_engine = None
-_use_sqlalchemy = False
-_active_connection = None
+def _get_env_required(name):
+    value = os.getenv(name)
+    if value is None or str(value).strip() == "":
+        raise ValueError(f"[DB_CONN] Variable de entorno requerida no configurada: {name}")
+    return str(value).strip()
+
+
+def _get_connection_drivers():
+    """Retorna los drivers ODBC disponibles ordenados por preferencia."""
+    available = [driver.strip() for driver in pyodbc.drivers() if driver and driver.strip()]
+    configured_driver = os.getenv('DB_DRON_DRIVER', '').strip()
+
+    preferred = [
+        configured_driver,
+        'ODBC Driver 18 for SQL Server',
+        'ODBC Driver 17 for SQL Server',
+        'SQL Server Native Client 11.0',
+        'SQL Server'
+    ]
+
+    ordered = []
+    for driver in preferred:
+        if driver and driver not in ordered:
+            ordered.append(driver)
+
+    # Incluir cualquier driver SQL no contemplado en la lista preferida
+    for driver in available:
+        if 'sql server' in driver.lower() and driver not in ordered:
+            ordered.append(driver)
+
+    # Solo mantener drivers realmente instalados
+    installed = [driver for driver in ordered if driver in available]
+    return installed, available
+
+
+def _get_server_candidates(server):
+    """Construye lista de destinos SQL a intentar (principal + fallbacks)."""
+    candidates = []
+
+    port = os.getenv('DB_DRON_PORT', '').strip()
+    fallbacks_raw = os.getenv('DB_DRON_SERVER_FALLBACKS', '').strip()
+
+    if port and '\\' not in server and ',' not in server and not server.lower().startswith('tcp:'):
+        candidates.append(f"tcp:{server},{port}")
+
+    candidates.append(server)
+
+    if fallbacks_raw:
+        for fallback in fallbacks_raw.split(','):
+            fallback = fallback.strip()
+            if fallback:
+                candidates.append(fallback)
+
+    # Mantener orden y eliminar duplicados
+    deduped = []
+    for candidate in candidates:
+        if candidate not in deduped:
+            deduped.append(candidate)
+
+    return deduped
 
 def get_db_connection():
     """
-    Obtiene una conexión a la base de datos.
-    Intenta usar SQLAlchemy primero, si falla usa pyodbc.
-    Retorna siempre una conexión compatible (pyodbc-like) no un Engine.
+    Obtiene una conexión a SQL Server usando pyodbc con drivers modernos.
+    Prueba múltiples combinaciones de server/driver para mejorar resiliencia.
     
     Returns:
-        pyodbc.Connection: Una conexión que funciona tanto con SQLAlchemy como pyodbc
+        pyodbc.Connection
     """
-    global _db_engine, _use_sqlalchemy, _active_connection
-    
-    server = os.getenv('DB_DRON_SERVER')
-    database = os.getenv('DB_DRON_DATABASE')
-    username = os.getenv('DB_DRON_USERNAME')
-    password = os.getenv('DB_DRON_PASSWORD')
-    
-    # Intentar usar SQLAlchemy primero (solo en el primer llamado)
-    if _db_engine is None and not _use_sqlalchemy:
-        try:
-            from sqlalchemy import create_engine
-            
-            # Construir la cadena de conexión para SQLAlchemy
-            connection_string = f'mssql+pyodbc://{username}:{password}@{server}/{database}?driver=SQL+Server'
-            _db_engine = create_engine(connection_string)
-            
-            # Probar la conexión obteniendo una conexión real del Engine
-            with _db_engine.connect() as test_conn:
-                pass
-            
-            _use_sqlalchemy = True
-            print("[INFO] Usando SQLAlchemy para conexión a base de datos")
-            
-        except Exception as e:
-            logging.warning(f"[DB_CONN] SQLAlchemy no disponible: {str(e)} - Usando pyodbc", exc_info=False)
-            _use_sqlalchemy = False
-            _db_engine = None
-    
-    # Si SQLAlchemy está disponible, obtener una conexión del Engine
-    if _use_sqlalchemy and _db_engine is not None:
-        try:
-            # Obtener una conexión del Engine (pyodbc Connection envuelta)
-            raw_conn = _db_engine.raw_connection()
-            return raw_conn
-        except Exception as e:
-            logging.warning(f"[DB_CONN] Error en pool SQLAlchemy: {str(e)} - Fallback a pyodbc", exc_info=False)
-            _use_sqlalchemy = False
-    
-    # Usar pyodbc como fallback
-    try:
-        conn = pyodbc.connect(f'DRIVER={{SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}')
-        return conn
-    except Exception as e:
-        logging.error(f"[DB_CONN] ✗ Error crítico conectando a BD {server}/{database}: {str(e)}", exc_info=True)
-        raise
+    server = _get_env_required('DB_DRON_SERVER')
+    database = _get_env_required('DB_DRON_DATABASE')
+    username = _get_env_required('DB_DRON_USERNAME')
+    password = _get_env_required('DB_DRON_PASSWORD')
+
+    timeout = int(os.getenv('DB_DRON_CONN_TIMEOUT', '5'))
+    encrypt = os.getenv('DB_DRON_ENCRYPT', 'yes').strip().lower()
+    trust_cert = os.getenv('DB_DRON_TRUST_CERT', 'yes').strip().lower()
+
+    drivers, available = _get_connection_drivers()
+    if not drivers:
+        raise RuntimeError(
+            "[DB_CONN] No hay drivers ODBC de SQL Server instalados. "
+            f"Drivers detectados: {available}"
+        )
+
+    server_candidates = _get_server_candidates(server)
+    attempts = []
+
+    for server_candidate in server_candidates:
+        for driver in drivers:
+            conn_str = (
+                f"DRIVER={{{driver}}};"
+                f"SERVER={server_candidate};"
+                f"DATABASE={database};"
+                f"UID={username};"
+                f"PWD={password};"
+                f"Encrypt={'yes' if encrypt in ('1', 'true', 'yes') else 'no'};"
+                f"TrustServerCertificate={'yes' if trust_cert in ('1', 'true', 'yes') else 'no'};"
+                f"Connection Timeout={timeout};"
+            )
+
+            try:
+                conn = pyodbc.connect(conn_str)
+                logging.info(
+                    f"[DB_CONN] Conexión SQL exitosa. "
+                    f"Server={server_candidate}, DB={database}, Driver={driver}"
+                )
+                return conn
+            except Exception as e:
+                attempts.append(f"{server_candidate} | {driver} -> {str(e)}")
+
+    attempts_text = "\n".join(attempts[:6])
+    logging.error(
+        f"[DB_CONN] ✗ Error crítico conectando a BD {server}/{database}. "
+        f"Intentos realizados: {len(attempts)}\n{attempts_text}",
+        exc_info=False
+    )
+    raise ConnectionError(
+        f"No se pudo conectar a SQL Server ({server}/{database}) tras {len(attempts)} intentos. "
+        "Revisar DNS/red, instancia SQL y firewall; opcionalmente configurar DB_DRON_PORT o DB_DRON_SERVER_FALLBACKS."
+    )
 
 def execute_sql_query(sql_query, conn, params=None):
     """
@@ -559,8 +621,14 @@ def Dron_GET_Boton_Envio_Datos():
 
 def insert_client_ip_to_heartbeats(client_ip):
     """Inserts the client IP into the Dron_Heartbeats table."""
+    conn = None
 
-    conn = get_db_connection() #Get the connection.
+    try:
+        conn = get_db_connection() #Get the connection.
+    except Exception as db_conn_err:
+        logging.error(f"[DB_CONN] Error conectando para heartbeat: {db_conn_err}", exc_info=False)
+        return False
+
     if conn is None:
         return False #exit if connection failed.
 
