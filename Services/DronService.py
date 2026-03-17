@@ -132,7 +132,7 @@ def Guardar_json_como_csv(json_entrada,folder,Prefix):
     try :
 
         data_list = []
-        for item in json_entrada['Inventario']:  # Adjust based on your JSON structure
+        for item in json_entrada['ARRAY_INPUT']:  # Adjust based on your JSON structure
             data_list.append(item)
 
         df = pd.DataFrame(data_list)

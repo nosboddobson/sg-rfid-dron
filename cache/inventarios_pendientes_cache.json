@@ -1,21 +1,32 @@
 {
-  "timestamp": "2026-03-17T11:19:35.531255",
-  "count": 32,
+  "timestamp": "2026-03-17T11:51:12.662815",
+  "count": 33,
   "inventarios": [
     {
-      "ID": 1612,
-      "Fecha_Vuelo": "2026-03-17 10:54:06",
-      "N_Elementos": 515,
-      "Tiempo_Vuelo": 1043,
-      "predicted_zone": "PF4",
-      "zone_confidence": 83.29,
+      "ID": 1614,
+      "Fecha_Vuelo": "2026-03-17 11:33:27",
+      "N_Elementos": 282,
+      "Tiempo_Vuelo": 668,
+      "predicted_zone": "PF5",
+      "zone_confidence": 71.34,
       "zone_breakdown": {
-        "PF4": 83.29,
-        "PT": 11.29,
-        "PF5": 3.85,
-        "PF3": 1.35,
-        "PF1": 0.17,
-        "PF2": 0.06
+        "PF5": 71.34,
+        "PT": 18.29,
+        "PF1": 4.7,
+        "PF4": 4.57,
+        "PF3": 1.0,
+        "PF2": 0.1
+      }
+    },
+    {
+      "ID": 1613,
+      "Fecha_Vuelo": "2026-03-17 11:11:34",
+      "N_Elementos": 6,
+      "Tiempo_Vuelo": 710,
+      "predicted_zone": "PF3",
+      "zone_confidence": 100.0,
+      "zone_breakdown": {
+        "PF3": 100.0
       }
     },
     {

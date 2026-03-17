@@ -83,6 +83,9 @@ def load_route_from_df(df):
 def create_dron_video_3d(df_jde,ID_Vuelo):
 
     output_video_path_base = os.getenv('VIDEO_OUTPUT_PATH', 'Webserver/videos/')
+    if not os.path.exists(output_video_path_base):
+        os.makedirs(output_video_path_base)
+        print(f"Directorio creado: {output_video_path_base}")
     json_path = 'Video_Vuelos/Video_Json/PM2_bounding-boxes_3d_20250226.json'
     image_path = 'Video_Vuelos/layout/PM2_3d_20250226.jpg'
     output_video_path = output_video_path_base + str(ID_Vuelo) +'_inventario_vuelo.mp4'
@@ -188,21 +191,29 @@ def create_drone_flight_video(json_path, image_path, drone_img_path, output_vide
         print(f"Error: No se pudo cargar la imagen desde {image_path}")
         return None
     height, width, channels = img.shape
-    # video
-    #fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    fourcc = cv2.VideoWriter_fourcc(*'X264')
     fps = 30
-    video_out = cv2.VideoWriter(output_video_path, fourcc, fps, (width, height))
-    # Obtener dimensiones de la imagen
-    
-    print(f"Dimensiones de la imagen: {width}x{height}")
-    
+    video_out = None
+    fourcc = None
 
-    if not video_out.isOpened():
-        print("Error crítico: No se puede crear el archivo de video con ningún códec.")
+    for codec in ['X264', 'avc1', 'mp4v', 'XVID']:
+        fourcc_candidate = cv2.VideoWriter_fourcc(*codec)
+        writer = cv2.VideoWriter(output_video_path, fourcc_candidate, fps, (width, height))
+        if writer.isOpened():
+            video_out = writer
+            fourcc = fourcc_candidate
+            print(f"Codec seleccionado: {codec}")
+            break
+        else:
+            writer.release()
+            print(f"Codec {codec} no disponible, intentando siguiente...")
+
+    print(f"Dimensiones de la imagen: {width}x{height}")
+
+    if video_out is None or not video_out.isOpened():
+        print("Error critico: No se puede crear el archivo de video con ningun codec.")
         return None
-    
-    print(f"Configuración de video: {width}x{height}, {fps} fps, códec: {chr(fourcc & 0xFF) + chr((fourcc >> 8) & 0xFF) + chr((fourcc >> 16) & 0xFF) + chr((fourcc >> 24) & 0xFF)}")
+
+    print(f"Configuracion de video: {width}x{height}, {fps} fps")
     
 
     def draw_all_boxes(image):
@@ -538,7 +549,7 @@ def create_drone_flight_video(json_path, image_path, drone_img_path, output_vide
         current_location, current_pos, current_polygon = route_centers[i]
         next_location, next_pos, next_polygon = route_centers[i + 1]
         
-        print(f"Animando movimiento: {current_location} → {next_location}")
+        print(f"Animando movimiento: {current_location} -> {next_location}")
         
 
         if "-" in current_location:

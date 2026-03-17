@@ -564,24 +564,28 @@ def actualizar_estado_inventario():
 
     start_time = time.time()
     archivo_json = request.get_json()
-    
+    logging.info(f"POST /dron/actualizar-estado-inventario: request recibido desde {request.remote_addr}")
+
     try:
         # Validar el JSON entrante contra el esquema.
         jsonschema.validate(instance=archivo_json, schema=json_schema)
-        
+
         # Procesar el inventario si la validación es exitosa.
         archivo_json = DronService.actualizar_estado_inventario(archivo_json)
-        
+
         end_time = time.time()
+        logging.info(f"POST /dron/actualizar-estado-inventario: OK ({end_time - start_time:.2f}s)")
         SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "actualizar-estado-inventario", 200)
         return jsonify(archivo_json), 200
-        
+
     except jsonschema.exceptions.ValidationError as e:
         end_time = time.time()
+        logging.warning(f"POST /dron/actualizar-estado-inventario: Esquema invalido - {e.message}")
         SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "actualizar-estado-inventario", 404)
         return jsonify({'error': 'Esquema de Archivo no Valido!', 'Campos necesarios': json_schema["properties"]["Inventario"]["items"]["required"]}), 404
     except Exception as e:
         end_time = time.time()
+        logging.error(f"POST /dron/actualizar-estado-inventario: Error - {str(e)}", exc_info=True)
         SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "actualizar-estado-inventario", 500)
         return jsonify({'Error': str(e)}), 500
 
@@ -639,81 +643,96 @@ def actualizar_inventario():
               type: string
     """
     start_time = time.time()
-    
+
     Sucursal = request.args.get('Sucursal', "SGMINA")
     Ubicacion = request.args.get('Ubicacion', "PT")
     ID = request.args.get('ID')
     Tipo_Inventario = request.args.get('Tipo_Inventario')
 
+    logging.info(f"POST /dron/actualizar-inventario: ID={ID}, Sucursal={Sucursal}, Ubicacion={Ubicacion}, Tipo={Tipo_Inventario} | IP={request.remote_addr}")
+
     if Tipo_Inventario == "Completo":
         Ubicacion = "PT"
-    
+
     try:
         # Conectar y limpiar la carpeta compartida de JD.
+        logging.info(f"POST /dron/actualizar-inventario: Conectando a carpeta JD: {os.getenv('JD_REMOTE_FOLDER')}")
         DronService.connect_to_share_folder(os.getenv('JD_REMOTE_FOLDER'), os.getenv('JD_REMOTE_FOLDER_USERNAME'), os.getenv('JD_REMOTE_FOLDER_PASSWORD'))
         DronService.borrar_archivos_en_carpeta(os.getenv('JD_REMOTE_FOLDER'))
-        
+
         # Generar el conteo en JD Edwards.
+        logging.info(f"POST /dron/actualizar-inventario: Generando conteo JD para Sucursal={Sucursal}, Ubicacion={Ubicacion}")
         if JDService.Generar_Conteo(Sucursal, Ubicacion) is not None:
-            time.sleep(40) # Esperar a que el archivo se genere.
+            logging.info("POST /dron/actualizar-inventario: Conteo JD generado. Esperando archivo (40s)...")
+            time.sleep(40)
 
             if JDService.Archivo_Conteo_Generado_Nuevo(start_time):
-                # Comparar y obtener el inventario actualizado.
+                logging.info("POST /dron/actualizar-inventario: Archivo JD detectado. Procesando inventario...")
                 inventario_json, NumeroConteo, TransactionId = DronService.actualizar_estado_inventario(ID)
-                
+
                 if inventario_json:
-                    # Guardar el resultado del inventario en un CSV.
+                    logging.info(f"POST /dron/actualizar-inventario: Inventario procesado. NumeroConteo={NumeroConteo}, TransactionId={TransactionId}")
                     DronService.Guardar_json_como_csv(inventario_json, os.getenv('DRON_FOLDER_RESULTS'), Ubicacion)
 
-                    # Devolver el inventario actualizado a JD Edwards.
+                    logging.info("POST /dron/actualizar-inventario: Enviando datos de conteo a JD...")
                     if JDService.Retorno_Datos_Conteo(inventario_json):
-                        # Generar reporte y cerrar el conteo en JD.
                         JDService.Generar_Reporte_Conteo(NumeroConteo)
-                        
+                        logging.info(f"POST /dron/actualizar-inventario: Reporte JD generado para NumeroConteo={NumeroConteo}")
+
                         end_time = time.time()
                         SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "actualizar-inventario", 200)
 
                         if ID:
-                            # Actualizar la base de datos local.
                             dbService.Actuaizar_Estado_inventario_vuelos(int(ID))
                             resumen = dbService.Resumen_de_Conteo_desde_Json(inventario_json)
+                            logging.info(f"POST /dron/actualizar-inventario: Resumen - OK={resumen['OK Count']}, Faltantes={resumen['FALTANTE Count']}, Otros={resumen['Other Count']}, %OK={resumen['Percentage OK']}")
                             ahora = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
                             Inventario_jed_id = dbService.insertar_inventario_jde(ID, ahora, resumen['OK Count'], resumen['FALTANTE Count'], resumen['Other Count'], resumen['Percentage OK'], NumeroConteo, Sucursal, Ubicacion, TransactionId)
+                            logging.info(f"POST /dron/actualizar-inventario: Inventario JDE insertado con ID={Inventario_jed_id}")
                             dbService.insertar_elementos_jde(Inventario_jed_id, inventario_json)
                             dbService.insertar_Fecha_Vuelo_Elementos_JED(ID, Inventario_jed_id)
-                            
+
                             elementos_jed_df = dbService.Exportar_Elementos_JED_a_df(Inventario_jed_id)
-                            
                             if elementos_jed_df is not None:
+                                logging.info(f"POST /dron/actualizar-inventario: Generando video 3D para Inventario_jed_id={Inventario_jed_id} ({len(elementos_jed_df)} elementos)")
                                 ruta_video = Video_Service.create_dron_video_3d(elementos_jed_df, Inventario_jed_id)
                                 if ruta_video is not None:
                                     dbService.insertar_ruta_video_inventario_jde(Inventario_jed_id, ruta_video)
-                                    
-                        return jsonify({'OK': 'Inventario en JD Actualizado con Éxito'}), 200
+                                    logging.info(f"POST /dron/actualizar-inventario: Video generado en '{ruta_video}'")
+                                else:
+                                    logging.warning(f"POST /dron/actualizar-inventario: No se pudo generar el video para Inventario_jed_id={Inventario_jed_id}")
+                            else:
+                                logging.warning(f"POST /dron/actualizar-inventario: Exportar_Elementos_JED_a_df retorno None para Inventario_jed_id={Inventario_jed_id}")
+
+                        logging.info(f"POST /dron/actualizar-inventario: Completado con exito para ID={ID} ({end_time - start_time:.2f}s)")
+                        return jsonify({'OK': 'Inventario en JD Actualizado con Exito'}), 200
                     else:
                         end_time = time.time()
+                        logging.error(f"POST /dron/actualizar-inventario: Fallo al enviar datos de conteo a JD (ID={ID})")
                         SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "actualizar-inventario", 404)
-                        return jsonify({'error': 'No fue posible Enviar Inventario a JD'}), 404 
+                        return jsonify({'error': 'No fue posible Enviar Inventario a JD'}), 404
                 else:
                     end_time = time.time()
+                    logging.error(f"POST /dron/actualizar-inventario: actualizar_estado_inventario retorno None para ID={ID}")
                     SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "actualizar-inventario", 404)
                     return jsonify({'error': 'No fue posible Obtener Inventario desde JD'}), 404
             else:
                 end_time = time.time()
+                logging.error(f"POST /dron/actualizar-inventario: Archivo JD no generado dentro del tiempo esperado (ID={ID})")
                 SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "actualizar-inventario", 404)
-                return jsonify({'error': 'Archivo desde JD No Generado'}), 404 
+                return jsonify({'error': 'Archivo desde JD No Generado'}), 404
         else:
             end_time = time.time()
+            logging.error(f"POST /dron/actualizar-inventario: Generar_Conteo retorno None (Sucursal={Sucursal}, Ubicacion={Ubicacion})")
             SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "actualizar-inventario", 404)
             return jsonify({'error': 'No fue posible Obtener Inventario desde JD'}), 404
-            
+
     except Exception as e:
         end_time = time.time()
+        logging.error(f"POST /dron/actualizar-inventario: Error general para ID={ID} - {str(e)}", exc_info=True)
         SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "actualizar-inventario", 500)
-        print ({'Error General': str(e)})
         return jsonify({'Error General': str(e)}), 500
     finally:
-        # Asegurar la desconexión del recurso compartido.
         DronService.disconnect_from_share_folder(os.getenv('JD_REMOTE_FOLDER'))
 
 @app.route('/dron/crear-video', methods=['POST'])
@@ -782,7 +801,7 @@ def crear_video():
             SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "crear-video", 404)
             return jsonify({'error': 'No se pudieron obtener los elementos JDE para generar el video'}), 404
 
-        #logging.info(f"POST /dron/crear-video: {len(elementos_jed_df)} elementos exportados. Generando video 3D...")
+        logging.info(f"POST /dron/crear-video: {len(elementos_jed_df)} elementos exportados. Generando video 3D...")
 
         ruta_video = Video_Service.create_dron_video_3d(elementos_jed_df, Inventario_jed_id)
         if ruta_video is None:
@@ -845,25 +864,30 @@ def eliminar_inventario():
     start_time = time.time()
     
     ID = request.args.get('ID')
+    logging.info(f"POST /dron/eliminar-inventario: ID={ID} | IP={request.remote_addr}")
+
     if ID and int(ID) > 0:
         try:
             Eliminar_inventario_id = dbService.delete_inventario_vuelo_row(ID)
-            
             if Eliminar_inventario_id:
                 end_time = time.time()
+                logging.info(f"POST /dron/eliminar-inventario: ID={ID} eliminado correctamente")
                 SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "eliminar-inventario", 200)
-                return jsonify({'OK': 'Inventario eliminado con Éxito'}), 200 
+                return jsonify({'OK': 'Inventario eliminado con Exito'}), 200
             else:
                 end_time = time.time()
+                logging.warning(f"POST /dron/eliminar-inventario: No se pudo eliminar ID={ID}")
                 SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "eliminar-inventario", 404)
-                return jsonify({'error': 'No fue posible Eliminar Inventario'}), 404 
+                return jsonify({'error': 'No fue posible Eliminar Inventario'}), 404
         except Exception as e:
             end_time = time.time()
+            logging.error(f"POST /dron/eliminar-inventario: Error al eliminar ID={ID} - {str(e)}", exc_info=True)
             SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "eliminar-inventario", 500)
             return jsonify({'Error': str(e)}), 500
     else:
         end_time = time.time()
-        SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "elimimar-inventario", 404)
+        logging.warning(f"POST /dron/eliminar-inventario: ID invalido o no proporcionado (ID={ID})")
+        SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "eliminar-inventario", 404)
         return jsonify({'error': 'No fue posible Obtener ID de Inventario'}), 404
 
 @app.route('/api/data', methods=['POST'])
@@ -930,40 +954,43 @@ def upload_file():
               type: string
     """
     start_time = time.time()
+    logging.info(f"POST /upload: request recibido desde {request.remote_addr}")
 
     if 'file' not in request.files:
         end_time = time.time()
+        logging.warning(f"POST /upload: request sin archivo adjunto desde {request.remote_addr}")
         SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "Upload_File", 400)
         return jsonify({'error': 'No file part'}), 400
-    
+
     file = request.files['file']
-    
+
     if file.filename == '':
         end_time = time.time()
-        SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "Upload_File", 500)
+        logging.warning("POST /upload: nombre de archivo vacio")
+        SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "Upload_File", 400)
         return jsonify({'error': 'No selected file'}), 400
-    
 
     if file:
+        logging.info(f"POST /upload: procesando archivo '{file.filename}'")
+        try:
+            df = pd.read_csv(file.stream, sep=',', dtype=str)
+            archivos_creados = DronService.Limpiar_Archivos_Dron(df, os.getenv('Dron_Folder'))
+            logging.info(f"POST /upload: {len(archivos_creados)} archivos generados desde el CSV")
 
-        df = pd.read_csv(file.stream, sep=',', dtype=str)
+            for filename in archivos_creados:
+                SaveExecutions.Guardar_Recepcion_Archivos_Dron_a_csv(filename)
+                dbService.insertar_datos_inventario_vuelos(filename)
+                logging.info(f"POST /upload: archivo '{filename}' procesado e insertado en BD")
 
-        # Llamar a la función Limpiar_Archivos_Dron para obtener la lista de archivos
-        archivos_creados = DronService.Limpiar_Archivos_Dron(df,os.getenv('Dron_Folder'))
-    
-      
-        for filename in archivos_creados:
-            # --- Código original que se ejecutaba con 'file' ---
-            # unique_id = str(uuid.uuid4()) # Ya no es necesario generar un nuevo UUID
-            # filename = utc_time() + "_" + unique_id + "_epc_records.csv" # Ya no es necesario generar un nuevo nombre
-            # file.save(os.path.join(os.getenv('DRON_FOLDER'), filename)) # Ya no se guarda porque ya está guardado en Limpiar_Archivos_Dron
-
-            SaveExecutions.Guardar_Recepcion_Archivos_Dron_a_csv(filename)
-            dbService.insertar_datos_inventario_vuelos(filename)
-            
-        end_time = time.time()
-        SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "Upload_File", 200)
-        return jsonify({'message': 'File successfully uploaded', 'filename': filename}), 200
+            end_time = time.time()
+            logging.info(f"POST /upload: completado ({end_time - start_time:.2f}s), ultimo archivo='{filename}'")
+            SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "Upload_File", 200)
+            return jsonify({'message': 'File successfully uploaded', 'filename': filename}), 200
+        except Exception as e:
+            end_time = time.time()
+            logging.error(f"POST /upload: Error procesando archivo - {str(e)}", exc_info=True)
+            SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "Upload_File", 500)
+            return jsonify({'error': str(e)}), 500
 
 @app.route('/predict-zone', methods=['POST'])
 def predict_zone():
@@ -1115,13 +1142,16 @@ def show_message(msg):
     try:
         client_ip = request.remote_addr
         dbService.insert_client_ip_to_heartbeats(client_ip)
-        
-        if dbService.Dron_GET_Boton_Envio_Datos(): 
+
+        if dbService.Dron_GET_Boton_Envio_Datos():
+            logging.info(f"POST /printer/{msg}: heartbeat desde {client_ip} - solicitud de envio activa")
             return jsonify({'message': 'ok'}), 201
         else:
+            logging.debug(f"POST /printer/{msg}: heartbeat desde {client_ip}")
             return jsonify({'message': 'ok'}), 200
-            
+
     except Exception as e:
+        logging.error(f"POST /printer/{msg}: Error - {str(e)}", exc_info=True)
         return jsonify({'Error': str(e)}), 500
 
 @app.route('/dron/TestJDFolder', methods=['POST'])
@@ -1149,11 +1179,12 @@ def TestJDFolder():
               type: string
     """
     try:
-        print("connecting to: " + os.getenv('JD_REMOTE_FOLDER') + " with user " + os.getenv('JD_REMOTE_FOLDER_USERNAME'))
+        logging.info(f"POST /dron/TestJDFolder: conectando a {os.getenv('JD_REMOTE_FOLDER')} con usuario {os.getenv('JD_REMOTE_FOLDER_USERNAME')}")
         DronService.connect_to_share_folder(os.getenv('JD_REMOTE_FOLDER'), os.getenv('JD_REMOTE_FOLDER_USERNAME'), os.getenv('JD_REMOTE_FOLDER_PASSWORD'))
+        logging.info("POST /dron/TestJDFolder: conexion exitosa")
         return "OK"
     except Exception as e:
-        print({'Error': str(e)})
+        logging.error(f"POST /dron/TestJDFolder: Error de conexion - {str(e)}", exc_info=True)
         return jsonify({'Error': str(e)}), 500
     finally:
         DronService.disconnect_from_share_folder(os.getenv('JD_REMOTE_FOLDER'))
