@@ -708,6 +708,26 @@ def obtener_datos_inventarios_jde(ID_Vuelo):
             close_connection(conn)
 
 
+def obtener_inventario_jde_id_por_vuelo(id_vuelo):
+    """
+    Retorna el ID de Inventarios_JDE correspondiente a un ID_Vuelo.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return None
+    try:
+        cursor = get_cursor_from_connection(conn)
+        query = 'SELECT TOP 1 ID FROM Inventarios_JDE WHERE ID_Vuelo = ? ORDER BY ID DESC'
+        cursor.execute(query, (id_vuelo,))
+        result = cursor.fetchone()
+        return result[0] if result else None
+    except Exception as e:
+        logging.error(f"[DB] Error obteniendo Inventario JDE por vuelo {id_vuelo}: {e}", exc_info=True)
+        return None
+    finally:
+        close_connection(conn)
+
+
 if __name__ == "__main__":
 
     print("OK")

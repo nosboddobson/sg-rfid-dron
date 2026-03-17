@@ -82,7 +82,7 @@ def load_route_from_df(df):
 
 def create_dron_video_3d(df_jde,ID_Vuelo):
 
-    output_video_path_base = 'Webserver/videos/'
+    output_video_path_base = os.getenv('VIDEO_OUTPUT_PATH', 'Webserver/videos/')
     json_path = 'Video_Vuelos/Video_Json/PM2_bounding-boxes_3d_20250226.json'
     image_path = 'Video_Vuelos/layout/PM2_3d_20250226.jpg'
     output_video_path = output_video_path_base + str(ID_Vuelo) +'_inventario_vuelo.mp4'
@@ -110,7 +110,7 @@ def create_dron_video_3d(df_jde,ID_Vuelo):
         
 def create_dron_video_3d_test(ID_Vuelo):
 
-    output_video_path_base = 'Webserver/videos/'
+    output_video_path_base = os.getenv('VIDEO_OUTPUT_PATH', 'Webserver/videos/')
     json_path = 'Video_Vuelos/Video_Json/PM2_bounding-boxes_3d_20250226.json'
     image_path = 'Video_Vuelos/layout/PM2_3d_20250226.jpg'
     output_video_path = output_video_path_base + str(ID_Vuelo) +'_inventario_vuelo.mp4'

@@ -716,6 +716,95 @@ def actualizar_inventario():
         # Asegurar la desconexión del recurso compartido.
         DronService.disconnect_from_share_folder(os.getenv('JD_REMOTE_FOLDER'))
 
+@app.route('/dron/crear-video', methods=['POST'])
+def crear_video():
+    """
+    Endpoint para crear el video 3D de un inventario de vuelo.
+    ---
+    tags:
+      - Dron - Inventario
+    parameters:
+      - in: query
+        name: ID
+        type: integer
+        required: true
+        description: ID del vuelo (Inventario_Vuelos)
+    responses:
+      200:
+        description: Video creado exitosamente
+        schema:
+          type: object
+          properties:
+            OK:
+              type: string
+            ruta_video:
+              type: string
+      404:
+        description: No se encontró el inventario o no se pudo generar el video
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+      500:
+        description: Error general del servidor
+        schema:
+          type: object
+          properties:
+            Error General:
+              type: string
+    """
+    start_time = time.time()
+
+    ID = request.args.get('ID')
+    logging.info(f"POST /dron/crear-video: ID={ID}")
+
+    if not ID or int(ID) <= 0:
+        end_time = time.time()
+        logging.warning(f"POST /dron/crear-video: ID de vuelo no válido (ID={ID})")
+        SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "crear-video", 404)
+        return jsonify({'error': 'ID de vuelo requerido'}), 404
+
+    try:
+        Inventario_jed_id = dbService.obtener_inventario_jde_id_por_vuelo(int(ID))
+        if not Inventario_jed_id:
+            end_time = time.time()
+            logging.warning(f"POST /dron/crear-video: No se encontró Inventarios_JDE para ID_Vuelo={ID}")
+            SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "crear-video", 404)
+            return jsonify({'error': f'No se encontró registro en Inventarios_JDE para el vuelo ID={ID}'}), 404
+
+        logging.info(f"POST /dron/crear-video: Inventario_jed_id={Inventario_jed_id} encontrado para ID_Vuelo={ID}")
+
+        elementos_jed_df = dbService.Exportar_Elementos_JED_a_df(Inventario_jed_id)
+        if elementos_jed_df is None:
+            end_time = time.time()
+            logging.warning(f"POST /dron/crear-video: No se pudieron obtener elementos JDE para Inventario_jed_id={Inventario_jed_id}")
+            SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "crear-video", 404)
+            return jsonify({'error': 'No se pudieron obtener los elementos JDE para generar el video'}), 404
+
+        #logging.info(f"POST /dron/crear-video: {len(elementos_jed_df)} elementos exportados. Generando video 3D...")
+
+        ruta_video = Video_Service.create_dron_video_3d(elementos_jed_df, Inventario_jed_id)
+        if ruta_video is None:
+            end_time = time.time()
+            logging.error(f"POST /dron/crear-video: create_dron_video_3d retornó None para Inventario_jed_id={Inventario_jed_id}")
+            SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "crear-video", 404)
+            return jsonify({'error': 'No se pudo generar el video 3D'}), 404
+
+        dbService.insertar_ruta_video_inventario_jde(Inventario_jed_id, ruta_video)
+        logging.info(f"POST /dron/crear-video: Video generado en '{ruta_video}' para Inventario_jed_id={Inventario_jed_id}")
+
+        end_time = time.time()
+        SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "crear-video", 200)
+        return jsonify({'OK': 'Video creado con Éxito', 'ruta_video': ruta_video}), 200
+
+    except Exception as e:
+        end_time = time.time()
+        logging.error(f"POST /dron/crear-video: Error general para ID={ID} - {str(e)}", exc_info=True)
+        SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "crear-video", 500)
+        return jsonify({'Error General': str(e)}), 500
+
+
 @app.route('/dron/eliminar-inventario', methods=['POST'])
 def eliminar_inventario():
     """
