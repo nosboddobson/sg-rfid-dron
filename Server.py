@@ -437,6 +437,213 @@ def obtener_datos_inventarios_pendientes():
             'inventarios': []
         }), 500
 
+@app.route('/inventarios-realizados', methods=['GET'])
+def obtener_inventarios_realizados():
+    """
+    Endpoint para obtener los últimos 100 inventarios realizados.
+    ---
+    tags:
+      - Inventario - Listado
+    responses:
+      200:
+        description: Lista de inventarios realizados
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+              example: true
+            count:
+              type: integer
+              example: 100
+            inventarios:
+              type: array
+              items:
+                type: object
+                properties:
+                  ID:
+                    type: integer
+                    example: 10
+                  ID_Vuelo:
+                    type: integer
+                    example: 5
+                  Fecha_Vuelo:
+                    type: string
+                    format: date-time
+                    example: "2026-01-31"
+                  Tiempo_Vuelo:
+                    type: integer
+                    example: 1200
+                  Fecha_Inventario:
+                    type: string
+                    format: date-time
+                    example: "2026-01-31T18:22:41"
+                  Elementos_OK:
+                    type: integer
+                    example: 290
+                  Elementos_Faltantes:
+                    type: integer
+                    example: 5
+                  Porcentaje_Lectura:
+                    type: number
+                    example: 96.67
+                  NumeroConteo:
+                    type: integer
+                    example: 1
+                  Sucursal:
+                    type: string
+                    example: "PF2"
+                  Ubicacion:
+                    type: string
+                    example: "Pasillo 3"
+                  TransactionId:
+                    type: string
+                    example: "abc123"
+                  Elementos_Sobrantes:
+                    type: integer
+                    example: 5
+                  N_elementos:
+                    type: integer
+                    example: 300
+                  Imagen_Vuelo:
+                    type: string
+                    example: "imagen.png"
+                  Video_Vuelo:
+                    type: string
+                    example: "video.mp4"
+      500:
+        description: Error al obtener datos
+    """
+    try:
+        start_time = time.time()
+
+        conn = dbService.get_db_connection()
+        sql_query = '''
+            SELECT TOP (100) j.ID, j.ID_Vuelo, v.Fecha_Vuelo, v.Tiempo_Vuelo, j.Fecha_Inventario,
+                   j.Elementos_OK, j.Elementos_Faltantes,
+                   j.Porcentaje_Lectura, j.NumeroConteo, j.Sucursal, j.Ubicacion,
+                   j.TransactionId, (v.N_elementos - j.Elementos_OK) AS Elementos_Sobrantes,
+                   v.N_elementos, j.Imagen_Vuelo, j.Video_Vuelo
+            FROM Inventarios_JDE j
+            JOIN Inventario_Vuelos v ON j.ID_Vuelo = v.ID
+            ORDER BY j.ID DESC
+        '''
+        df = dbService.execute_sql_query(sql_query, conn, params=None)
+        dbService.close_connection(conn)
+
+        if df is None or len(df) == 0:
+            return jsonify({'success': True, 'count': 0, 'inventarios': []}), 200
+
+        inventarios = []
+        for _, row in df.iterrows():
+            inventarios.append({
+                'ID': int(row['ID']),
+                'ID_Vuelo': int(row['ID_Vuelo']),
+                'Fecha_Vuelo': str(row['Fecha_Vuelo']),
+                'Tiempo_Vuelo': int(row['Tiempo_Vuelo']) if row['Tiempo_Vuelo'] is not None else None,
+                'Fecha_Inventario': str(row['Fecha_Inventario']),
+                'Elementos_OK': int(row['Elementos_OK']) if row['Elementos_OK'] is not None else None,
+                'Elementos_Faltantes': int(row['Elementos_Faltantes']) if row['Elementos_Faltantes'] is not None else None,
+                'Porcentaje_Lectura': float(row['Porcentaje_Lectura']) if row['Porcentaje_Lectura'] is not None else None,
+                'NumeroConteo': int(row['NumeroConteo']) if row['NumeroConteo'] is not None else None,
+                'Sucursal': row['Sucursal'],
+                'Ubicacion': row['Ubicacion'],
+                'TransactionId': row['TransactionId'],
+                'Elementos_Sobrantes': int(row['Elementos_Sobrantes']) if row['Elementos_Sobrantes'] is not None else None,
+                'N_elementos': int(row['N_elementos']) if row['N_elementos'] is not None else None,
+                'Imagen_Vuelo': row['Imagen_Vuelo'],
+                'Video_Vuelo': row['Video_Vuelo'],
+            })
+
+        end_time = time.time()
+        SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "obtener_inventarios_realizados", 200)
+        logging.info(f"GET /inventarios-realizados: Returned {len(inventarios)} records")
+
+        return jsonify({'success': True, 'count': len(inventarios), 'inventarios': inventarios}), 200
+
+    except Exception as e:
+        logging.error(f"GET /inventarios-realizados: Error - {str(e)}")
+        return jsonify({'success': False, 'error': str(e), 'inventarios': []}), 500
+
+@app.route('/inventario-jde', methods=['GET'])
+def obtener_elementos_jde():
+    """
+    Endpoint para obtener los elementos JDE de un inventario específico.
+    ---
+    tags:
+      - Inventario - Listado
+    parameters:
+      - in: query
+        name: id_inventario
+        type: integer
+        required: true
+        description: ID del inventario
+        example: 10
+    responses:
+      200:
+        description: Lista de elementos JDE del inventario
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+              example: true
+            count:
+              type: integer
+              example: 50
+            elementos:
+              type: array
+              items:
+                type: object
+                properties:
+                  EPC:
+                    type: string
+                    example: "E28011702000"
+                  Resultado:
+                    type: string
+                    example: "OK"
+                  Ubicacion:
+                    type: string
+                    example: "PT"
+                  CodigoArticulo:
+                    type: string
+                    example: "ART001"
+      400:
+        description: Parámetro id_inventario requerido
+      500:
+        description: Error al obtener datos
+    """
+    try:
+        start_time = time.time()
+
+        id_inventario = request.args.get('id_inventario')
+        if not id_inventario:
+            return jsonify({'success': False, 'error': 'El parámetro id_inventario es requerido'}), 400
+
+        conn = dbService.get_db_connection()
+        sql_query = '''
+            SELECT EPC, Resultado, Ubicacion, CodigoArticulo
+            FROM Elementos_JDE
+            WHERE ID_Inventario = ?
+        '''
+        df = dbService.execute_sql_query(sql_query, conn, params=[int(id_inventario)])
+        dbService.close_connection(conn)
+
+        if df is None or len(df) == 0:
+            return jsonify({'success': True, 'count': 0, 'elementos': []}), 200
+
+        elementos = df.to_dict(orient='records')
+
+        end_time = time.time()
+        SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "obtener_elementos_jde", 200)
+        logging.info(f"GET /inventario-jde: id={id_inventario} - Returned {len(elementos)} records")
+
+        return jsonify({'success': True, 'count': len(elementos), 'elementos': elementos}), 200
+
+    except Exception as e:
+        logging.error(f"GET /inventario-jde: Error - {str(e)}")
+        return jsonify({'success': False, 'error': str(e), 'elementos': []}), 500
+
 @app.route('/dron/actualizar-estado-inventario', methods=['POST'])
 def actualizar_estado_inventario():
     """
@@ -911,6 +1118,87 @@ def post_data():
     """
     new_data = request.json
     return jsonify(new_data), 201
+
+@app.route('/log-de-vuelos', methods=['GET'])
+def obtener_log_vuelos():
+    """
+    Endpoint para obtener el log de los últimos 300 vuelos registrados.
+    ---
+    tags:
+      - Data
+    responses:
+      200:
+        description: Lista de vuelos registrados
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+              example: true
+            count:
+              type: integer
+              example: 300
+            vuelos:
+              type: array
+              items:
+                type: object
+                properties:
+                  ID:
+                    type: integer
+                    example: 1
+                  Nombre_Archivo:
+                    type: string
+                    example: "vuelo_001.csv"
+                  Fecha_Vuelo:
+                    type: string
+                    format: date-time
+                    example: "2026-01-31"
+                  N_Elementos:
+                    type: integer
+                    example: 300
+                  Tiempo_Vuelo:
+                    type: integer
+                    example: 1200
+                  Estado_Inventario:
+                    type: string
+                    example: "Pendiente"
+      500:
+        description: Error al obtener datos
+    """
+    try:
+        start_time = time.time()
+
+        conn = dbService.get_db_connection()
+        sql_query = '''
+            SELECT TOP 300 ID, Nombre_Archivo, Fecha_Vuelo, N_Elementos, Tiempo_Vuelo, Estado_Inventario
+            FROM Inventario_Vuelos
+            ORDER BY Fecha_Vuelo DESC
+        '''
+        df = dbService.execute_sql_query(sql_query, conn, params=None)
+        dbService.close_connection(conn)
+
+        if df is None or len(df) == 0:
+            return jsonify({'success': True, 'count': 0, 'vuelos': []}), 200
+
+        dron_folder = os.getenv('Dron_Folder', '')
+        if dron_folder:
+            df['Nombre_Archivo'] = df['Nombre_Archivo'].apply(
+                lambda x: os.path.join(dron_folder, x) if x else x
+            )
+
+        vuelos = df.to_dict(orient='records')
+        for v in vuelos:
+            v['Fecha_Vuelo'] = str(v['Fecha_Vuelo'])
+
+        end_time = time.time()
+        SaveExecutions.Guardar_Ejecucion_a_csv(start_time, end_time, "log_de_vuelos", 200)
+        logging.info(f"GET /log-de-vuelos: Returned {len(vuelos)} records")
+
+        return jsonify({'success': True, 'count': len(vuelos), 'vuelos': vuelos}), 200
+
+    except Exception as e:
+        logging.error(f"GET /log-de-vuelos: Error - {str(e)}")
+        return jsonify({'success': False, 'error': str(e), 'vuelos': []}), 500
 
 @app.route('/upload', methods=['POST'])
 def upload_file():

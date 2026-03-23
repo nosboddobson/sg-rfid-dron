@@ -88,7 +88,7 @@ def create_dron_video_3d(df_jde,ID_Vuelo):
         print(f"Directorio creado: {output_video_path_base}")
     json_path = 'Video_Vuelos/Video_Json/PM2_bounding-boxes_3d_20250226.json'
     image_path = 'Video_Vuelos/layout/PM2_3d_20250226.jpg'
-    output_video_path = output_video_path_base + str(ID_Vuelo) +'_inventario_vuelo.mp4'
+    output_video_path = os.path.join(output_video_path_base, str(ID_Vuelo) + '_inventario_vuelo.mp4')
     drone_img_path = 'Video_Vuelos/dji_matrice_350_transparent.png'  # Ruta a la imagen del dron con fondo transparente
     Flight_Info=DB.obtener_datos_inventarios_jde(ID_Vuelo)
     
