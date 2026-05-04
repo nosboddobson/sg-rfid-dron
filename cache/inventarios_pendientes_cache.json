@@ -1,10 +1,109 @@
 {
-  "timestamp": "2026-03-23T09:39:32.553411",
-  "count": 34,
+  "timestamp": "2026-03-30T17:18:24.390790",
+  "count": 43,
   "inventarios": [
     {
-      "ID": 1621,
-      "Fecha_Vuelo": "2026-03-22 18:37:33",
+      "ID": 1642,
+      "Fecha_Vuelo": "2026-03-30 12:54:09",
+      "N_Elementos": 318,
+      "Tiempo_Vuelo": 571,
+      "predicted_zone": "PF1",
+      "zone_confidence": 86.37,
+      "zone_breakdown": {
+        "PF1": 86.37,
+        "PT": 10.57,
+        "PF5": 2.31,
+        "PF2": 0.75
+      }
+    },
+    {
+      "ID": 1641,
+      "Fecha_Vuelo": "2026-03-28 17:42:11",
+      "N_Elementos": 483,
+      "Tiempo_Vuelo": 3936,
+      "predicted_zone": "PF1",
+      "zone_confidence": 66.67,
+      "zone_breakdown": {
+        "PF1": 66.67,
+        "PF2": 33.33
+      }
+    },
+    {
+      "ID": 1639,
+      "Fecha_Vuelo": "2026-03-28 12:00:54",
+      "N_Elementos": 236,
+      "Tiempo_Vuelo": 17895,
+      "predicted_zone": "PF1",
+      "zone_confidence": 86.14,
+      "zone_breakdown": {
+        "PF1": 86.14,
+        "PT": 11.01,
+        "PF5": 2.44,
+        "PF2": 0.41
+      }
+    },
+    {
+      "ID": 1635,
+      "Fecha_Vuelo": "2026-03-27 17:17:56",
+      "N_Elementos": 381,
+      "Tiempo_Vuelo": 24087,
+      "predicted_zone": "PT",
+      "zone_confidence": null,
+      "zone_breakdown": {
+        "PF2": 50.0,
+        "PF1": 50.0
+      }
+    },
+    {
+      "ID": 1631,
+      "Fecha_Vuelo": "2026-03-27 12:08:18",
+      "N_Elementos": 57,
+      "Tiempo_Vuelo": 975,
+      "predicted_zone": null,
+      "zone_confidence": 0,
+      "zone_breakdown": {}
+    },
+    {
+      "ID": 1629,
+      "Fecha_Vuelo": "2026-03-25 19:00:32",
+      "N_Elementos": 51,
+      "Tiempo_Vuelo": 738,
+      "predicted_zone": null,
+      "zone_confidence": 0,
+      "zone_breakdown": {}
+    },
+    {
+      "ID": 1627,
+      "Fecha_Vuelo": "2026-03-25 17:53:13",
+      "N_Elementos": 49,
+      "Tiempo_Vuelo": 914,
+      "predicted_zone": null,
+      "zone_confidence": 0,
+      "zone_breakdown": {}
+    },
+    {
+      "ID": 1625,
+      "Fecha_Vuelo": "2026-03-23 19:10:43",
+      "N_Elementos": 3,
+      "Tiempo_Vuelo": 239,
+      "predicted_zone": "PF2",
+      "zone_confidence": 100.0,
+      "zone_breakdown": {
+        "PF2": 100.0
+      }
+    },
+    {
+      "ID": 1623,
+      "Fecha_Vuelo": "2026-03-23 09:44:20",
+      "N_Elementos": 2,
+      "Tiempo_Vuelo": 0,
+      "predicted_zone": null,
+      "zone_confidence": 0,
+      "zone_breakdown": {}
+    },
+    {
+      "ID": 1622,
+      "Fecha_Vuelo": "2026-03-22 19:05:32",
       "N_Elementos": 2,
       "Tiempo_Vuelo": 0,
       "predicted_zone": null,

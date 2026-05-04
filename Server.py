@@ -39,6 +39,8 @@ import signal
 import sys
 import traceback
 from logging.handlers import RotatingFileHandler
+from flask import Flask, request as flask_request
+from Services.tracking import track_visit
 
 # Cargar variables de entorno desde un archivo .env.
 # La opción `override=True` permite sobrescribir variables de entorno existentes.
@@ -150,6 +152,12 @@ logging.info("=" * 80)
 @app.before_request
 def log_request_info():
     logging.info(f"Ruta accedida: {request.path} | Método: {request.method} | IP: {request.remote_addr}")
+    track_visit(
+        pagina="API: " + request.path,
+        url=request.url,
+        ip_cliente=request.remote_addr,
+        user_agent=request.headers.get('User-Agent', '')
+    )
 
 @app.after_request
 def log_response_info(response):
